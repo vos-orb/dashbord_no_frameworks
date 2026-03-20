@@ -1,0 +1,22 @@
+# LICENCE
+
+## Author
+vosmer@yandex.ru
+
+## You can
+watch project files if you got access to them
+
+## You can not
+
+ - Develop,
+ - copy,
+ - show,
+ - use in commercial purposes,
+ - sell,
+ - resell,
+ - teach AI by ...
+
+... the code of this project without personal permissions of the author
+
+## By watching any file of this project you agree that you've read and agreed to this licence.
+
