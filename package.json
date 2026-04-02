@@ -1,0 +1,19 @@
+{
+  "name": "frontend-static-build",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/compile-njk.js && vite",
+    "build:prod": "node scripts/compile-njk.js --mode production && vite build --mode production",
+    "build:prod:seo": "node scripts/compile-njk.js --mode production && vite build --mode production && node scripts/generate-sitemap.js --mode production && node scripts/generate-robots.js --mode production",
+    "preview": "vite preview"
+  },
+
+  "devDependencies": {
+    "nunjucks": "^3.2.4",
+    "rollup-plugin-visualizer": "^6.0.5",
+    "sass": "^1.94.2",
+    "vite": "^7.3.0",
+    "vite-plugin-nunjucks": "^0.2.0"
+  }
+}

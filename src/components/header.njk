@@ -1,0 +1,7 @@
+<header>
+  <nav>
+    {% for route in routes %}
+    <a href="{{ route.path }}" class="{{ currentPath == route.path ? 'active' : '' }}">{{ route.name }}</a>
+    {% endfor %}
+  </nav>
+</header>
