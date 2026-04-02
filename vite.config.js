@@ -34,7 +34,8 @@ export default defineConfig({
       scss: {
         additionalData: `@use 'variables' as *;`
       }
-    }
+    },
+    devSourcemap: true
   },
 
   build: {
@@ -44,6 +45,11 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'dist/index.html'),
         about: path.resolve(__dirname, 'dist/about.html')
+      },
+      output: {
+        assetFileNames: 'assets/[name]-[hash].[ext]',
+        chunkFileNames: 'assets/[name]-[hash].js',
+        entryFileNames: 'assets/[name]-[hash].js'
       }
     }
   },

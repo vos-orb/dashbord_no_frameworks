@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "node scripts/compile-njk.js && vite",
     "build:prod": "node scripts/compile-njk.js --mode production && vite build --mode production",
-    "build:prod:seo": "node scripts/compile-njk.js --mode production && vite build --mode production && node scripts/generate-sitemap.js --mode production && node scripts/generate-robots.js --mode production",
-    "preview": "vite preview"
+    "build:prod:seo": "node scripts/compile-njk.js --mode production && vite build --mode production",
+    "preview": "vite preview",
+    "compile:scss": "sass src/styles/main.scss:dist/assets/css/main.css --watch"
   },
-
   "devDependencies": {
     "nunjucks": "^3.2.4",
     "rollup-plugin-visualizer": "^6.0.5",

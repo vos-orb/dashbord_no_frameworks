@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import nunjucks from 'nunjucks';
 import { routes } from '../src/routes.js';
+import { execSync } from 'child_process';
 
 const args = process.argv.slice(2);
 const mode = args.includes('--mode') ? args[args.indexOf('--mode') + 1] : 'development';
@@ -19,6 +20,16 @@ const env = new nunjucks.Environment(
   ], { noCache: true }),
   { autoescape: true }
 );
+
+// Compile SCSS to CSS
+try {
+  console.log('Compiling SCSS to CSS...');
+  execSync('sass src/styles/main.scss:dist/assets/css/main.css', { stdio: 'inherit' });
+  console.log('✅ SCSS compiled successfully');
+} catch (err) {
+  console.error('SCSS compilation failed:', err);
+  process.exit(1);
+}
 
 routes.forEach(route => {
   try {
@@ -54,7 +65,19 @@ if (!fs.existsSync(path.join(DIST_DIR, 'assets'))) {
 
 const srcAssets = path.join(SRC_ROOT, 'assets');
 if (fs.existsSync(srcAssets)) {
-  fs.cpSync(srcAssets, path.join(DIST_DIR, 'assets'), { recursive: true });
+  // Copy all assets except SCSS files (already compiled)
+  const files = fs.readdirSync(srcAssets);
+  files.forEach(file => {
+    if (!file.endsWith('.scss')) {
+      const srcPath = path.join(srcAssets, file);
+      const destPath = path.join(DIST_DIR, 'assets', file);
+      if (fs.lstatSync(srcPath).isDirectory()) {
+        fs.cpSync(srcPath, destPath, { recursive: true });
+      } else {
+        fs.copyFileSync(srcPath, destPath);
+      }
+    }
+  });
 
   // Fix SCSS import paths in main.js
   const mainJsPath = path.join(DIST_DIR, 'assets/js/main.js');
