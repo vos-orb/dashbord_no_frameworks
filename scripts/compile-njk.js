@@ -3,9 +3,15 @@ import path from 'path';
 import nunjucks from 'nunjucks';
 import { routes } from '../src/routes.js';
 import { execSync } from 'child_process';
+import { loadEnv } from 'vite';
 
+const ROOT = process.cwd();
 const args = process.argv.slice(2);
 const mode = args.includes('--mode') ? args[args.indexOf('--mode') + 1] : 'development';
+// Load env EXACTLY like Vite does
+const envVars = loadEnv(mode, ROOT, 'VITE_');
+// Optional: merge into process.env if you want
+Object.assign(process.env, envVars);
 
 const SRC_ROOT = path.resolve('./src');
 const DIST_DIR = path.resolve('./dist');
@@ -20,6 +26,8 @@ const env = new nunjucks.Environment(
   ], { noCache: true }),
   { autoescape: true }
 );
+
+env.addGlobal('API_URL', process.env.VITE_API_URL);
 
 // Compile SCSS to CSS
 try {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "node scripts/compile-njk.js && vite",
+    "dev": "node scripts/compile-njk.js && vite --mode development",
     "build:prod": "node scripts/compile-njk.js --mode production && vite build --mode production",
     "build:prod:seo": "node scripts/compile-njk.js --mode production && vite build --mode production",
     "preview": "vite preview",

@@ -1,10 +1,37 @@
 import { routes } from '@/routes';
 import '@/styles/main.scss';
 import './vendors/shoelace.js';
+import {  getRequest, postRequest } from '@/services/api.js';
+const apiUrl = import.meta.env.VITE_API_URL;
+console.log('API URL:', apiUrl);
 
-console.log('HELLO WORLD2:');
-console.log('Current routes:', routes);
-console.log('API URL from env:', import.meta.env.VITE_API_URL || 'Not set');
+// Example GET request
+async function fetchData() {
+  try {
+    const data = await getRequest('/users');
+    console.log('Users:', data);
+  } catch (error) {
+    console.error('Failed to fetch users:', error);
+  }
+}
+
+// Example POST request
+async function createUser() {
+  try {
+    const newUser = {
+      name: 'John Doe',
+      email: 'john@example.com'
+    };
+    const response = await postRequest('/users', newUser);
+    console.log('User created:', response);
+  } catch (error) {
+    console.error('Failed to create user:', error);
+  }
+}
+
+// Call the functions
+fetchData();
+createUser();
 
 (function(window, undefined) {
   let that = this;

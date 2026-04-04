@@ -9,16 +9,14 @@
   <link rel="stylesheet" href="{{ asset('styles/vendors/shoelace.css') }}">
 </head>
 <body>
-<header>
-  <nav>
-    <a href="/" class="{% if currentPath == '/' %}active{% endif %}">Home</a>
-    <a href="/about" class="{% if currentPath == '/about' %}active{% endif %}">About</a>
-  </nav>
-</header>
+
+{% include "header.njk" %}
 
 <main>
   {% block content %}{% endblock %}
 </main>
+
+{% include "footer.njk" %}
 
 <script type="module" src="/assets/js/main.js"></script>
 </body>
