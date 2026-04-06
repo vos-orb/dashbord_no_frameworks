@@ -14,7 +14,10 @@ export default defineConfig(({ mode }) => {
     root: 'dist',
     publicDir: path.resolve('./src/assets'),
     define: {
-      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL)
+      'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_API_TIMEOUT': JSON.stringify(env.VITE_API_TIMEOUT),
+      'import.meta.env.VITE_API_HEADERS': JSON.stringify(env.VITE_API_HEADERS),
+      'import.meta.env.VITE_DEBUG': JSON.stringify(env.VITE_DEBUG)
     },
     plugins: [
       viteNunjucks({
@@ -23,9 +26,12 @@ export default defineConfig(({ mode }) => {
           path.resolve(__dirname, 'src/layouts'),
           path.resolve(__dirname, 'src/components')
         ],
-        // Pass API_URL to Nunjucks templates
+        // Pass .env vars to Nunjucks templates
         nunjucksEnvironment: (envNunjucks) => {
           envNunjucks.addGlobal('API_URL', env.VITE_API_URL);
+          envNunjucks.addGlobal('API_TIMEOUT', env.VITE_API_TIMEOUT);
+          envNunjucks.addGlobal('API_HEADERS', env.VITE_API_HEADERS);
+          envNunjucks.addGlobal('DEBUG', env.VITE_DEBUG);
         }
       })
     ],

@@ -5,13 +5,22 @@
  * @returns {Promise<any>} - API response
  */
 export async function apiRequest(endpoint, options = {}) {
-  const url = `${ENV.API_URL}${endpoint}`;
+  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiTimeout = import.meta.env.VITE_API_TIMEOUT;
+  const apiHeaders = JSON.parse(import.meta.env.VITE_API_HEADERS);
+  const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);
+  if (debug) {
+    console.log('apiRequest --- API URL:', apiUrl);
+    console.log('apiRequest --- API TIMEOUT:', apiTimeout);
+    console.log('apiRequest --- API HEADERS:', apiHeaders);
+  }
+  const url = `${apiUrl}${endpoint}`;
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), ENV.API_TIMEOUT);
+  const timeoutId = setTimeout(() => controller.abort(), apiTimeout);
 
   const defaultOptions = {
     method: 'GET',
-    headers: ENV.API_HEADERS,
+    headers: apiHeaders,
     signal: controller.signal
   };
 
@@ -40,7 +49,7 @@ export async function apiRequest(endpoint, options = {}) {
   } catch (error) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
-      throw new Error(`Request timed out after ${ENV.API_TIMEOUT}ms`);
+      throw new Error(`Request timed out after ${apiTimeout}ms`);
     }
     throw error;
   }

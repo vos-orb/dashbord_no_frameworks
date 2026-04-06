@@ -2,8 +2,12 @@ import { routes } from '@/routes';
 import '@/styles/main.scss';
 import './vendors/shoelace.js';
 import {  getRequest, postRequest } from '@/services/api.js';
-const apiUrl = import.meta.env.VITE_API_URL;
-console.log('API URL:', apiUrl);
+
+const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);
+if (debug) {
+  const apiUrl = import.meta.env.VITE_API_URL;
+  console.log('is debug:', apiUrl, debug);
+}
 
 // Example GET request
 async function fetchData() {

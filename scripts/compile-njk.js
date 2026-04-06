@@ -26,8 +26,10 @@ const env = new nunjucks.Environment(
   ], { noCache: true }),
   { autoescape: true }
 );
-
+//TODO TEST seems they are added from vite.config already and no need to di that again here
 env.addGlobal('API_URL', process.env.VITE_API_URL);
+env.addGlobal('API_TIMEOUT', process.env.VITE_API_TIMEOUT);
+env.addGlobal('API_HEADERS', process.env.VITE_API_HEADERS);
 
 // Compile SCSS to CSS
 try {
