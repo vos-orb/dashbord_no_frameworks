@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     root: 'dist',
-    publicDir: path.resolve('./src/assets'),
+    publicDir: path.resolve('./dist/assets'),
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
       'import.meta.env.VITE_API_TIMEOUT': JSON.stringify(env.VITE_API_TIMEOUT),
@@ -50,7 +50,9 @@ export default defineConfig(({ mode }) => {
       },
       devSourcemap: true
     },
-
+    optimizeDeps: {
+      exclude: ['**/*.scss']
+    },
     build: {
       outDir: '../dist_build',
       emptyOutDir: true,
@@ -70,9 +72,8 @@ export default defineConfig(({ mode }) => {
     server: {
       port: 3001,
       fs: {
-        strict: false,
+        strict: true,
         allow: [
-          path.resolve(__dirname, 'src'),
           path.resolve(__dirname, 'dist')
         ]
       }

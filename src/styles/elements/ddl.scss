@@ -17,7 +17,8 @@
     font-family: Arial, sans-serif;
     outline: none;
     &:focus {
-      border-style: dashed;
+      -webkit-box-shadow: 0px 0px 3px 0px $secondary-color;
+      box-shadow: 0px 0px 3px 0px $secondary-color;
       box-sizing: border-box;
     }
     .dropdown-arrow {

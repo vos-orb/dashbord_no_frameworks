@@ -34,7 +34,7 @@ env.addGlobal('API_HEADERS', process.env.VITE_API_HEADERS);
 // Compile SCSS to CSS
 try {
   console.log('Compiling SCSS to CSS...');
-  execSync('sass src/styles/main.scss:dist/assets/css/main.css', { stdio: 'inherit' });
+  execSync('sass src/styles/main.scss:dist/assets/css/main.css --no-source-map --style=compressed', { stdio: 'inherit' });
   console.log('✅ SCSS compiled successfully');
 } catch (err) {
   console.error('SCSS compilation failed:', err);

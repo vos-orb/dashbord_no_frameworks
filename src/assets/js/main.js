@@ -1,9 +1,9 @@
 import { routes } from '@/routes';
-import '@/styles/main.scss';
 import './vendors/shoelace.js';
 import './ui/spoilers.js';
 import './ui/table.js';
 import './ui/ddls.js';
+import './ui/datePickers.js';
 import {  getRequest, postRequest } from '@/services/api.js';
 
 const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);
