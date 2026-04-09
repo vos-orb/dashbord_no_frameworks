@@ -20,7 +20,7 @@
   <div class="header">Выпадающие меню</div>
   <div class="contents">
 
-<div class="dropdown">
+<div class="dropdown fruits">
   <button class="dropdown-toggle">Выберите фрукт</button>
   <div class="dropdown-menu"></div>
 </div>
@@ -171,4 +171,59 @@ const sampleData1 = [
   </div>
 </div>
 
+
+  <script type="application/javascript">
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // v1 function
+      initDropdowns('.dropdown.fruits', {
+        data: function() {
+          return ['Яблоко', 'Банан', 'Апельсин', 'Груша', 'Виноград'];
+        },
+        onSelect: function(selectedItem) {
+          console.log('Выбран фрукт:', selectedItem);
+        }
+      });
+
+      // v2 array
+      initDropdowns('.dropdown-colors', {
+        data: ['Красный', 'Синий', 'Зелёный', 'Жёлтый', 'Фиолетовый'],
+        onSelect: function(selectedItem) {
+          console.log('Выбран цвет:', selectedItem);
+        }
+      });
+
+      // v3 request
+      initDropdowns('.dropdown-async', {
+        data: async function() {
+          try {
+            const response = await fetch('/api/items');
+            const data = await response.json();
+            return data.map(item => item.name);
+          } catch (error) {
+            console.error('Ошибка загрузки данных:', error);
+            return ['Ошибка загрузки'];
+          }
+        },
+        onSelect: function(selectedItem) {
+          console.log('Выбран элемент:', selectedItem);
+        }
+      });
+
+      // v4 other
+      initDropdowns('.dropdown-complex', {
+        data: function() {
+          const currentYear = new Date().getFullYear();
+          const years = [];
+          for (let year = currentYear - 10; year <= currentYear + 5; year++) {
+            years.push(year.toString());
+          }
+          return years;
+        },
+        onSelect: function(selectedYear) {
+          console.log('Выбранный год:', selectedYear);
+        }
+      });
+    });
+  </script>
 {% endblock %}

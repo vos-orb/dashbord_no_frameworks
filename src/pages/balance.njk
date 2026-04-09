@@ -5,6 +5,10 @@
   <div class="header">PnL/ROI Spoiler</div>
   <div class="contents">
 
+    <div class="dropdown users">
+      <button class="dropdown-toggle">Выберите пользователя</button>
+      <div class="dropdown-menu"></div>
+    </div>
     ddl user
     radio periods (WholePeriod|30days|90days|180days)
     highchart POST api/get_pnl_roi_for_user
@@ -40,4 +44,19 @@
 </div>
 
 <shoelace-button variant="primary">Click me!</shoelace-button>
+
+  <script type="application/javascript">
+    //TESTda da d
+    document.addEventListener('DOMContentLoaded', () => {
+      // v1 function
+      initDropdowns('.dropdown.users', {
+        data: function () {
+          return ['Пётрович', 'Баяныч', 'Семёныч', 'Григорыч', 'Викторыч' ];
+        },
+        onSelect: function (selectedItem) {
+          console.log('Выбран Пользак:', selectedItem);
+        }
+      });
+    });
+  </script>
 {% endblock %}
