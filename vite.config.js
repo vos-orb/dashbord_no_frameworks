@@ -12,7 +12,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     root: 'dist',
-    publicDir: path.resolve('./dist/assets'),
+    publicDir: path.resolve('./src/assets'),
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
       'import.meta.env.VITE_API_TIMEOUT': JSON.stringify(env.VITE_API_TIMEOUT),
@@ -45,7 +45,8 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use 'variables' as *;`
+          additionalData: `@use '${path.resolve(__dirname, 'src/styles/variables')}' as *; @use '${path.resolve(__dirname, 'src/styles/_shared')}' as *;`,
+          api: 'modern-compiler'
         }
       },
       devSourcemap: true
@@ -74,8 +75,12 @@ export default defineConfig(({ mode }) => {
       fs: {
         strict: true,
         allow: [
-          path.resolve(__dirname, 'dist')
+          path.resolve(__dirname, 'dist'),
+          path.resolve(__dirname, 'src')
         ]
+      },
+      hmr: {
+        overlay: true
       }
     }
   };
