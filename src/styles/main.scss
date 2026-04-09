@@ -1,12 +1,17 @@
 // src/styles/main.scss
-@use 'variables' as *;
+@use '_shared' as *;
+@use "layouts.scss";
+
+@use "elements/skeleton.scss";
+@use "elements/spoiler.scss";
+@use "elements/ddl.scss";
+@use "elements/tables.scss";
 
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   background: $background-color;
-
 }
 
 header, footer {

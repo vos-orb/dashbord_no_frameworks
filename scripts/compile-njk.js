@@ -47,6 +47,7 @@ routes.forEach(route => {
     console.log('Rendering template:', templatePath);
 
     const rendered = env.render(templatePath, {
+      debug: true,
       title: route.name,
       routes,
       currentPath: route.path,

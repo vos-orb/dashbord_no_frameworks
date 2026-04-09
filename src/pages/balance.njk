@@ -1,0 +1,37 @@
+{% extends "layout.njk" %}
+{% block content %}
+<h1>Welcome to My Landing Page {{API_URL}}</h1>
+<div class="spoiler">
+  <div class="header">PnL/ROI Spoiler</div>
+  <div class="contents">
+
+    ddl user
+    radio periods (WholePeriod|30days|90days|180days)
+    highchart POST api/get_pnl_roi_for_user
+      params {account}
+  </div>
+</div>
+
+
+
+Balance Spoiler
+  ddl user
+  radio periods (WholePeriod|30days|90days|180days)
+  highchart POST api/get_data_balance_user
+    params {user}
+
+Balance of investors Spoiler
+  ddl user
+  Баланс инвестора Сумма текущего баланса 85723485,33$ ТАБЛИЦА
+    Аккаунт/Начальный баланс ($)/Текущий баланс($)
+      /api/get_filter_and_compute_daily_diff
+  История пополнений ТАБЛИЦА
+    Аккаунт/Объём ($)/Дата
+      /api/get_history_top
+  История изменений баланса ТАБЛИЦА
+    Аккаунт/Начальный баланс ($)/Текущий баланс($)/PnL/Начало периода/Конец периода
+      /api/get_balance_diff
+
+
+<shoelace-button variant="primary">Click me!</shoelace-button>
+{% endblock %}

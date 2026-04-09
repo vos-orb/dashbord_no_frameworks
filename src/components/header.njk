@@ -2,5 +2,9 @@
   <nav>
     <a href="/" class="{% if currentPath == '/' %}active{% endif %}">Home</a>
     <a href="/about" class="{% if currentPath == '/about' %}active{% endif %}">About</a>
+    <a href="/balance" class="{% if currentPath == '/balance' %}active{% endif %}">Баланс</a>
+    {% if debug %}
+      <a href="/design-system" class="{% if currentPath == '/design-system' %}active{% endif %}">Дизайн-система</a>
+    {% endif %}
   </nav>
 </header>

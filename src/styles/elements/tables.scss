@@ -1,0 +1,88 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.table-component {
+  font-family: Arial, sans-serif;
+  margin: 20px auto;
+  background: color.adjust($secondary-color, $alpha: -0.9);
+  padding: 0 0 8px 0;
+  .search-container {
+    position: relative;
+    margin-bottom: 8px;
+    .inp.search {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid color.adjust($secondary-color, $alpha: -0.7);
+      border-radius: 0;
+      box-sizing: border-box;
+    }
+  }
+  .autocomplete-items {
+    position: absolute;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    border: 1px solid #ddd;
+    background: white;
+    max-height: 150px;
+    overflow-y: auto;
+    display: none;
+    .autocomplete-item {
+      padding: 8px 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+      &:hover {
+        background-color: #f0f0f0;
+      }
+    }
+  }
+  &>table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+    & tbody > tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    & thead > tr > th,
+    & tbody > tr > td {
+      border: 1px solid color.adjust($secondary-color, $alpha: -0.8);
+      padding: 12px;
+      text-align: left;
+    }
+    & thead > tr > th {
+      background-color: #f8f8f8;
+      cursor: pointer;
+      position: relative;
+      color: $primary-text-color;
+      &.sorted-asc::after {
+        content: " ▲";
+        color: #666;
+        font-size: 12px;
+      }
+      &.sorted-desc::after {
+        content: " ▼";
+        color: #666;
+        font-size: 12px;
+      }
+    }
+  }
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    .btn {
+      padding: 8px 16px;
+      border: 1px solid $secondary-color;
+      background: white;
+      color: $secondary-color;
+      border-radius: 4px;
+      cursor: pointer;
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+  }
+}

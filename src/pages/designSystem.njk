@@ -1,0 +1,155 @@
+{% extends "layout.njk" %}
+{% block content %}
+<h1>UI elements</h1>
+<h3>Спойлеры</h3>
+<div class="spoiler">
+  <div class="header">Покажи мне</div>
+  <div class="contents">
+    Показываю
+  </div>
+</div>
+<div class="spoiler">
+  <div class="header">Скелетоны</div>
+  <div class="contents">
+<div class="skeleton" style="width: 600px; height: 40px;"></div>
+<div class="skeleton" style="width: 100%; height: 40px;"></div>
+  </div>
+</div>
+
+<div class="spoiler">
+  <div class="header">Выпадающие меню</div>
+  <div class="contents">
+
+<div class="dropdown">
+  <button class="dropdown-toggle">Выберите фрукт</button>
+  <div class="dropdown-menu"></div>
+</div>
+
+<div class="dropdown dropdown-colors">
+  <button class="dropdown-toggle">Выберите цвет</button>
+  <div class="dropdown-menu"></div>
+</div>
+
+<div class="dropdown dropdown-async">
+  <button class="dropdown-toggle">Загрузите данные</button>
+  <div class="dropdown-menu"></div>
+</div>
+
+<div class="dropdown dropdown-complex">
+  <button class="dropdown-toggle">Выберите год</button>
+  <div class="dropdown-menu"></div>
+</div>
+  </div>
+</div>
+
+<div class="spoiler">
+  <div class="header">Таблицы</div>
+  <div class="contents">
+<!-- Первая таблица -->
+<div class="table-component">
+  <div class="search-container">
+    <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+    <div class="autocomplete-items"></div>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th data-column="name">Имя</th>
+        <th data-column="email">Email</th>
+        <th data-column="role">Роль</th>
+      </tr>
+    </thead>
+    <tbody class="table-body">
+      <tr>
+        <td><div class="skeleton" style="width: 100%; height: 40px;">fgdfg</div></td>
+        <td><div class="skeleton" style="width: 100%; height: 40px;">dfgd</div></td>
+        <td><div class="skeleton" style="width: 100%; height: 40px;">dfgdf</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    <button class="btn prev-page" disabled>Назад</button>
+    <span class="page-info">Страница 1 из 1</span>
+    <button class="btn next-page">Вперёд</button>
+  </div>
+</div>
+
+<!-- Вторая таблица -->
+<div class="table-component">
+  <div class="search-container">
+    <input class="inp search" type="text" placeholder="Поиск по второй таблице..." autocomplete="off">
+    <div class="autocomplete-items"></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th data-column="product">Товар</th>
+        <th data-column="price">Цена</th>
+        <th data-column="category">Категория</th>
+      </tr>
+    </thead>
+    <tbody class="table-body"></tbody>
+  </table>
+
+  <div class="pagination">
+    <button class="btn prev-page" disabled>Назад</button>
+    <span class="page-info">Страница 1 из 1</span>
+    <button class="btn next-page">Вперёд</button>
+  </div>
+</div>
+
+<script type="application/javascript">
+  console.log("TEST");
+(function(window, undefined) {
+  let that = this;
+  that = {
+    widgetId: 'test_script',
+    options: {},
+    methods: {}
+  };
+  console.log('HELLO WORLD:TABLES FILL');
+
+const sampleData1 = [
+    { name: 'Анна Иванова', email: 'anna@example.com', role: 'Администратор' },
+    { name: 'Пётр Сидоров', email: 'peter@example.com', role: 'Модератор' },
+    { name: 'Мария Петрова', email: 'maria@example.com', role: 'Пользователь' },
+    { name: 'Иван Кузнецов', email: 'ivan@example.com', role: 'Гость' },
+    { name: 'Ольга Смирнова', email: 'olga@example.com', role: 'Администратор' },
+    { name: 'Алексей Попов', email: 'alex@example.com', role: 'Модератор' },
+    { name: 'Елена Волкова', email: 'elena@example.com', role: 'Пользователь' },
+    { name: 'Дмитрий Новиков', email: 'dmitry@example.com', role: 'Гость' }
+  ];
+
+  // table2 data
+  const sampleData2 = [
+    { product: 'Ноутбук', price: '50 000 руб.', category: 'Электроника' },
+    { product: 'Мышь', price: '1 500 руб.', category: 'Аксессуары' },
+    { product: 'Клавиатура', price: '3 000 руб.', category: 'Аксессуары' },
+    { product: 'Монитор', price: '25 000 руб.', category: 'Электроника' }
+  ];
+  document.addEventListener('DOMContentLoaded', () => {
+    console.log('HELLO WORLD:TABLES FILL');
+    const tableContainers = document.querySelectorAll('.table-component');
+
+    tableContainers.forEach((container, index) => {
+      // apply data
+      console.log('FOUND TABLE', index, container);
+      const data = index === 0 ? sampleData1 : sampleData2;
+      new UiTable(container, data, 3);
+    });
+  });
+
+
+  window[that.widgetId] = that;
+})(window);
+
+
+</script>
+
+
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+  .dropdown-toggle {
+    padding: 8px 16px;
+    border: 1px solid $secondary-color;
+    background: white;
+    cursor: pointer;
+    width: 200px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    outline: none;
+    &:focus {
+      border-style: dashed;
+      box-sizing: border-box;
+    }
+    .dropdown-arrow {
+      transition: transform 0.3s;
+      display: inline-block;
+      margin-left: 8px;
+      &:before {
+        content:'▼';
+        color: $secondary-color;
+      }
+    }
+  }
+  &.expanded {
+    .dropdown-toggle {
+      .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    &.show {
+      display: block;
+    }
+    .dropdown-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      &:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      &:hover,
+      &.focus {
+        background-color: #f0f0f0;
+      }
+      &.selected {
+        background-color: #007bff;
+        color: white;
+      }
+    }
+  }
+}
