@@ -5,7 +5,10 @@
   position: relative;
   display: inline-block;
   .dropdown-toggle {
-    padding: 8px 16px;
+    padding: 0 8px;
+    height: 40px;
+    line-height: 40px;
+    box-sizing: border-box;
     border: 1px solid $secondary-color;
     background: white;
     cursor: pointer;

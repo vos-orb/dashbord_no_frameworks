@@ -1,0 +1,29 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.ui-radio-group.long-button {
+  background-color: color.adjust($secondary-color, $alpha: -0.9);
+  padding: 2px 8px 0 8px;
+  height: 40px;
+  box-sizing: border-box;
+  display: inline-block;
+  border-radius: 8px;
+  vertical-align: top;
+  .ui-radio {
+    position: relative;
+    display: inline-block;
+    margin: 0 8px 0 0;
+    padding: 0 8px;
+    height: 36px;
+    line-height: 36px;
+    vertical-align: top;
+    cursor: pointer;
+    border-radius: 8px;
+    &:last-child {
+      margin-right: 0;
+    }
+    &.selected {
+      background: #ffffff;
+    }
+  }
+}

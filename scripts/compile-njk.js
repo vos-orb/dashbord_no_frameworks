@@ -30,6 +30,7 @@ const env = new nunjucks.Environment(
 env.addGlobal('API_URL', process.env.VITE_API_URL);
 env.addGlobal('API_TIMEOUT', process.env.VITE_API_TIMEOUT);
 env.addGlobal('API_HEADERS', process.env.VITE_API_HEADERS);
+env.addGlobal('DEBUG', process.env.VITE_DEBUG);
 
 // Compile SCSS to CSS
 try {

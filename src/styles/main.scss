@@ -7,6 +7,7 @@
 @use "elements/ddl.scss";
 @use "elements/tables.scss";
 @use "elements/datePickers.scss";
+@use "elements/radios.scss";
 
 body {
   font-family: Arial, sans-serif;
@@ -18,17 +19,28 @@ body {
 header, footer {
   background: $header-color;
   color: $header-text;
-  padding: 1rem;
+  padding: 0 8px;
 }
 
-nav a {
-  color: $header-text;
-  margin-right: 1rem;
-  text-decoration: none;
-  &:hover {
-    text-decoration: underline;
-  }
-  &.active {
-    font-weight: bold;
+.main-menu {
+  padding: 0;
+  white-space: nowrap;
+  .menu-link {
+    color: $header-text;
+    text-decoration: none;
+    height: 50px;
+    line-height: 50px;
+    vertical-align: top;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0 8px;
+    font-family: monospace;
+    font-size: 16px;
+    &:hover, &.active {
+      border-bottom: 4px solid $header-text;
+    }
+    &:hover {
+      font-weight: bold;
+    }
   }
 }

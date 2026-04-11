@@ -39,6 +39,21 @@
   <button class="dropdown-toggle">Выберите год</button>
   <div class="dropdown-menu"></div>
 </div>
+
+  </div>
+</div>
+
+<div class="spoiler">
+  <div class="header">Радио кнопки</div>
+  <div class="contents">
+
+    <div class="ui-radio-group long-button my-perid">
+      <div class="ui-radio" data-radio="period" data-value="all">Весь период</div>
+      <div class="ui-radio" data-radio="period" data-value="30days">30 дней</div>
+      <div class="ui-radio" data-radio="period" data-value="90days">90 дней</div>
+      <div class="ui-radio" data-radio="period" data-value="180days">180 дней</div>
+    </div>
+
   </div>
 </div>
 
@@ -141,6 +156,10 @@ const sampleData1 = [
     });
   });
 
+  let myPeriodRadioGroup = document.querySelector('.my-perid');
+  myPeriodRadioGroup.addEventListener('radiochange', (e) => {
+    console.warn('SELECTED, e.detail', e.detail);
+  });
 
   window[that.widgetId] = that;
 })(window);

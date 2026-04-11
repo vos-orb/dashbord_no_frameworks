@@ -100,12 +100,11 @@ ${this.isRange ? `
         }
       });
 
-      // period-buttons
-      if (this.isRange) {
+      if (this.isRange) { // period-buttons
         this.popup.querySelectorAll('.period-buttons button').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const days = parseInt(e.target.dataset.days, 10);
-            this.setPeriod(days);
+            this._setPeriod(days);
           });
         });
 
@@ -154,8 +153,7 @@ ${this.isRange ? `
         'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
         'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
       ];
-      this.popup.querySelector('.current-month').textContent =
-        `${monthNames[month]} ${year}`;
+      this.popup.querySelector('.current-month').textContent = `${monthNames[month]} ${year}`;
 
       // Clear calendar grid
       const calendarGrid = this.popup.querySelector('.calendar-grid');
@@ -176,20 +174,16 @@ ${this.isRange ? `
         this.addDayCell(calendarGrid, prevMonthLastDay - i + 1, 'disabled');
       }
 
-      // fill current month with days
-      for (let day = 1; day <= lastDay.getDate(); day++) {
+      for (let day = 1; day <= lastDay.getDate(); day++) { // fill current month with days
         const date = new Date(year, month, day);
         let classes = '';
 
         if (this.isRange) {
-          //highlight one date if chosen
-          if (this.selectedDates.start && !this.selectedDates.end) {
+          if (this.selectedDates.start && !this.selectedDates.end) { //highlight one date if chosen
             if (date.toDateString() === this.selectedDates.start.toDateString()) {
               classes += 'start-date';
             }
-          }
-          // highlight period if selected
-          else if (this.selectedDates.start && this.selectedDates.end) {
+          } else if (this.selectedDates.start && this.selectedDates.end) { // highlight period if selected
             if (date >= this.selectedDates.start && date <= this.selectedDates.end) {
               classes += 'in-range';
             }
@@ -203,7 +197,6 @@ ${this.isRange ? `
         } else if (this.selectedDates && date.toDateString() === this.selectedDates.toDateString()) {
           classes += ' start-date';
         }
-
         this.addDayCell(calendarGrid, day, classes);
       }
 
@@ -242,13 +235,12 @@ ${this.isRange ? `
         this.selectedDates = selectedDate;
         this.updateInput();
         this.hide();
-
       }
-
       this.renderCalendar();
     }
 
-    setPeriod(days) {
+    _setPeriod(days) {
+      console.info('datePicket->_setPeriod', days);
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(endDate.getDate() - days + 1);
@@ -258,6 +250,10 @@ ${this.isRange ? `
 
       this.updatePeriodButtons(days);
       this.renderCalendar();
+    };
+    setPeriod(days) {
+      this._setPeriod(days);
+      this.updateInput();
     }
 
     applyRange() {
@@ -266,33 +262,44 @@ ${this.isRange ? `
         this.hide();
       }
     }
+    dispatchChange(prev, current) { //fire event "datechange" on change
+      const theEvent = new CustomEvent('datechange', {
+        detail: {
+          prevValue: prev,
+          currentValue: current
+        },
+        bubbles: true
+      });
+      this.element.dispatchEvent(theEvent);
+    }
 
     updateInput() {
       if ((this.isRange && (!this.selectedDates.start || !this.selectedDates.end)) ||
         (!this.isRange && !this.selectedDates)) {
+        let buffer = this.input.value;
         this.input.value = '';
+        this.dispatchChange(buffer, this.input.value);
         return;
       }
-
-      //selected both dates in period
-      if (this.isRange && this.selectedDates.start && this.selectedDates.end) {
+      if (this.isRange && this.selectedDates.start && this.selectedDates.end) { //selected both dates in period
         const formatDate = (date) => {
           const day = String(date.getDate()).padStart(2, '0');
           const month = String(date.getMonth() + 1).padStart(2, '0');
           const year = date.getFullYear();
           return `${day}.${month}.${year}`;
         };
+        let buffer = this.input.value;
         this.input.value = `${formatDate(this.selectedDates.start)} — ${formatDate(this.selectedDates.end)}`;
-      }
-      //single date selected
-      else if (!this.isRange && this.selectedDates) {
+        this.dispatchChange(buffer, this.input.value);
+      } else if (!this.isRange && this.selectedDates) { //single date selected
         const day = String(this.selectedDates.getDate()).padStart(2, '0');
         const month = String(this.selectedDates.getMonth() + 1).padStart(2, '0');
         const year = this.selectedDates.getFullYear();
+        let buffer = this.input.value;
         this.input.value = `${day}.${month}.${year}`;
+        this.dispatchChange(buffer, this.input.value);
       }
     }
-
   }
 
   //mother object for all datepickers

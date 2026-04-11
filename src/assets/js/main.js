@@ -1,12 +1,15 @@
 import { routes } from '@/routes';
 import './vendors/shoelace.js';
+import './vendors/highcharts.js';
 import './ui/spoilers.js';
 import './ui/table.js';
 import './ui/ddls.js';
 import './ui/datePickers.js';
+import './ui/radios.js';
 import {  getRequest, postRequest } from '@/services/api.js';
 
 const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);
+
 if (debug) {
   const apiUrl = import.meta.env.VITE_API_URL;
   console.log('is debug:', apiUrl, debug);

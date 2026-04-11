@@ -32,6 +32,11 @@ export default defineConfig(({ mode }) => {
           envNunjucks.addGlobal('API_TIMEOUT', env.VITE_API_TIMEOUT);
           envNunjucks.addGlobal('API_HEADERS', env.VITE_API_HEADERS);
           envNunjucks.addGlobal('DEBUG', env.VITE_DEBUG);
+          Object.keys(env).forEach(key => {
+            if (key.startsWith('VITE_')) {
+              envNunjucks.addGlobal(key, env[key]);
+            }
+          });
         }
       })
     ],
