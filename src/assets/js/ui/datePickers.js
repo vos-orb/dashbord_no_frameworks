@@ -6,6 +6,7 @@
       this.element = element;
       this.input = element.querySelector('input');
       this.isRange = element.hasAttribute('data-range');
+      this.dateFormat = element.getAttribute('data-format') || 'YYYY-MM-DD';
       this.selectedDates = this.isRange ? { start: null, end: null } : null;
       this.currentDate = new Date();
       this.popup = null;
@@ -281,22 +282,23 @@ ${this.isRange ? `
         this.dispatchChange(buffer, this.input.value);
         return;
       }
-      if (this.isRange && this.selectedDates.start && this.selectedDates.end) { //selected both dates in period
-        const formatDate = (date) => {
-          const day = String(date.getDate()).padStart(2, '0');
-          const month = String(date.getMonth() + 1).padStart(2, '0');
-          const year = date.getFullYear();
-          return `${day}.${month}.${year}`;
-        };
+
+      const formatDate = (date) => {
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return this.dateFormat
+          .replace('DD', day)
+          .replace('MM', month)
+          .replace('YYYY', year);
+      };
+      if (this.isRange && this.selectedDates.start && this.selectedDates.end) {
         let buffer = this.input.value;
         this.input.value = `${formatDate(this.selectedDates.start)} — ${formatDate(this.selectedDates.end)}`;
         this.dispatchChange(buffer, this.input.value);
-      } else if (!this.isRange && this.selectedDates) { //single date selected
-        const day = String(this.selectedDates.getDate()).padStart(2, '0');
-        const month = String(this.selectedDates.getMonth() + 1).padStart(2, '0');
-        const year = this.selectedDates.getFullYear();
+      } else if (!this.isRange && this.selectedDates) {
         let buffer = this.input.value;
-        this.input.value = `${day}.${month}.${year}`;
+        this.input.value = formatDate(this.selectedDates);
         this.dispatchChange(buffer, this.input.value);
       }
     }

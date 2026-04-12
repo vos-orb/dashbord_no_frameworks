@@ -6,14 +6,14 @@
   display: inline-block;
   @include box-shadow-main;
   .dropdown-toggle {
-    padding: 0 8px;
+    padding: 0 24px 0 8px;
     height: 40px;
     line-height: 40px;
     box-sizing: border-box;
     border: 1px solid $secondary-color;
     background: white;
     cursor: pointer;
-    width: 200px;
+    min-width: 200px;
     text-align: left;
     display: flex;
     justify-content: space-between;
