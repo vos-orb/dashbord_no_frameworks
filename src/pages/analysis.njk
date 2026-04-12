@@ -4,45 +4,55 @@
 <div class="flex-row">
   <div class="flex-column">
     <div class="dropdown">
-      <button class="dropdown-toggle">Выберите показатель</button>
+      <button class="dropdown-toggle">Начальная дата</button>
+      <div class="dropdown-menu"></div>
+    </div>
+  </div>
+
+  <div class="flex-column">
+    <div class="dropdown ddl-strategy">
+      <button class="dropdown-toggle">Стратегия</button>
       <div class="dropdown-menu"></div>
     </div>
   </div>
   <div class="flex-column">
     <div class="dropdown">
-      <button class="dropdown-toggle">Выберите показатель</button>
+      <button class="dropdown-toggle">Монета</button>
       <div class="dropdown-menu"></div>
     </div>
   </div>
   <div class="flex-column">
-    <div class="dropdown">
-      <button class="dropdown-toggle">Выберите показатель</button>
+    <div class="dropdown ddl-direction">
+      <button class="dropdown-toggle">Направление</button>
       <div class="dropdown-menu"></div>
     </div>
   </div>
   <div class="flex-column">
-    <div class="dropdown">
-      <button class="dropdown-toggle">Выберите показатель</button>
-      <div class="dropdown-menu"></div>
-    </div>
-  </div>
-  <div class="flex-column">
-    <div class="dropdown">
-      <button class="dropdown-toggle">Выберите показатель</button>
+    <div class="dropdown ddl-trading-series">
+      <button class="dropdown-toggle">Торговые серрии</button>
       <div class="dropdown-menu"></div>
     </div>
   </div>
 </div>
 
 <br />
-<div class="ui-button primary">sdfjsdhfjsd</div>
+<div class="ui-button primary">Применить фильтры</div>
 <br />
 <br />
 
 <div class="spoiler">
-  <div class="header">awdawdawdawd</div>
+  <div class="header">PNL/ROI</div>
   <div class="contents">
-    awdawdawdaw
+    График
+  </div>
+</div>
+
+<div class="spoiler expanded">
+  <div class="header">Детализация</div>
+  <div class="contents">
+
+    <div class="ui-calendar full-width trading-calendar"></div>
+
   </div>
 </div>
 
@@ -59,6 +69,100 @@ import { getRequest, postRequest } from '@/services/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const getDataForDddls = async function() {
+    if ({{ DEBUG }}) {
+      console.log("API_URL", '{{ API_URL }}');
+      return [
+        {
+          "name": "grid_bot_strategy",
+          "coins": [
+            "BTC-USDT", "DOGE-USDT", "ETH-USDT", "PEPE-USDT", "SOL-USDT", "XRP-USDT"
+          ]
+        },
+        {
+          "name": "oneside_grid_bot",
+          "coins": [
+            "BTC-USDT"
+          ]
+        },
+        {
+          "name": "supertrend_15m_tp_ts_total_tp_sl_v1",
+          "coins": [
+            "2Z-USDT", "ACH-USDT", "ACT-USDT", "ADA-USDT", "AGLD-USDT", "AIXBT-USDT", "ALGO-USDT", "ALLO-USDT", "ANIME-USDT", "APE-USDT", "APR-USDT", "ARB-USDT", "ARKM-USDT", "ASTER-USDT", "AT-USDT", "ATH-USDT", "AVNT-USDT", "AZTEC-USDT", "BABY-USDT", "BARD-USDT", "BASED-USDT", "BEAT-USDT", "BICO-USDT", "BIGTIME-USDT", "BIO-USDT", "BLUR-USDT", "BOME-USDT", "BONK-USDT", "BRETT-USDT", "BREV-USDT", "BSB-USDT", "CFX-USDT", "CHZ-USDT", "CORE-USDT", "CRV-USDT", "DOGE-USDT", "DOOD-USDT", "DOT-USDT", "DYDX-USDT", "EDEN-USDT", "EDGE-USDT", "EIGEN-USDT", "ENA-USDT", "ENJ-USDT", "ENSO-USDT", "ESP-USDT", "ETHFI-USDT", "F-USDT", "FARTCOIN-USDT", "FIL-USDT", "FLOKI-USDT", "FLOW-USDT", "FOGO-USDT", "GALA-USDT", "GLM-USDT", "GMT-USDT", "GPS-USDT", "GRASS-USDT", "GRT-USDT", "H-USDT", "HBAR-USDT", "HMSTR-USDT", "HOME-USDT", "HUMA-USDT", "ICX-USDT", "IOST-USDT", "IOTA-USDT", "JELLYJELLY-USDT", "JTO-USDT", "JUP-USDT", "KAITO-USDT", "KAT-USDT", "KITE-USDT", "KMNO-USDT", "LA-USDT", "LAB-USDT", "LAYER-USDT", "LDO-USDT", "LIGHT-USDT", "LINEA-USDT", "LRC-USDT", "LUNA-USDT", "MAGIC-USDT", "ME-USDT", "MEME-USDT", "MERL-USDT", "MET-USDT", "MEW-USDT", "MINA-USDT", "MMT-USDT", "MON-USDT", "MOODENG-USDT", "MOVE-USDT", "MUBARAK-USDT", "NEAR-USDT", "NEIRO-USDT", "NIGHT-USDT", "NOT-USDT", "OFC-USDT", "OL-USDT", "ONDO-USDT", "ONE-USDT", "ONT-USDT", "OP-USDT", "OPN-USDT", "ORDER-USDT", "PARTI-USDT", "PENGU-USDT", "PEOPLE-USDT", "PEPE-USDT", "PI-USDT", "PIPPIN-USDT", "PLUME-USDT", "PNUT-USDT", "POL-USDT", "PROVE-USDT", "PUMP-USDT", "PYTH-USDT", "RAVE-USDT", "RECALL-USDT", "RESOLV-USDT", "RLS-USDT", "ROBO-USDT", "RSR-USDT", "RVN-USDT", "S-USDT", "SAHARA-USDT", "SAND-USDT", "SAPIEN-USDT", "SATS-USDT", "SEI-USDT", "SENT-USDT", "SHELL-USDT", "SHIB-USDT", "SIGN-USDT", "SOON-USDT", "SOPH-USDT", "SPACE-USDT", "SPK-USDT", "STABLE-USDT", "STRK-USDT", "SUI-USDT", "THETA-USDT", "TRIA-USDT", "TRUMP-USDT", "TRUTH-USDT", "TURBO-USDT", "UP-USDT", "USELESS-USDT", "W-USDT", "WCT-USDT", "WET-USDT", "WIF-USDT", "WLD-USDT", "WLFI-USDT", "WOO-USDT", "XLM-USDT", "XPL-USDT", "XRP-USDT", "YB-USDT", "YGG-USDT", "ZAMA-USDT", "ZBT-USDT", "ZETA-USDT", "ZIL-USDT", "ZK-USDT", "ZKP-USDT", "ZORA-USDT", "ZRX-USDT"
+          ]
+        },
+        {
+          "name": "supertrend_15m_tp_ts_total_tp_v2",
+          "coins": [
+            "2Z-USDT", "ACH-USDT", "ACT-USDT", "ADA-USDT", "AEVO-USDT", "AGLD-USDT", "AIXBT-USDT", "ALGO-USDT", "ALLO-USDT", "ANIME-USDT", "APE-USDT", "APR-USDT", "ARB-USDT", "ASTER-USDT", "AT-USDT", "ATH-USDT", "AVNT-USDT", "AZTEC-USDT", "BABY-USDT", "BARD-USDT", "BASED-USDT", "BEAT-USDT", "BICO-USDT", "BIGTIME-USDT", "BIO-USDT", "BLUR-USDT", "BOME-USDT", "BONK-USDT", "BRETT-USDT", "BREV-USDT", "BSB-USDT", "CC-USDT", "CFX-USDT", "CHZ-USDT", "CORE-USDT", "CRV-USDT", "DOGE-USDT", "DOOD-USDT", "DOT-USDT", "DYDX-USDT", "EDEN-USDT", "EDGE-USDT", "EIGEN-USDT", "ENA-USDT", "ENJ-USDT", "ENSO-USDT", "ESP-USDT", "F-USDT", "FARTCOIN-USDT", "FIL-USDT", "FLOKI-USDT", "FLOW-USDT", "FOGO-USDT", "GALA-USDT", "GLM-USDT", "GMT-USDT", "GPS-USDT", "GRASS-USDT", "GRT-USDT", "H-USDT", "HOME-USDT", "HUMA-USDT", "ICX-USDT", "IOST-USDT", "IOTA-USDT", "JELLYJELLY-USDT", "JUP-USDT", "KAITO-USDT", "KAT-USDT", "KMNO-USDT", "LA-USDT", "LAB-USDT", "LAYER-USDT", "LIGHT-USDT", "LINEA-USDT", "LRC-USDT", "LUNA-USDT", "MAGIC-USDT", "MEME-USDT", "MERL-USDT", "MET-USDT", "MEW-USDT", "MINA-USDT", "MMT-USDT", "MON-USDT", "MOODENG-USDT", "MOVE-USDT", "MUBARAK-USDT", "NEAR-USDT", "NEIRO-USDT", "NIGHT-USDT", "NOT-USDT", "OFC-USDT", "OL-USDT", "ONDO-USDT", "ONE-USDT", "ONT-USDT", "OP-USDT", "OPN-USDT", "ORDER-USDT", "PARTI-USDT", "PENGU-USDT", "PEOPLE-USDT", "PEPE-USDT", "PI-USDT", "PIPPIN-USDT", "PLUME-USDT", "PNUT-USDT", "PROVE-USDT", "PUMP-USDT", "PYTH-USDT", "RAVE-USDT", "RECALL-USDT", "RESOLV-USDT", "RLS-USDT", "ROBO-USDT", "RSR-USDT", "RVN-USDT", "S-USDT", "SAHARA-USDT", "SAND-USDT", "SATS-USDT", "SEI-USDT", "SENT-USDT", "SHELL-USDT", "SHIB-USDT", "SIGN-USDT", "SOON-USDT", "SOPH-USDT", "SPACE-USDT", "SPK-USDT", "STABLE-USDT", "STRK-USDT", "SUI-USDT", "THETA-USDT", "TRIA-USDT", "TRUMP-USDT", "TRUTH-USDT", "TURBO-USDT", "UP-USDT", "USELESS-USDT", "W-USDT", "WCT-USDT", "WET-USDT", "WIF-USDT", "WLD-USDT", "WLFI-USDT", "WOO-USDT", "XLM-USDT", "XPL-USDT", "YB-USDT", "YGG-USDT", "ZAMA-USDT", "ZBT-USDT", "ZETA-USDT", "ZIL-USDT", "ZK-USDT", "ZKP-USDT", "ZORA-USDT"
+          ]
+        }
+      ];
+    }
+    try {
+      const response = await getRequest('/get_strategy_results');
+      const dta = await response?.json();
+      return dta.map(item => item.name);
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+  const ddlData = getDataForDddls();
+
+
+
+  initDropdowns('.dropdown.ddl-strategy', {
+    data: ['grid_bot_strategy', 'oneside_grid_bot', 'supertrend_15m_tp_ts_total_tp_sl_v1', 'supertrend_15m_tp_ts_total_tp_v2'],
+    onSelect: function(selectedItem) {
+      console.log('Выбрано направление:', selectedItem);
+    }
+  });
+  initDropdowns('.dropdown.ddl-coin', {
+    data: ['Long', 'Short'],
+    onSelect: function(selectedItem) {
+      console.log('Выбрано направление:', selectedItem);
+    }
+  });
+
+  initDropdowns('.dropdown.ddl-direction', {
+    data: ['Long', 'Short'],
+    onSelect: function(selectedItem) {
+      console.log('Выбрано направление:', selectedItem);
+    }
+  });
+  initDropdowns('.dropdown.ddl-trading-series', {
+    data: ['Азия', 'Европа', 'Америка', 'Тихоокеания'],
+    onSelect: function(selectedItem) {
+      console.log('Выбрана серия:', selectedItem);
+    }
+  });
+
+  //fill Trading calendar with meta
+  (function() {
+    const calendarElement = document.querySelector('.ui-calendar.trading-calendar');
+
+    calendarElement.addEventListener('calendarinitialized', (e) => {
+      e.detail.calendar.setMeta([
+        {
+          date: new Date('2023-10-15'),
+          htmltext: '<span class="event">Event 1</span>'
+        },
+        {
+          date: new Date('2023-10-20'),
+          htmltext: '<span class="event">Event 2</span>'
+        },
+        {
+          date: new Date('2026-04-21'),
+          htmltext: '<span class="event">much better WOW</span>'
+        },
+        {
+          date: new Date('2026-05-23'),
+          htmltext: '<span class="event">very nice</span>'
+        }
+      ]);
+    });
+  })();
 
 });
   </script>

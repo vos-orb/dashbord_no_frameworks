@@ -200,10 +200,45 @@ const sampleData1 = [
   </div>
 </div>
 
+  <div class="spoiler">
+    <div class="header">Календари</div>
+    <div class="contents">
+
+      <div class="ui-calendar"></div>
+      <div class="ui-calendar full-width" id="myCalendar"></div>
+
+    </div>
+  </div>
+
 
   <script type="application/javascript">
-
     document.addEventListener('DOMContentLoaded', () => {
+
+      //fill calendar with meta
+      (function() {
+        const calendarElement = document.getElementById('myCalendar');
+
+          calendarElement.addEventListener('calendarinitialized', (e) => {
+            e.detail.calendar.setMeta([
+              {
+                date: new Date('2023-10-15'),
+                htmltext: '<span class="event">Event 1</span>'
+              },
+              {
+                date: new Date('2023-10-20'),
+                htmltext: '<span class="event">Event 2</span>'
+              },
+              {
+                date: new Date('2026-04-23'),
+                htmltext: '<span class="event">much better</span>'
+              },
+              {
+                date: new Date('2026-05-23'),
+                htmltext: '<span class="event">very nice</span>'
+              }
+            ]);
+          });
+      })();
       // v1 function
       initDropdowns('.dropdown.fruits', {
         data: function() {
