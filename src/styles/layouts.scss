@@ -7,7 +7,8 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-
+  font-size: 14px;
+  font-family: 'Source Sans Pro', sans-serif;
   &> header {
     flex-shrink: 0;
   }
@@ -18,5 +19,12 @@
   }
   &> footer {
     flex-shrink: 0;
+  }
+}
+.flex-row {
+  display: flex;
+  gap: 8px;
+  .flex-column {
+    flex: 1;
   }
 }

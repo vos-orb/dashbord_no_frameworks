@@ -4,6 +4,8 @@
     <a href="/about" class="{% if currentPath == '/about' %}active{% endif %}">About</a>
     #}
     <a href="/balance" class="menu-link{% if currentPath == '/balance' %} active{% endif %}">Баланс</a>
+    <a href="/trading-history" class="menu-link{% if currentPath == '/trading-history' %} active{% endif %}">История торгов</a>
+    <a href="/current-positions" class="menu-link{% if currentPath == '/current-positions' %} active{% endif %}">Текущие позиции</a>
     {% if debug %}
       <a href="/design-system" class="menu-link{% if currentPath == '/design-system' %} active{% endif %}">Дизайн-система</a>
     {% endif %}

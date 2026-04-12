@@ -1,0 +1,21 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.ui-button {
+  background-color: color.adjust($secondary-color, $alpha: -0.9);
+  border: 1px solid $secondary-color;
+  @include box-shadow-main;
+  padding: 0 8px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  box-sizing: border-box;
+  display: inline-block;
+  border-radius: 0;
+  vertical-align: top;
+  @include box-shadow-main;
+  cursor: pointer;
+  &:hover, &:focus {
+    background: #ffffff;
+  }
+}

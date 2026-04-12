@@ -4,7 +4,8 @@
   border: 1px solid $secondary-color;
   background: color.adjust($secondary-color, $alpha: -0.9);
   border-width: 0 0 0 8px;
-  margin-bottom: 8px;
+  margin-bottom: 16px;
+  @include box-shadow-main;
   &>.header {
     height: $field-height;
     line-height: $field-height;

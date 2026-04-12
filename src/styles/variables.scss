@@ -11,3 +11,9 @@ $header-color: #222;
 $header-text: #bd24bd;
 $field-height: 40px;
 
+@mixin box-shadow-main($x: 4px, $y: 4px, $blur: 3px, $spread: 0px, $color: rgba(0, 0, 0, 0.5)) {
+  -webkit-box-shadow: $x $y $blur $spread $color;
+  -moz-box-shadow: $x $y $blur $spread $color;
+  box-shadow: $x $y $blur $spread $color;
+}
+
