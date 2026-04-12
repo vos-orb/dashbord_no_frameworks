@@ -4,7 +4,7 @@
   <div class="header">PnL/ROI Spoiler</div>
   <div class="contents">
 
-    <div class="dropdown users">
+    <div class="dropdown users-pnl">
       <button class="dropdown-toggle">Выберите пользователя</button>
       <div class="dropdown-menu"></div>
     </div>
@@ -21,11 +21,9 @@
         <input type="text" placeholder="Выберите период" readonly />
       </div>
     </div>
-
     <br />
     <br />
-
-    <div id="container_pnl_roi" style="width:100%; height:400px;"></div>
+    <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
   </div>
 </div>
 
@@ -45,40 +43,161 @@
       <div class="ui-radio" data-radio="balance_period" data-value="180days">180 дней</div>
     </div>
 
-  highchart POST api/get_data_balance_user
-    params {user}
+    <div class="ui-datepicker balance-period-datepicker" data-range="true">
+      <div class="wrapper">
+        <input type="text" placeholder="Выберите период" readonly />
+      </div>
+    </div>
+    <br />
+    <br />
+    <div class="ui-chartjs" id="container_balance" style="width:100%; height:400px;"></div>
+
   </div>
 </div>
 
-<div class="spoiler">
+<div class="spoiler expanded">
   <div class="header">Баланс и инвесторы</div>
   <div class="contents">
 
-  ddl user
-  Баланс инвестора Сумма текущего баланса 85723485,33$ ТАБЛИЦА
+    <div class="dropdown users-balance-inv">
+      <button class="dropdown-toggle">Выберите пользователя</button>
+      <div class="dropdown-menu"></div>
+    </div>
+<br />
+
+<div class="flex-row">
+  <div class="flex-column">
+    <h3>Баланс инвестора</h3>
+    {# TODO }ОТКУДА БРАТЬ НАЧАЛЬНЫЙ БАЛАНС И ТЕКУЩИЙ БАЛАНС#}
+    <div class="table-component balance-of-investor">
+      <div class="search-container">
+        <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+        <div class="autocomplete-items"></div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+          <tr>
+            <th data-column="date">Дата</th>
+            <th data-column="avg">AVG ???</th>
+          </tr>
+          </thead>
+          <tbody class="table-body">
+          <tr>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn prev-page" disabled>Назад</button>
+        <span class="page-info">Страница 1 из 1</span>
+        <button class="btn next-page">Вперёд</button>
+      </div>
+    </div>
+  </div>
+  <div class="flex-column">
+    <h3>История пополнений</h3>
+    <div class="table-component history-pop-up">
+      <div class="search-container">
+        <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+        <div class="autocomplete-items"></div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+          <tr>
+            <th data-column="account_name">Аккаунт</th>
+            <th data-column="amount">Объём</th>
+            <th data-column="datetime">Дата</th>
+          </tr>
+          </thead>
+          <tbody class="table-body">
+          <tr>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn prev-page" disabled>Назад</button>
+        <span class="page-info">Страница 1 из 1</span>
+        <button class="btn next-page">Вперёд</button>
+      </div>
+    </div>
+  </div>
+  <div class="flex-column">
+    <h3>История изменения баланса</h3>
+    <div class="table-component get-filter-and-compute-daily-diffs">
+      <div class="search-container">
+        <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+        <div class="autocomplete-items"></div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+          <tr>
+            <th data-column="day">День</th>
+            <th data-column="account_name">Аккаунт</th>
+            <th data-column="start_balance">Начальный баланс</th>
+            <th data-column="end_balance">Текущий баланс</th>
+            <th data-column="diff">PnL</th>
+          </tr>
+          </thead>
+          <tbody class="table-body">
+          <tr>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn prev-page" disabled>Назад</button>
+        <span class="page-info">Страница 1 из 1</span>
+        <button class="btn next-page">Вперёд</button>
+      </div>
+    </div>
+  </div>
+</div>
+  {# }Баланс инвестора Сумма текущего баланса 85723485,33$ ТАБЛИЦА
     Аккаунт/Начальный баланс ($)/Текущий баланс($)
       /api/get_filter_and_compute_daily_diff
   История пополнений ТАБЛИЦА
     Аккаунт/Объём ($)/Дата
-      /api/get_history_top
+      /api/get_history_top_up
   История изменений баланса ТАБЛИЦА
     Аккаунт/Начальный баланс ($)/Текущий баланс($)/PnL/Начало периода/Конец периода
       /api/get_balance_diff
+    #}
   </div>
 </div>
 
-  <!-- In src/pages/balance.njk -->
+
+
+
+
+
+
   <script type="module">
 import { getRequest, postRequest } from '@/services/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  initDropdowns('.dropdown.users', {
+  // PnL
+  initDropdowns('.dropdown.users-pnl', {
     data: async function() {
       if ({{ DEBUG }}) {
+        console.log("API_URL", '{{ API_URL }}');
         return ["user1","user2","user3","user4"];
       }
       try {
-        const response = await fetch('/filter/user_name_lead');
+        const response = await fetch('{{ API_URL }}/filter/user_name_lead');
         const dta = await response?.json();
         return dta.map(item => item.name);
       } catch (error) {
@@ -92,31 +211,9 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('PnL data:', response);
     }
   });
-
-  initDropdowns('.dropdown.users-balance', {
-    data: async function() {
-      if ({{ DEBUG }}) {
-        return ["user1","user2","user3","user4","user5","user6"];
-      }
-      try {
-        const response = await fetch('/filter/user_name');
-        const dta = await response?.json();
-        return dta.map(item => item.name);
-      } catch (error) {
-        console.error('Ошибка загрузки данных:', error);
-        return ['Ошибка загрузки'];
-      }
-    },
-    onSelect: async function (selectedItem) {
-      console.log('Выбран Пользак Balance:', selectedItem);
-      const response = await postRequest('/get_data_balance_user', { "user": selectedItem } );
-      console.log('Balance data:', response);
-    }
-  });
-
   let pnlPeriodDatepicker = document.querySelector('.pnl-period-datepicker');
-  let myPeriodRadioGroup = document.querySelector('.pnl-period');
-  myPeriodRadioGroup.addEventListener('radiochange', (e) => {
+  let pnlPeriodRadioGroup = document.querySelector('.pnl-period');
+  pnlPeriodRadioGroup.addEventListener('radiochange', (e) => {
     if (!e?.detail?.value) {
       return false;
     }
@@ -130,101 +227,333 @@ document.addEventListener('DOMContentLoaded', () => {
       '90days': 90,
       '180days': 180,
     }
-    console.warn('SELECTED PNL, e.detail', e.detail);
-    //TODO select period in date-picker
-    console.log(pnlPeriodDatepicker, 'pnlPeriodDatepicker');
+    // select period in date-picker
     pnlPeriodDatepicker._datepicker.setPeriod(tr[e.detail.value]);
   });
-
-  let balancePeriodRadioGroup = document.querySelector('.balance-period');
-  balancePeriodRadioGroup.addEventListener('radiochange', (e) => {
-    console.warn('SELECTED BALANCE PREIOD, e.detail', e.detail);
-    //TODO select period in date-picker
-
-  });
-
   pnlPeriodDatepicker.addEventListener('datechange', (e) => {
     console.warn('PL DATE CHANGED, e.detail', e.detail);
-    //TODO apply to chart
+    //TODO apply date filter to chart
+
+  });
+  //Balance
+  initDropdowns('.dropdown.users-balance', {
+    data: async function() {
+      if ({{ DEBUG }}) {
+        return ["user1","user2","user3","user4","user5","user6"];
+      }
+      try {
+        const response = await fetch('{{ API_URL }}/filter/user_name');
+        const dta = await response?.json();
+        return dta.map(item => item.name);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        return ['Ошибка загрузки'];
+      }
+    },
+    onSelect: async function (selectedItem) {
+      console.log('Выбран Пользак Balance:', selectedItem);
+      const response = await postRequest('/get_data_balance_user', { "user": selectedItem } );
+      console.log('Balance data:', response);
+    }
+  });
+  let balancePeriodRadioGroup = document.querySelector('.balance-period');
+  let balancePeriodDatepicker = document.querySelector('.balance-period-datepicker');
+  balancePeriodRadioGroup.addEventListener('radiochange', (e) => {
+    if (!e?.detail?.value) {
+      return false;
+    }
+    if (e?.detail?.value === 'all') {
+      balancePeriodDatepicker._datepicker.clearSelection();
+      return;
+    }
+    let tr = {
+      'all': null,
+      '30days': 30,
+      '90days': 90,
+      '180days': 180,
+    }
+    // select period in date-picker
+    balancePeriodDatepicker._datepicker.setPeriod(tr[e.detail.value]);
+  });
+  balancePeriodDatepicker.addEventListener('datechange', (e) => {
+    console.warn('BALANCE DATE CHANGED, e.detail', e.detail);
+    //TODO apply date filter to chart
 
   });
 
+  // Balance and Investors
+  initDropdowns('.dropdown.users-balance-inv', {
+    data: async function() {
+      if ({{ DEBUG }}) {
+        return ["user1","user2","user3","user4","user5","user6"];
+      }
+      try {
+        const response = await fetch('{{ API_URL }}/filter/user_name');
+        const dta = await response?.json();
+        return dta.map(item => item.name);
+      } catch (error) {
+        console.error('Ошибка загрузки данных:', error);
+        return ['Ошибка загрузки'];
+      }
+    },
+    onSelect: async function (selectedItem) {
+      console.log('Выбран Пользак Balance:', selectedItem);
+      let tableGFCDF = await document.querySelector('.table-component.get-filter-and-compute-daily-diffs');
+      let tableHPU = await document.querySelector('.table-component.history-pop-up');
+      let tableBOI = await document.querySelector('.table-component.balance-of-investor');
+      console.log('tableGFCDF:', tableGFCDF);
+      //const response = await postRequest('/get_filter_and_compute_daily_diff', { "name_account": selectedItem } );
+
+      let dataDaylyDiff = [];
+
+        dataDaylyDiff = [
+          {"day":"2025-10-01","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-02","account_name":"user1","start_balance":313.486,"end_balance":313.486,"diff":0.0},
+          {"day":"2025-10-03","account_name":"user1","start_balance":315.229,"end_balance":315.229,"diff":0.0},
+          {"day":"2025-10-04","account_name":"user1","start_balance":324.49,"end_balance":324.49,"diff":0.0},
+          {"day":"2025-10-05","account_name":"user1","start_balance":307.811,"end_balance":307.811,"diff":0.0},
+          {"day":"2025-10-06","account_name":"user1","start_balance":303.205,"end_balance":303.205,"diff":0.0},
+          {"day":"2025-10-07","account_name":"user1","start_balance":323.807,"end_balance":323.807,"diff":0.0},
+          {"day":"2025-10-08","account_name":"user1","start_balance":311.829,"end_balance":311.829,"diff":0.0},
+          {"day":"2025-10-09","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-10","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-11","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-12","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-13","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-14","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-15","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-16","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-17","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-18","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-19","account_name":"user1","start_balance":324.0,"end_balance":324.0,"diff":0.0},
+          {"day":"2025-10-20","account_name":"user1","start_balance":340.5698864150889,"end_balance":339.80254409073376,"diff":-0.76734232435514},
+          {"day":"2025-10-21","account_name":"user1","start_balance":335.8782959422659,"end_balance":330.2280987305559,"diff":-5.65019721171},
+          {"day":"2025-10-22","account_name":"user1","start_balance":326.5431148407142,"end_balance":330.66117945457603,"diff":4.11806461386183},
+          {"day":"2025-10-23","account_name":"user1","start_balance":327.33298575847016,"end_balance":324.8602681118194,"diff":-2.47271764665076},
+          {"day":"2025-10-24","account_name":"user1","start_balance":327.1322159859528,"end_balance":331.34451274645437,"diff":4.21229676050157},
+          {"day":"2025-10-25","account_name":"user1","start_balance":344.6938451490693,"end_balance":344.63181328363424,"diff":-0.06203186543506},
+          {"day":"2025-10-26","account_name":"user1","start_balance":346.6980482676557,"end_balance":337.83043683100215,"diff":-8.86761143665355},
+          {"day":"2025-10-27","account_name":"user1","start_balance":333.4850690380124,"end_balance":335.1374902683077,"diff":1.6524212302953},
+          {"day":"2025-10-28","account_name":"user1","start_balance":335.2130531171973,"end_balance":330.6614145742782,"diff":-4.5516385429191},
+          {"day":"2025-10-29","account_name":"user1","start_balance":325.61274332446175,"end_balance":324.3459134326224,"diff":-1.26682989183935},
+          {"day":"2025-10-30","account_name":"user1","start_balance":324.16734833009434,"end_balance":49.932341191125474,"diff":-274.23500713896885},
+          {"day":"2025-10-31","account_name":"user1","start_balance":49.928845717513674,"end_balance":49.905875462350444,"diff":-0.02297025516323},
+          {"day":"2025-11-01","account_name":"user1","start_balance":49.909370935962244,"end_balance":49.917859943305174,"diff":0.00848900734293},
+          {"day":"2025-11-02","account_name":"user1","start_balance":49.91736058993206,"end_balance":49.9298444242599,"diff":0.01248383432784},
+          {"day":"2025-11-03","account_name":"user1","start_balance":49.9298444242599,"end_balance":49.928845717513674,"diff":-0.000998706746226},
+          {"day":"2025-11-04","account_name":"user1","start_balance":49.926348950648105,"end_balance":49.92085606354385,"diff":-0.005492887104255},
+          {"day":"2025-11-05","account_name":"user1","start_balance":49.932341191125474,"end_balance":599.821349597275,"diff":549.8890084061495},
+          {"day":"2025-11-06","account_name":"user1","start_balance":599.8949261548419,"end_balance":599.24123098243,"diff":-0.6536951724119},
+          {"day":"2025-11-07","account_name":"user1","start_balance":596.9157714310078,"end_balance":591.2850172154848,"diff":-5.630754215523},
+          {"day":"2025-11-08","account_name":"user1","start_balance":583.6699271142213,"end_balance":584.0921227917171,"diff":0.4221956774958},
+          {"day":"2025-11-09","account_name":"user1","start_balance":587.8735402437383,"end_balance":575.9589349794227,"diff":-11.9146052643156},
+          {"day":"2025-11-10","account_name":"user1","start_balance":570.3844796035206,"end_balance":564.3793800809599,"diff":-6.0050995225607},
+          {"day":"2025-11-11","account_name":"user1","start_balance":566.3330685661579,"end_balance":551.144605769956,"diff":-15.1884627962019},
+          {"day":"2025-11-12","account_name":"user1","start_balance":551.1789512541769,"end_balance":534.5360026305833,"diff":-16.6429486235936},
+          {"day":"2025-11-13","account_name":"user1","start_balance":528.9996495912713,"end_balance":554.5900531972309,"diff":25.5904036059596},
+          {"day":"2025-11-14","account_name":"user1","start_balance":550.4330203905265,"end_balance":519.6446512225126,"diff":-30.7883691680139},
+          {"day":"2025-11-15","account_name":"user1","start_balance":514.5747306964066,"end_balance":514.6262221538382,"diff":0.0514914574316},
+          {"day":"2025-11-16","account_name":"user1","start_balance":514.236658834041,"end_balance":505.1212209183706,"diff":-9.1154379156704},
+          {"day":"2025-11-17","account_name":"user1","start_balance":496.5781203502938,"end_balance":492.03062414591795,"diff":-4.54749620437585},
+          {"day":"2025-11-18","account_name":"user1","start_balance":552.3842160064675,"end_balance":599.1082390439714,"diff":46.7240230375039},
+          {"day":"2025-11-19","account_name":"user1","start_balance":599.4325159537511,"end_balance":612.4144324953809,"diff":12.9819165416298},
+          {"day":"2025-11-20","account_name":"user1","start_balance":613.8370095291823,"end_balance":610.6677722844237,"diff":-3.1692372447586},
+          {"day":"2025-11-21","account_name":"user1","start_balance":617.2928472201007,"end_balance":614.0859750398545,"diff":-3.2068721802462},
+          {"day":"2025-11-22","account_name":"user1","start_balance":600.1854325061217,"end_balance":599.3068073356623,"diff":-0.8786251704594},
+          {"day":"2025-11-23","account_name":"user1","start_balance":597.2343428762641,"end_balance":591.3413463819038,"diff":-5.8929964943603},
+          {"day":"2025-11-24","account_name":"user1","start_balance":571.265239594997,"end_balance":610.3023269747587,"diff":39.0370873797617},
+          {"day":"2025-11-25","account_name":"user1","start_balance":601.2523053236315,"end_balance":595.9898015746096,"diff":-5.2625037490219},
+          {"day":"2025-11-26","account_name":"user1","start_balance":590.5756666839383,"end_balance":584.715575552876,"diff":-5.8600911310623},
+          {"day":"2025-11-27","account_name":"user1","start_balance":600.2565887294676,"end_balance":595.3154116590405,"diff":-4.9411770704271},
+          {"day":"2025-11-28","account_name":"user1","start_balance":592.8663720512255,"end_balance":584.159439227441,"diff":-8.7069328237845},
+          {"day":"2025-11-29","account_name":"user1","start_balance":584.2295236424211,"end_balance":584.1828006991011,"diff":-0.04672294332},
+          {"day":"2025-11-30","account_name":"user1","start_balance":584.124397019951,"end_balance":582.7981593882912,"diff":-1.3262376316598},
+          {"day":"2025-12-01","account_name":"user1","start_balance":597.1186830404192,"end_balance":590.5661713584935,"diff":-6.5525116819257},
+          {"day":"2025-12-02","account_name":"user1","start_balance":588.5443516503527,"end_balance":620.4812632649275,"diff":31.9369116145748},
+          {"day":"2025-12-03","account_name":"user1","start_balance":611.9079264349306,"end_balance":606.9129975135284,"diff":-4.9949289214022},
+          {"day":"2025-12-04","account_name":"user1","start_balance":601.5788175618316,"end_balance":598.0867176646864,"diff":-3.4920998971452},
+          {"day":"2025-12-05","account_name":"user1","start_balance":603.2572071709,"end_balance":597.591366738222,"diff":-5.665840432678},
+          {"day":"2025-12-06","account_name":"user1","start_balance":597.5853920792329,"end_balance":597.591366738222,"diff":0.0059746589891},
+          {"day":"2025-12-07","account_name":"user1","start_balance":597.5853920792329,"end_balance":608.0721311044913,"diff":10.4867390252584},
+          {"day":"2025-12-08","account_name":"user1","start_balance":608.6021770600738,"end_balance":606.0839936770188,"diff":-2.518183383055},
+          {"day":"2025-12-09","account_name":"user1","start_balance":602.6685191483093,"end_balance":626.2408007139151,"diff":23.5722815656058},
+          {"day":"2025-12-10","account_name":"user1","start_balance":623.0364472478268,"end_balance":612.7430029640102,"diff":-10.2934442838166},
+          {"day":"2025-12-11","account_name":"user1","start_balance":612.7184991248131,"end_balance":613.5630866629716,"diff":0.8445875381585},
+          {"day":"2025-12-12","account_name":"user1","start_balance":610.1752295793059,"end_balance":608.5077505939602,"diff":-1.6674789853457},
+          {"day":"2025-12-13","account_name":"user1","start_balance":614.6533187232666,"end_balance":614.6471729890247,"diff":-0.0061457342419},
+          {"day":"2025-12-14","account_name":"user1","start_balance":614.696338862959,"end_balance":614.6779016602337,"diff":-0.0184372027253},
+          {"day":"2025-12-15","account_name":"user1","start_balance":613.7637344145412,"end_balance":615.129509643821,"diff":1.3657752292798},{"day":"2025-12-16","account_name":"user1","start_balance":616.4728128015208,"end_balance":614.2196765162045,"diff":-2.2531362853163},{"day":"2025-12-17","account_name":"user1","start_balance":605.7912772620537,"end_balance":603.3700795660836,"diff":-2.4211976959701},{"day":"2025-12-18","account_name":"user1","start_balance":630.1682999968035,"end_balance":630.8849184020177,"diff":0.7166184052142},{"day":"2025-12-19","account_name":"user1","start_balance":639.8732430746221,"end_balance":642.3364535377387,"diff":2.4632104631166},{"day":"2025-12-20","account_name":"user1","start_balance":634.1705173702234,"end_balance":634.6604312819077,"diff":0.4899139116843},{"day":"2025-12-21","account_name":"user1","start_balance":634.4085596248748,"end_balance":633.9580244268093,"diff":-0.4505351980655},{"day":"2025-12-22","account_name":"user1","start_balance":632.2423218058645,"end_balance":628.4006318881726,"diff":-3.8416899176919},{"day":"2025-12-23","account_name":"user1","start_balance":626.4320671470958,"end_balance":623.8064612265658,"diff":-2.62560592053},{"day":"2025-12-24","account_name":"user1","start_balance":611.7089503787909,"end_balance":608.2556050377349,"diff":-3.453345341056},{"day":"2025-12-25","account_name":"user1","start_balance":604.5084040583635,"end_balance":601.9043946641823,"diff":-2.6040093941812},{"day":"2025-12-26","account_name":"user1","start_balance":598.421174437505,"end_balance":589.6182147927672,"diff":-8.8029596447378},{"day":"2025-12-27","account_name":"user1","start_balance":587.1049505692931,"end_balance":587.2694682792663,"diff":0.1645177099732},{"day":"2025-12-28","account_name":"user1","start_balance":587.1402043642873,"end_balance":587.1167018342912,"diff":-0.0235025299961},{"day":"2025-12-29","account_name":"user1","start_balance":587.0990749367941,"end_balance":593.0721968218658,"diff":5.9731218850717},{"day":"2025-12-30","account_name":"user1","start_balance":589.5146662000458,"end_balance":589.4137444454427,"diff":-0.1009217546031},{"day":"2025-12-31","account_name":"user1","start_balance":584.5822165257233,"end_balance":584.8378305837501,"diff":0.2556140580268},{"day":"2026-01-01","account_name":"user1","start_balance":580.1871753127881,"end_balance":579.1870682394498,"diff":-1.0001070733383},{"day":"2026-01-02","account_name":"user1","start_balance":579.7725241065709,"end_balance":583.8552700925841,"diff":4.0827459860132},{"day":"2026-01-03","account_name":"user1","start_balance":574.1883875574702,"end_balance":574.1251983997178,"diff":-0.0631891577524},{"day":"2026-01-04","account_name":"user1","start_balance":574.1941320263567,"end_balance":574.1654096819237,"diff":-0.028722344433},{"day":"2026-01-05","account_name":"user1","start_balance":574.1883875574702,"end_balance":573.111923499466,"diff":-1.0764640580042},{"day":"2026-01-06","account_name":"user1","start_balance":569.1323621182563,"end_balance":567.412267436334,"diff":-1.7200946819223},{"day":"2026-01-07","account_name":"user1","start_balance":567.7795707465344,"end_balance":562.1489694255182,"diff":-5.6306013210162},{"day":"2026-01-08","account_name":"user1","start_balance":560.4461568254155,"end_balance":554.795018073855,"diff":-5.6511387515605},{"day":"2026-01-09","account_name":"user1","start_balance":546.0444046243204,"end_balance":539.8231335025965,"diff":-6.2212711217239},{"day":"2026-01-10","account_name":"user1","start_balance":528.2475020005218,"end_balance":528.2898180810689,"diff":0.0423160805471},{"day":"2026-01-11","account_name":"user1","start_balance":528.2157649401114,"end_balance":528.2527915105902,"diff":0.0370265704788},{"day":"2026-01-12","account_name":"user1","start_balance":526.9264496818042,"end_balance":526.0299547480363,"diff":-0.8964949337679},{"day":"2026-01-13","account_name":"user1","start_balance":520.2129333389496,"end_balance":518.7653019691114,"diff":-1.4476313698382},{"day":"2026-01-14","account_name":"user1","start_balance":538.2018974414173,"end_balance":539.4710153014265,"diff":1.2691178600092},{"day":"2026-01-15","account_name":"user1","start_balance":536.5621724328963,"end_balance":537.7158378268886,"diff":1.1536653939923},{"day":"2026-01-16","account_name":"user1","start_balance":529.374988445582,"end_balance":526.8918113742425,"diff":-2.4831770713395},{"day":"2026-01-17","account_name":"user1","start_balance":524.6172454743801,"end_balance":599.5857454743801,"diff":74.9685},{"day":"2026-01-18","account_name":"user1","start_balance":599.5977422279261,"end_balance":599.5437568369692,"diff":-0.0539853909569},{"day":"2026-01-19","account_name":"user1","start_balance":600.2956090522681,"end_balance":603.5854794156279,"diff":3.2898703633598},{"day":"2026-01-20","account_name":"user1","start_balance":601.5005733191077,"end_balance":606.1502032550887,"diff":4.649629935981},{"day":"2026-01-21","account_name":"user1","start_balance":620.9029894886964,"end_balance":619.749961890753,"diff":-1.1530275979434},{"day":"2026-01-22","account_name":"user1","start_balance":635.937529506442,"end_balance":632.9955297774765,"diff":-2.9419997289655},{"day":"2026-01-23","account_name":"user1","start_balance":628.3125940197898,"end_balance":620.8799696633849,"diff":-7.4326243564049},{"day":"2026-01-24","account_name":"user1","start_balance":614.9856478739124,"end_balance":614.7947579840124,"diff":-0.1908898899},{"day":"2026-01-25","account_name":"user1","start_balance":614.813231199164,"end_balance":614.6858947083633,"diff":-0.1273364908007},{"day":"2026-01-26","account_name":"user1","start_balance":624.1994179623836,"end_balance":625.2736270525966,"diff":1.074209090213},{"day":"2026-01-27","account_name":"user1","start_balance":618.5656693467524,"end_balance":615.1448225337449,"diff":-3.4208468130075},{"day":"2026-01-28","account_name":"user1","start_balance":617.7887124351812,"end_balance":618.0091634900498,"diff":0.2204510548686},{"day":"2026-01-29","account_name":"user1","start_balance":607.3096426562669,"end_balance":610.0968557462014,"diff":2.7872130899345},{"day":"2026-01-30","account_name":"user1","start_balance":620.0094476762024,"end_balance":617.2732481678863,"diff":-2.7361995083161},{"day":"2026-01-31","account_name":"user1","start_balance":610.7607390818325,"end_balance":610.705684179118,"diff":-0.0550549027145},{"day":"2026-02-01","account_name":"user1","start_balance":610.9993103269293,"end_balance":611.2011783035496,"diff":0.2018679766203},{"day":"2026-02-02","account_name":"user1","start_balance":594.9786165419958,"end_balance":588.683840124971,"diff":-6.2947764170248},{"day":"2026-02-03","account_name":"user1","start_balance":584.268399109074,"end_balance":576.05656726789,"diff":-8.211831841184},{"day":"2026-02-04","account_name":"user1","start_balance":616.07167598291,"end_balance":607.1764719394206,"diff":-8.8952040434894},{"day":"2026-02-05","account_name":"user1","start_balance":592.0529270907435,"end_balance":571.1953114981187,"diff":-20.8576155926248},{"day":"2026-02-06","account_name":"user1","start_balance":557.91254225759,"end_balance":610.3304224248086,"diff":52.4178801672186},{"day":"2026-02-07","account_name":"user1","start_balance":617.5967948242245,"end_balance":617.5349887902165,"diff":-0.061806034008},{"day":"2026-02-08","account_name":"user1","start_balance":617.6647814616332,"end_balance":617.5473499970182,"diff":-0.117431464615},{"day":"2026-02-09","account_name":"user1","start_balance":608.990950416524,"end_balance":610.0229742158302,"diff":1.0320237993062},{"day":"2026-02-10","account_name":"user1","start_balance":594.1147781077198,"end_balance":608.2878275665004,"diff":14.1730494587806},{"day":"2026-02-11","account_name":"user1","start_balance":589.4053857619488,"end_balance":590.7197547463885,"diff":1.3143689844397},{"day":"2026-02-12","account_name":"user1","start_balance":578.2591179428352,"end_balance":571.4444161583002,"diff":-6.814701784535},{"day":"2026-02-13","account_name":"user1","start_balance":567.6267340105961,"end_balance":564.2916734153977,"diff":-3.3350605951984},{"day":"2026-02-14","account_name":"user1","start_balance":570.3792372442439,"end_balance":575.0440727457758,"diff":4.6648355015319},{"day":"2026-02-15","account_name":"user1","start_balance":569.8026155031814,"end_balance":566.8730145153839,"diff":-2.9296009877975},{"day":"2026-02-16","account_name":"user1","start_balance":569.6682988625142,"end_balance":566.2533566820571,"diff":-3.4149421804571},{"day":"2026-02-17","account_name":"user1","start_balance":565.0677736927889,"end_balance":558.5263452623386,"diff":-6.5414284304503},{"day":"2026-02-18","account_name":"user1","start_balance":545.9629634716183,"end_balance":544.1293385344945,"diff":-1.8336249371238},{"day":"2026-02-19","account_name":"user1","start_balance":532.3318501216298,"end_balance":530.9563001562952,"diff":-1.3755499653346},{"day":"2026-02-20","account_name":"user1","start_balance":522.4326897897901,"end_balance":519.630445924756,"diff":-2.8022438650341},{"day":"2026-02-21","account_name":"user1","start_balance":555.7790845151051,"end_balance":554.8716018303202,"diff":-0.9074826847849},{"day":"2026-02-22","account_name":"user1","start_balance":549.6365486243143,"end_balance":549.9264747187883,"diff":0.289926094474},{"day":"2026-02-23","account_name":"user1","start_balance":546.496053078152,"end_balance":559.2006345909195,"diff":12.7045815127675},{"day":"2026-02-24","account_name":"user1","start_balance":550.5992412272452,"end_balance":547.010454757982,"diff":-3.5887864692632},{"day":"2026-02-25","account_name":"user1","start_balance":543.29986055172,"end_balance":549.2120221980745,"diff":5.9121616463545},{"day":"2026-02-26","account_name":"user1","start_balance":574.6191311036893,"end_balance":567.1065780321394,"diff":-7.5125530715499},{"day":"2026-02-27","account_name":"user1","start_balance":564.4053087616365,"end_balance":564.894634048649,"diff":0.4893252870125},{"day":"2026-02-28","account_name":"user1","start_balance":563.5681649634678,"end_balance":563.6414324882893,"diff":0.0732675248215},{"day":"2026-03-01","account_name":"user1","start_balance":563.647068451737,"end_balance":600.3230623193264,"diff":36.6759938675894},{"day":"2026-03-02","account_name":"user1","start_balance":590.3090617522203,"end_balance":597.8500494266325,"diff":7.5409876744122},{"day":"2026-03-03","account_name":"user1","start_balance":601.3579999972847,"end_balance":602.9935747990965,"diff":1.6355748018118},{"day":"2026-03-04","account_name":"user1","start_balance":602.1051592804448,"end_balance":585.0476250428994,"diff":-17.0575342375454},{"day":"2026-03-05","account_name":"user1","start_balance":584.8164468533828,"end_balance":585.0241479933621,"diff":0.2077011399793},{"day":"2026-03-06","account_name":"user1","start_balance":585.3982115479581,"end_balance":607.269997639989,"diff":21.8717860920309},{"day":"2026-03-07","account_name":"user1","start_balance":607.3398961304152,"end_balance":590.6849910664088,"diff":-16.6549050640064},{"day":"2026-03-08","account_name":"user1","start_balance":590.5249202684245,"end_balance":573.7943689048934,"diff":-16.7305513635311},{"day":"2026-03-09","account_name":"user1","start_balance":573.8058452513253,"end_balance":567.6150530224049,"diff":-6.1907922289204},{"day":"2026-03-10","account_name":"user1","start_balance":568.176090796155,"end_balance":566.1051486568446,"diff":-2.0709421393104},{"day":"2026-03-11","account_name":"user1","start_balance":566.3641449712845,"end_balance":561.0888815911544,"diff":-5.2752633801301},{"day":"2026-03-12","account_name":"user1","start_balance":561.0944917506496,"end_balance":550.6620603505452,"diff":-10.4324314001044},{"day":"2026-03-13","account_name":"user1","start_balance":550.6565539501977,"end_balance":536.9563139238734,"diff":-13.7002400263243},{"day":"2026-03-14","account_name":"user1","start_balance":536.967051117457,"end_balance":534.7174183284147,"diff":-2.2496327890423},{"day":"2026-03-15","account_name":"user1","start_balance":534.6488956305916,"end_balance":524.6248397566976,"diff":-10.024055873894},{"day":"2026-03-16","account_name":"user1","start_balance":524.635330050531,"end_balance":517.7528093457553,"diff":-6.8825207047757},{"day":"2026-03-17","account_name":"user1","start_balance":517.7758035255731,"end_balance":527.085579386861,"diff":9.3097758612879},{"day":"2026-03-18","account_name":"user1","start_balance":527.4856834351149,"end_balance":525.1043571394817,"diff":-2.3813262956332},{"day":"2026-03-19","account_name":"user1","start_balance":524.8732788388792,"end_balance":540.0145906354035,"diff":15.1413117965243},{"day":"2026-03-20","account_name":"user1","start_balance":539.6901654453776,"end_balance":525.7583419013007,"diff":-13.9318235440769},{"day":"2026-03-21","account_name":"user1","start_balance":525.9960926818133,"end_balance":539.5622748988006,"diff":13.5661822169873},{"day":"2026-03-22","account_name":"user1","start_balance":539.011253393278,"end_balance":555.8342801945619,"diff":16.8230268012839},{"day":"2026-03-23","account_name":"user1","start_balance":555.8453996600322,"end_balance":557.8035891726647,"diff":1.9581895126325},{"day":"2026-03-24","account_name":"user1","start_balance":557.8470309152658,"end_balance":545.2179729758857,"diff":-12.6290579393801},{"day":"2026-03-25","account_name":"user1","start_balance":545.2070641438049,"end_balance":550.6810268705138,"diff":5.4739627267089},{"day":"2026-03-26","account_name":"user1","start_balance":550.7765366325802,"end_balance":550.4100862458614,"diff":-0.3664503867188},{"day":"2026-03-27","account_name":"user1","start_balance":550.3011833583049,"end_balance":578.7644459808432,"diff":28.4632626225383},{"day":"2026-03-28","account_name":"user1","start_balance":578.7644459808432,"end_balance":568.162780600562,"diff":-10.6016653802812},{"day":"2026-03-29","account_name":"user1","start_balance":568.1741532955108,"end_balance":567.399717848757,"diff":-0.7744354467538},{"day":"2026-03-30","account_name":"user1","start_balance":567.4020538726029,"end_balance":555.5353538130313,"diff":-11.8667000595716},{"day":"2026-03-31","account_name":"user1","start_balance":555.5242338764076,"end_balance":560.5403481859511,"diff":5.0161143095435},{"day":"2026-04-01","account_name":"user1","start_balance":560.7264625909108,"end_balance":572.0708773092035,"diff":11.3444147182927},{"day":"2026-04-02","account_name":"user1","start_balance":572.4379192040202,"end_balance":559.508544186573,"diff":-12.9293750174472},{"day":"2026-04-03","account_name":"user1","start_balance":559.6013735519099,"end_balance":578.1176434052342,"diff":18.5162698533243},{"day":"2026-04-04","account_name":"user1","start_balance":578.1607210106338,"end_balance":583.3278885324429,"diff":5.1671675218091},{"day":"2026-04-05","account_name":"user1","start_balance":582.9969522077777,"end_balance":590.3263970378274,"diff":7.3294448300497},{"day":"2026-04-06","account_name":"user1","start_balance":590.3263970378274,"end_balance":600.5850111664018,"diff":10.2586141285744},{"day":"2026-04-07","account_name":"user1","start_balance":600.9802442354472,"end_balance":587.0170632942786,"diff":-13.9631809411686},{"day":"2026-04-08","account_name":"user1","start_balance":587.0229342868505,"end_balance":575.3948676875766,"diff":-11.6280665992739},{"day":"2026-04-09","account_name":"user1","start_balance":575.417882791831,"end_balance":580.4370584107162,"diff":5.0191756188852},
+          {"day":"2026-04-10","account_name":"user1","start_balance":580.3811457076199,"end_balance":588.2218884210192,"diff":7.8407427133993}
+        ];
+        let dataHistoryPopUp = [
+          {"account_name":"user1","amount":"-119.93","datetime":"2026-04-06T09:11:00"},
+          {"account_name":"user1","amount":"120","datetime":"2026-03-24T08:39:28"},
+          {"account_name":"user1","amount":"-102","datetime":"2026-03-03T08:46:16"},
+          {"account_name":"user1","amount":"37","datetime":"2026-03-01T11:21:29"},
+          {"account_name":"user1","amount":"50","datetime":"2026-02-20T16:18:29"},
+          {"account_name":"user1","amount":"-624","datetime":"2026-02-05T11:38:21"},
+          {"account_name":"user1","amount":"100","datetime":"2026-01-23T10:43:41"},
+          {"account_name":"user1","amount":"125","datetime":"2026-01-17T10:25:00"},
+          {"account_name":"user1","amount":"600","datetime":"2025-12-18T06:49:58"},
+          {"account_name":"user1","amount":"46","datetime":"2025-11-18T06:08:33"},
+          {"account_name":"user1","amount":"69.79683844","datetime":"2025-11-17T17:48:47"},
+          {"account_name":"user1","amount":"50","datetime":"2025-11-13T19:19:43"},
+          {"account_name":"user1","amount":"550","datetime":"2025-11-05T10:20:55"},
+          {"account_name":"user1","amount":"50","datetime":"2025-10-30T08:09:06"},
+          {"account_name":"user1","amount":"-324.08923709","datetime":"2025-10-30T08:05:10"},
+          {"account_name":"user1","amount":"600","datetime":"2025-08-27T10:02:26"},
+          {"account_name":"user1","amount":"-85.45938372","datetime":"2024-12-13T13:37:38"},
+          {"account_name":"user1","amount":"1","datetime":"2024-11-26T07:48:06"},
+          {"account_name":"user1","amount":"100","datetime":"2024-11-26T07:35:52"},
+          {"account_name":"user1","amount":"-39.71550217","datetime":"2024-11-06T13:39:03"},
+          {"account_name":"user1","amount":"40","datetime":"2024-10-14T10:45:46"}
+        ];
+        let dataBalanceUser = [
+          {"date":"2026-04-06","avg":"1201.2506714233388890"},
+          {"date":"2026-04-07","avg":"1170.7515910468483574"},
+          {"date":"2026-04-08","avg":"1182.0878337240066822"},
+          {"date":"2026-04-09","avg":"1189.9878019086450461"},
+          {"date":"2026-04-10","avg":"1213.8803342683904784"}
+        ];
+
+
+      try {
+
+      new UiTable(tableGFCDF, dataDaylyDiff, 10);
+      new UiTable(tableHPU, dataHistoryPopUp, 10);
+      new UiTable(tableBOI, dataBalanceUser, 10);
+      } catch(err){
+        console.log('ERRRORROROR', err)
+      }
+      const response2 = await postRequest('/get_history_top_up', { "name_acc": selectedItem } );
+      const response3 = await postRequest('/get_balance_diff_user', { "name_acc": selectedItem } );
+      console.log('Balance data:', response);
+      //TODO fiil up the tables
+    }
+  });
+
+
+
+  let mockChartsDates = [
+    "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-27", "2025-09-28", "2025-09-29", "2025-09-30",
+    "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-04", "2025-10-05", "2025-10-06", "2025-10-07", "2025-10-08",
+    "2025-10-09", "2025-10-10", "2025-10-11", "2025-10-12", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16",
+    "2025-10-17", "2025-10-18", "2025-10-19", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24",
+    "2025-10-25", "2025-10-26", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-01",
+    "2025-11-02", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-08", "2025-11-09",
+    "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-15", "2025-11-16", "2025-11-17",
+    "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-22", "2025-11-23", "2025-11-24", "2025-11-25",
+    "2025-11-26", "2025-11-27", "2025-11-28", "2025-11-29", "2025-11-30", "2025-12-01", "2025-12-02", "2025-12-03",
+    "2025-12-04", "2025-12-05", "2025-12-06", "2025-12-07", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11",
+    "2025-12-12", "2025-12-13", "2025-12-14", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19",
+    "2025-12-20", "2025-12-21", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-27",
+    "2025-12-28", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04",
+    "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-10", "2026-01-11", "2026-01-12",
+    "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20",
+    "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28",
+    "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05",
+    "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13",
+    "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21",
+    "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01",
+    "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09",
+    "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17",
+    "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25",
+    "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02",
+    "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10",
+    "2026-04-11"
+  ];
+  let mockChartsFloat1 = [
+    34.327, 94.825, 71.859, 57.859, 11.382, 11.379, 1.099, 85.948, 58.117, 69.348, -2.839, 96.841,
+    82.406, 17.296, 14.092, 14.257, 26.945, 50.099, 40.354, 25.579, 59.245, 9.647, 25.675, 33.468,
+    42.887, 77.443, 15.966, 48.995, 57.204, -0.123, 58.792, 12.905, 1.83, 94.633, 96.391, 79.882,
+    26.984, 5.256, 66.844, 41.216, 7.814, 46.994, -1.389, 90.479, 22.172, 64.565, 27.73, 49.607,
+    52.405, 14.41, 96.806, 76.389, 93.647, 88.957, 57.779, 91.797, 4.292, 15.578, -0.251, 29.16,
+    35.811, 23.492, 82.017, 32.459, 24.498, 51.983, 9.797, 79.231, 2.828, 98.623, 76.086, 15.865,
+    -4.42, 80.623, 69.22, 71.546, 75.983, 2.775, 32.639, 7.166, 85.626, 60.446, 29.744, 1.674,
+    27.653, 29.144, 71.609, 61.944, 88.157, 44.583, 7.557, 69.891, 74.882, 53.934, 75.952, 46.849,
+    49.887, 39.892, -2.331, 6.329, -1.7, 61.823, 28.007, 48.4, 90.294, 21.176, 38.09, 74.333,
+    19.024, 3.083, 25.424, 11.928, 92.618, 79.853, 61.507, 86.503, 79.386, 14.59, 88.719, 51.631,
+    79.781, 89.09, 28.39, 6.555, 18.933, 39.846, 80.892, 85.377, -4.27, 48.628, 38.828, 18.321,
+    7.586, 30.45, 94.006, 28.936, 49.473, 68.817, 33.181, 97.037, 96.057, 21.437, 47.211, 26.592,
+    24.908, -1.127, 59.004, 47.781, 0.405, 24.258, 90.368, 20.154, 10.214, 46.393, 98.493, 20.416,
+    65.574, 74.97, 19.952, 71.463, 33.617, 61.392, 61.521, 51.256, 4.48, 82.707, 28.682, 14.584,
+    -0.719, 57.044, 66.144, -3.258, 48.77, 18.782, 62.743, 13.308, 67.548, 35.607, 93.357, 9.44,
+    30.812, 6.915, 92.093, 87.121, 22.084, 64.298, 80.808, 53.296, 50.613, 20.394, 4.776, 89.208,
+    89.544, 61.476, 30.598, 31.667, 71.225, 89.197, 88.144, 76.887
+  ];
+  let mockChartsFloat2 = [
+    92.725, 3.462, 15.861, 133.769, 87.029, -8.528, 6.235, 96.16, -9.19, 15.729, 77.797, 100.703,94.314,
+    25.883, 103.949, 27.96, 42.064, 109.439, 93.941, 125.876, 95.218, 80.929, 4.988, 48.835,32.432,
+    29.038, 145.682, 52.896, 132.727, 90.982, 117.17, 70.422, 82.305, 68.803, 21.239, 105.592,34.924,
+    -6.109, 93.276, 18.338, 140.473, 142.629, 136.378, 49.225, -7.527, 138.531, 58.509, 144.665,144.179,
+    126.482, 37.112, 51.616, 126.182, 40.708, 17.119, 79.088, 139.785, 101.365, 81.21, 5.548,88.401,
+    148.409, 12.413, 72.933, 130.38, 108.523, 101.523, 102.397, 47.519, 36.975, 119.498, 119.618,128.732,
+    136.118, 71.815, 70.243, 117.727, 93.994, 102.315, 117.327, 132.401, 44.079, 50.093, 5.037,82.525,
+    -4.249, 64.496, 76.823, 35.847, 84.533, -5.12, -4.024, 121.616, 47.631, 10.33, 73.559,113.199, 24.531,
+    89.662, 3.656, -1.731, 75.017, 76.502, 91.989, 106.175, 146.136, 72.608, 41.673,117.23, 33.333,
+    60.235, 2.553, -5.944, 144.024, 123.757, 101.356, 55.432, 17.727, 15.03, 30.039,77.876, 104.335,
+    95.632, 34.789, 142.778, 108.064, 78.697, 87.875, 57.136, 29.637, 46.956, 111.255,-7.697, 8.572,
+    -2.64, -3.483, 126.874, 102.585, 65.868, 5.653, 68.659, 65.755, 17.712, 59.416,53.761, 88.536, 91.615,
+    -2.751, 49.938, 90.138, 70.502, 127.038, 95.391, 16.07, 1.291, 92.787,-5.758, 83.724, 140.437, 82.076,
+    52.107, 92.926, 63.32, 77.299, 140.634, 51.776, 143.79, 134.856,21.327, 1.098, 6.124, -7.085, 5.111,
+    99.281, 1.39, 41.036, 125.18, -6.276, 120.315, 35.097, 8.906,101.478, 90.631, 130.396, 107.611,
+    118.557, 35.126, 18.39, 110.098, 119.094, 148.481, 56.019, 49.523,114.226, 44.529, 138.921, 127.346,
+    58.639, 110.139, 110.727
+  ];
+
     console.warn("Highcharts",Highcharts);
-    const chart = Highcharts.chart('container_pnl_roi', {
+  const chartPnl = Highcharts.chart('container_pnl_roi', {
+    chart:{
+      backgroundColor: 'rgba(0,0,0,0)'
+    },
+    title: {
+      text: null
+    },
+    xAxis: {
+      categories: mockChartsDates
+    },
+    yAxis: {
       title: {
-        text: null
-      },
-      xAxis: {
-        categories: [
-          "2025-09-23", "2025-09-24", "2025-09-25", "2025-09-26", "2025-09-27", "2025-09-28", "2025-09-29", "2025-09-30",
-          "2025-10-01", "2025-10-02", "2025-10-03", "2025-10-04", "2025-10-05", "2025-10-06", "2025-10-07", "2025-10-08",
-          "2025-10-09", "2025-10-10", "2025-10-11", "2025-10-12", "2025-10-13", "2025-10-14", "2025-10-15", "2025-10-16",
-          "2025-10-17", "2025-10-18", "2025-10-19", "2025-10-20", "2025-10-21", "2025-10-22", "2025-10-23", "2025-10-24",
-          "2025-10-25", "2025-10-26", "2025-10-27", "2025-10-28", "2025-10-29", "2025-10-30", "2025-10-31", "2025-11-01",
-          "2025-11-02", "2025-11-03", "2025-11-04", "2025-11-05", "2025-11-06", "2025-11-07", "2025-11-08", "2025-11-09",
-          "2025-11-10", "2025-11-11", "2025-11-12", "2025-11-13", "2025-11-14", "2025-11-15", "2025-11-16", "2025-11-17",
-          "2025-11-18", "2025-11-19", "2025-11-20", "2025-11-21", "2025-11-22", "2025-11-23", "2025-11-24", "2025-11-25",
-          "2025-11-26", "2025-11-27", "2025-11-28", "2025-11-29", "2025-11-30", "2025-12-01", "2025-12-02", "2025-12-03",
-          "2025-12-04", "2025-12-05", "2025-12-06", "2025-12-07", "2025-12-08", "2025-12-09", "2025-12-10", "2025-12-11",
-          "2025-12-12", "2025-12-13", "2025-12-14", "2025-12-15", "2025-12-16", "2025-12-17", "2025-12-18", "2025-12-19",
-          "2025-12-20", "2025-12-21", "2025-12-22", "2025-12-23", "2025-12-24", "2025-12-25", "2025-12-26", "2025-12-27",
-          "2025-12-28", "2025-12-29", "2025-12-30", "2025-12-31", "2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04",
-          "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08", "2026-01-09", "2026-01-10", "2026-01-11", "2026-01-12",
-          "2026-01-13", "2026-01-14", "2026-01-15", "2026-01-16", "2026-01-17", "2026-01-18", "2026-01-19", "2026-01-20",
-          "2026-01-21", "2026-01-22", "2026-01-23", "2026-01-24", "2026-01-25", "2026-01-26", "2026-01-27", "2026-01-28",
-          "2026-01-29", "2026-01-30", "2026-01-31", "2026-02-01", "2026-02-02", "2026-02-03", "2026-02-04", "2026-02-05",
-          "2026-02-06", "2026-02-07", "2026-02-08", "2026-02-09", "2026-02-10", "2026-02-11", "2026-02-12", "2026-02-13",
-          "2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17", "2026-02-18", "2026-02-19", "2026-02-20", "2026-02-21",
-          "2026-02-22", "2026-02-23", "2026-02-24", "2026-02-25", "2026-02-26", "2026-02-27", "2026-02-28", "2026-03-01",
-          "2026-03-02", "2026-03-03", "2026-03-04", "2026-03-05", "2026-03-06", "2026-03-07", "2026-03-08", "2026-03-09",
-          "2026-03-10", "2026-03-11", "2026-03-12", "2026-03-13", "2026-03-14", "2026-03-15", "2026-03-16", "2026-03-17",
-          "2026-03-18", "2026-03-19", "2026-03-20", "2026-03-21", "2026-03-22", "2026-03-23", "2026-03-24", "2026-03-25",
-          "2026-03-26", "2026-03-27", "2026-03-28", "2026-03-29", "2026-03-30", "2026-03-31", "2026-04-01", "2026-04-02",
-          "2026-04-03", "2026-04-04", "2026-04-05", "2026-04-06", "2026-04-07", "2026-04-08", "2026-04-09", "2026-04-10",
-          "2026-04-11"
-        ]
-      },
-      yAxis: {
-        title: {
-          text: 'Pnl($)'
-        }
-      },
-      series: [{
-        name: 'PnL',
-        data: [
-          34.327, 94.825, 71.859, 57.859, 11.382, 11.379, 1.099, 85.948, 58.117, 69.348, -2.839, 96.841,
-          82.406, 17.296, 14.092, 14.257, 26.945, 50.099, 40.354, 25.579, 59.245, 9.647, 25.675, 33.468,
-          42.887, 77.443, 15.966, 48.995, 57.204, -0.123, 58.792, 12.905, 1.83, 94.633, 96.391, 79.882,
-          26.984, 5.256, 66.844, 41.216, 7.814, 46.994, -1.389, 90.479, 22.172, 64.565, 27.73, 49.607,
-          52.405, 14.41, 96.806, 76.389, 93.647, 88.957, 57.779, 91.797, 4.292, 15.578, -0.251, 29.16,
-          35.811, 23.492, 82.017, 32.459, 24.498, 51.983, 9.797, 79.231, 2.828, 98.623, 76.086, 15.865,
-          -4.42, 80.623, 69.22, 71.546, 75.983, 2.775, 32.639, 7.166, 85.626, 60.446, 29.744, 1.674,
-          27.653, 29.144, 71.609, 61.944, 88.157, 44.583, 7.557, 69.891, 74.882, 53.934, 75.952, 46.849,
-          49.887, 39.892, -2.331, 6.329, -1.7, 61.823, 28.007, 48.4, 90.294, 21.176, 38.09, 74.333,
-          19.024, 3.083, 25.424, 11.928, 92.618, 79.853, 61.507, 86.503, 79.386, 14.59, 88.719, 51.631,
-          79.781, 89.09, 28.39, 6.555, 18.933, 39.846, 80.892, 85.377, -4.27, 48.628, 38.828, 18.321,
-          7.586, 30.45, 94.006, 28.936, 49.473, 68.817, 33.181, 97.037, 96.057, 21.437, 47.211, 26.592,
-          24.908, -1.127, 59.004, 47.781, 0.405, 24.258, 90.368, 20.154, 10.214, 46.393, 98.493, 20.416,
-          65.574, 74.97, 19.952, 71.463, 33.617, 61.392, 61.521, 51.256, 4.48, 82.707, 28.682, 14.584,
-          -0.719, 57.044, 66.144, -3.258, 48.77, 18.782, 62.743, 13.308, 67.548, 35.607, 93.357, 9.44,
-          30.812, 6.915, 92.093, 87.121, 22.084, 64.298, 80.808, 53.296, 50.613, 20.394, 4.776, 89.208,
-          89.544, 61.476, 30.598, 31.667, 71.225, 89.197, 88.144, 76.887
-        ]
-      }, {
-        name: 'com_pnl',
-        data: [
-          92.725, 3.462, 15.861, 133.769, 87.029, -8.528, 6.235, 96.16, -9.19, 15.729, 77.797, 100.703,94.314, 25.883, 103.949, 27.96, 42.064, 109.439, 93.941, 125.876, 95.218, 80.929, 4.988, 48.835,32.432, 29.038, 145.682, 52.896, 132.727, 90.982, 117.17, 70.422, 82.305, 68.803, 21.239, 105.592,34.924, -6.109, 93.276, 18.338, 140.473, 142.629, 136.378, 49.225, -7.527, 138.531, 58.509, 144.665,144.179, 126.482, 37.112, 51.616, 126.182, 40.708, 17.119, 79.088, 139.785, 101.365, 81.21, 5.548,88.401, 148.409, 12.413, 72.933, 130.38, 108.523, 101.523, 102.397, 47.519, 36.975, 119.498, 119.618,128.732, 136.118, 71.815, 70.243, 117.727, 93.994, 102.315, 117.327, 132.401, 44.079, 50.093, 5.037,82.525, -4.249, 64.496, 76.823, 35.847, 84.533, -5.12, -4.024, 121.616, 47.631, 10.33, 73.559,113.199, 24.531, 89.662, 3.656, -1.731, 75.017, 76.502, 91.989, 106.175, 146.136, 72.608, 41.673,117.23, 33.333, 60.235, 2.553, -5.944, 144.024, 123.757, 101.356, 55.432, 17.727, 15.03, 30.039,77.876, 104.335, 95.632, 34.789, 142.778, 108.064, 78.697, 87.875, 57.136, 29.637, 46.956, 111.255,-7.697, 8.572, -2.64, -3.483, 126.874, 102.585, 65.868, 5.653, 68.659, 65.755, 17.712, 59.416,53.761, 88.536, 91.615, -2.751, 49.938, 90.138, 70.502, 127.038, 95.391, 16.07, 1.291, 92.787,-5.758, 83.724, 140.437, 82.076, 52.107, 92.926, 63.32, 77.299, 140.634, 51.776, 143.79, 134.856,21.327, 1.098, 6.124, -7.085, 5.111, 99.281, 1.39, 41.036, 125.18, -6.276, 120.315, 35.097, 8.906,101.478, 90.631, 130.396, 107.611, 118.557, 35.126, 18.39, 110.098, 119.094, 148.481, 56.019, 49.523,114.226, 44.529, 138.921, 127.346, 58.639, 110.139, 110.727
-        ]
-      }/*, {
-        name: 'ROI',
-        data: [5, 7, 3]
-      }*/]
-    });
+        text: 'Pnl($)'
+      }
+    },
+    series: [{
+      name: 'PnL',
+      data: mockChartsFloat1
+    }, {
+      name: 'com_pnl',
+      data: mockChartsFloat2
+    }/*, {
+      name: 'ROI',
+      data: [5, 7, 3]
+    }*/]
+  });
+
+  const chartBalance = Highcharts.chart('container_balance', {
+    chart:{
+      backgroundColor: 'rgba(0,0,0,0)'
+    },
+    title: {
+      text: null
+    },
+    xAxis: {
+      categories: mockChartsDates
+    },
+    yAxis: {
+      title: {
+        text: 'Pnl($)'
+      }
+    },
+    series: [{
+      name: 'PnL',
+      data: mockChartsFloat1
+    }, {
+      name: 'com_pnl',
+      data: mockChartsFloat2
+    }]
+  });
 
 });
-
-// Use the function inside the script tag
-
   </script>
   <script type="application/javascript">
     console.log({{ DEBUG }},"<-:DEBUG");

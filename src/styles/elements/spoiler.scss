@@ -15,6 +15,15 @@
     color: $primary-text-color;
     cursor: pointer;
     font-weight: bold;
+    position: relative;
+    &:after {
+      color: $primary-text-color;
+      content: '▼';
+      display: inline-block;
+      position: absolute;
+      right: 8px;
+      transition: transform 1s ease-in-out;
+    }
   }
   &>.contents {
     width: 100%;
@@ -22,6 +31,7 @@
     overflow: hidden;
     padding: 0;
     box-sizing: border-box;
+    overflow-x: auto;
     &:before {
       content: '';
       height: 8px;
@@ -31,6 +41,11 @@
     }
   }
   &.expanded {
+    &>.header {
+      &:after {
+        transform: rotate(540deg);
+      }
+    }
     &>.contents {
       padding: 0 8px 8px 8px;
       height: auto;

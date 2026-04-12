@@ -1,11 +1,9 @@
 <header>
   <nav class="main-menu">
-    {#<a href="/" class="{% if currentPath == '/' %}active{% endif %}">Home</a>
-    <a href="/about" class="{% if currentPath == '/about' %}active{% endif %}">About</a>
-    #}
     <a href="/balance" class="menu-link{% if currentPath == '/balance' %} active{% endif %}">Баланс</a>
     <a href="/trading-history" class="menu-link{% if currentPath == '/trading-history' %} active{% endif %}">История торгов</a>
     <a href="/current-positions" class="menu-link{% if currentPath == '/current-positions' %} active{% endif %}">Текущие позиции</a>
+    <a href="/analysis" class="menu-link{% if currentPath == '/analysis' %} active{% endif %}">Анализ</a>
     {% if debug %}
       <a href="/design-system" class="menu-link{% if currentPath == '/design-system' %} active{% endif %}">Дизайн-система</a>
     {% endif %}

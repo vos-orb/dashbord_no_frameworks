@@ -4,6 +4,7 @@
 .ui-button {
   background-color: color.adjust($secondary-color, $alpha: -0.9);
   border: 1px solid $secondary-color;
+  color: $secondary-color;
   @include box-shadow-main;
   padding: 0 8px;
   height: 40px;
@@ -15,6 +16,11 @@
   vertical-align: top;
   @include box-shadow-main;
   cursor: pointer;
+  font-weight: bold;
+  &.primary {
+    background-color: $secondary-color;
+    color: $primary-color;
+  }
   &:hover, &:focus {
     background: #ffffff;
   }

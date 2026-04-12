@@ -16,4 +16,7 @@ $field-height: 40px;
   -moz-box-shadow: $x $y $blur $spread $color;
   box-shadow: $x $y $blur $spread $color;
 }
+@mixin text-shadow-main($x: 3px, $y: 3px, $blur: 0px, $color: rgba(0, 0, 0, 0.3)) {
+  text-shadow: $x $y $blur $color;
+}
 

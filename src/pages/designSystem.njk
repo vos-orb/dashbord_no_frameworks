@@ -8,6 +8,15 @@
     Показываю
   </div>
 </div>
+
+<div class="spoiler">
+  <div class="header">Кнопки</div>
+  <div class="contents">
+    <div class="ui-button">Простая кнопка</div>
+    <div class="ui-button primary">Важная кнопка</div>
+  </div>
+</div>
+
 <div class="spoiler">
   <div class="header">Скелетоны</div>
   <div class="contents">
@@ -66,23 +75,24 @@
     <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
     <div class="autocomplete-items"></div>
   </div>
-  <table>
-    <thead>
-      <tr>
-        <th data-column="name">Имя</th>
-        <th data-column="email">Email</th>
-        <th data-column="role">Роль</th>
-      </tr>
-    </thead>
-    <tbody class="table-body">
-      <tr>
-        <td><div class="skeleton" style="width: 100%; height: 40px;">fgdfg</div></td>
-        <td><div class="skeleton" style="width: 100%; height: 40px;">dfgd</div></td>
-        <td><div class="skeleton" style="width: 100%; height: 40px;">dfgdf</div></td>
-      </tr>
-    </tbody>
-  </table>
-
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th data-column="name">Имя</th>
+          <th data-column="email">Email</th>
+          <th data-column="role">Роль</th>
+        </tr>
+      </thead>
+      <tbody class="table-body">
+        <tr>
+          <td><div class="skeleton" style="height: 40px;">fgdfg</div></td>
+          <td><div class="skeleton" style="height: 40px;">dfgd</div></td>
+          <td><div class="skeleton" style="height: 40px;">dfgdf</div></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   <div class="pagination">
     <button class="btn prev-page" disabled>Назад</button>
     <span class="page-info">Страница 1 из 1</span>
@@ -96,18 +106,18 @@
     <input class="inp search" type="text" placeholder="Поиск по второй таблице..." autocomplete="off">
     <div class="autocomplete-items"></div>
   </div>
-
-  <table>
-    <thead>
-      <tr>
-        <th data-column="product">Товар</th>
-        <th data-column="price">Цена</th>
-        <th data-column="category">Категория</th>
-      </tr>
-    </thead>
-    <tbody class="table-body"></tbody>
-  </table>
-
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th data-column="product">Товар</th>
+          <th data-column="price">Цена</th>
+          <th data-column="category">Категория</th>
+        </tr>
+      </thead>
+      <tbody class="table-body"></tbody>
+    </table>
+  </div>
   <div class="pagination">
     <button class="btn prev-page" disabled>Назад</button>
     <span class="page-info">Страница 1 из 1</span>
