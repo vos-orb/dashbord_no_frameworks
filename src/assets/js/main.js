@@ -6,6 +6,7 @@ import './ui/table.js';
 import './ui/ddls.js';
 import './ui/datePickers.js';
 import './ui/radios.js';
+import './ui/checkboxes.js';
 import './ui/calendar.js';
 import {  getRequest, postRequest } from '@/services/api.js';
 
