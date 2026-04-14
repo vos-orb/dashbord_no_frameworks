@@ -7,8 +7,8 @@ export default defineConfig(({ mode }) => {
   // The third argument '' ensures all VITE_ variables are loaded
   const env = loadEnv(mode, process.cwd(), '');
 
-  console.log('FULL ENV:', env); // DEBUG: check what Vite actually loads
-  console.log('CWD:', process.cwd());
+  // console.log('FULL ENV:', env); // DEBUG: check what Vite actually loads
+  // console.log('CWD:', process.cwd());
 
   return {
     root: 'dist',
@@ -26,18 +26,6 @@ export default defineConfig(({ mode }) => {
           path.resolve(__dirname, 'src/layouts'),
           path.resolve(__dirname, 'src/components')
         ],
-        // Pass .env vars to Nunjucks templates
-        nunjucksEnvironment: (envNunjucks) => {
-          envNunjucks.addGlobal('API_URL', env.VITE_API_URL);
-          envNunjucks.addGlobal('API_TIMEOUT', env.VITE_API_TIMEOUT);
-          envNunjucks.addGlobal('API_HEADERS', env.VITE_API_HEADERS);
-          envNunjucks.addGlobal('DEBUG', env.VITE_DEBUG);
-          Object.keys(env).forEach(key => {
-            if (key.startsWith('VITE_')) {
-              envNunjucks.addGlobal(key, env[key]);
-            }
-          });
-        }
       })
     ],
 

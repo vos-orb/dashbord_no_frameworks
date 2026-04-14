@@ -12,12 +12,12 @@
     padding: 0 8px;
     box-sizing: border-box;
     vertical-align: top;
-    color: $primary-text-color;
+    color: $secondary-color;
     cursor: pointer;
     font-weight: bold;
     position: relative;
     &:after {
-      color: $primary-text-color;
+      color: $secondary-color;
       content: '▼';
       display: inline-block;
       position: absolute;

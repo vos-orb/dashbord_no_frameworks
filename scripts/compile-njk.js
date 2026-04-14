@@ -32,10 +32,22 @@ env.addGlobal('API_TIMEOUT', process.env.VITE_API_TIMEOUT);
 env.addGlobal('API_HEADERS', process.env.VITE_API_HEADERS);
 env.addGlobal('DEBUG', process.env.VITE_DEBUG);
 
+const themes = [
+  { themeName: 'light', styleFile: 'main-light.scss'},
+  { themeName: 'dark', styleFile: 'main-dark.scss'},
+  { themeName: 'ocean', styleFile: 'mian-ocean.scss'},
+  { themeName: 'prom', styleFile: 'mian-ocean.scss'}
+];
+// Get theme from environment or use default
+const selectedTheme = process.env.VITE_THEME || 'light';
+console.warn('TEST VARIABLE VITE_THEME from env', selectedTheme);
+const themeConfig = themes.find(t => t.themeName === selectedTheme) || themes[0];
+env.addGlobal('THEME_NAME', themeConfig.themeName);
+
 // Compile SCSS to CSS
 try {
   console.log('Compiling SCSS to CSS...');
-  execSync('sass src/styles/main.scss:dist/assets/css/main.css --no-source-map --style=compressed', { stdio: 'inherit' });
+  execSync('sass src/styles:dist/assets/css --no-source-map --style=compressed', { stdio: 'inherit' });
   console.log('✅ SCSS compiled successfully');
 } catch (err) {
   console.error('SCSS compilation failed:', err);
