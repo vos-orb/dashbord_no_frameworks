@@ -8,19 +8,19 @@ $hover-color: #f8f9fa;
   .calendar-popup {
     position: relative;
     background: white;
-    border: 1px solid $secondary-color;
-    @include box-shadow-main;
-    border-radius: 0;
+    border: 1px solid $primary-color;
+    @include border-radius;
     min-width: 300px;
     .calendar-controls {
       display: flex;
       justify-content: space-between;
       padding: 10px;
       background: $hover-color;
-      border-bottom: 1px solid $secondary-color;
+      border-bottom: 1px solid $primary-color;
+      @include border-radius(8px 8px 0 0);
       select {
         padding: 5px;
-        border: 1px solid $secondary-color;
+        border: 1px solid $primary-color;
         border-radius: 3px;
         cursor: pointer;
       }
@@ -36,7 +36,7 @@ $hover-color: #f8f9fa;
         text-align: center;
         font-weight: bold;
         font-size: 12px;
-        color: $secondary-color;
+        color: $primary-color;
         line-height: 12px;
         container-type: size;
         .text {
@@ -51,24 +51,24 @@ $hover-color: #f8f9fa;
         cursor: pointer;
         font-weight: bold;
         font-size: 13px;
+        color: $primary-text-color;
         box-sizing: border-box;
         container-type: size;
         background: rgba(0, 0, 0, 0.1);
+        @include border-radius;
         &.has-meta {
-          background-color: color.adjust($secondary-color, $alpha: -0.5);
+          background-color: color.adjust($primary-color, $alpha: -0.5);
         }
         &:hover {
-          border: 1px solid $secondary-color;
-          @include box-shadow-main;
+          border: 1px solid $primary-color;
         }
         &.selected {
-          border: 1px solid $secondary-color;
-          background: $secondary-color;
+          border: 1px solid $primary-color;
+          background: $primary-color;
           color: #ffffff;
-          @include box-shadow-main;
         }
         &.disabled {
-          color: color.adjust($secondary-color, $alpha: -0.5);
+          color: color.adjust($primary-color, $alpha: -0.5);
           cursor: not-allowed;
         }
         .day-content {

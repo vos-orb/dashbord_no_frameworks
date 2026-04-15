@@ -1,5 +1,4 @@
 import { routes } from '@/routes';
-import './vendors/shoelace.js';
 import './vendors/highcharts.js';
 import './ui/spoilers.js';
 import './ui/table.js';
