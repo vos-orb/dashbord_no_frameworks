@@ -1,0 +1,54 @@
+@use 'light/_shared' as *;
+@use "light/_layouts.scss";
+
+@use "light/elements/_skeleton.scss";
+@use "light/elements/_spoiler.scss";
+@use "light/elements/_ddl.scss";
+@use "light/elements/_tables.scss";
+@use "light/elements/_datePickers.scss";
+@use "light/elements/_radios.scss";
+@use "light/elements/_checkboxes.scss";
+@use "light/elements/_buttons.scss";
+@use "light/elements/_calendar.scss";
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: $background-color;
+}
+
+header, footer {
+  background: $header-color;
+  color: $header-text;
+  padding: 0 8px;
+}
+
+.main-menu {
+  padding: 0;
+  white-space: nowrap;
+  .menu-link {
+    color: $header-text;
+    text-decoration: none;
+    height: 50px;
+    line-height: 50px;
+    vertical-align: top;
+    box-sizing: border-box;
+    display: inline-block;
+    padding: 0 8px;
+    font-family: monospace;
+    font-size: 16px;
+    &:hover, &.active {
+      border-bottom: 4px solid $primary-color;
+    }
+    &:hover {
+      font-weight: bold;
+    }
+  }
+}
+
+h3 {
+  color: $header-text;
+  font-size: 14px;
+  margin: 10px 0;
+}

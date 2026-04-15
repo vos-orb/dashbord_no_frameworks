@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use '${path.resolve(__dirname, 'src/styles/variables')}' as *; @use '${path.resolve(__dirname, 'src/styles/_shared')}' as *;`,
+          additionalData: `@use "sass:color";`,
           api: 'modern-compiler'
         }
       },

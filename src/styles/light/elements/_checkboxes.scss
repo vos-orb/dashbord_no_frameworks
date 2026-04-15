@@ -1,0 +1,55 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.ui-checkbox {
+  color: $secondary-color;
+  padding: 0 8px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 14px;
+  box-sizing: border-box;
+  display: inline-block;
+  border-radius: 0;
+  vertical-align: top;
+  cursor: pointer;
+  font-weight: bold;
+  .inp-checkbox {
+    display: none;
+  }
+  &>.icon {
+    background-color: #ffffff;
+    border: 1px solid $secondary-color;
+    @include box-shadow-main;
+    height: 40px;
+    width: 40px;
+    line-height: 40px;
+    display: inline-block;
+    box-sizing: border-box;
+    font-size: 24px;
+    text-align: center;
+  }
+  &>.text {
+    height: 40px;
+    line-height: 40px;
+    vertical-align: top;
+    padding: 0 0 0 8px;
+  }
+  &:hover, &:focus {
+    .icon {
+      border-width: 2px;
+    }
+  }
+  &.checked {
+    .icon {
+      &:before {
+        content: '✓';
+        height: 40px;
+        line-height: 40px;
+        vertical-align: top;
+        display: inline-block;
+        font-weight: bold;
+        box-sizing: border-box;
+      }
+    }
+  }
+}

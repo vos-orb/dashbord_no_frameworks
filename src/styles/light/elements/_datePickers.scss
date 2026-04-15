@@ -6,7 +6,7 @@ $hover-color: #f8f9fa;
   position: relative;
   display: inline-block;
   width: 250px;
-  @include box-shadow-main;
+  @include border-radius;
   .wrapper {
     position: relative;
     &>input {
@@ -14,16 +14,16 @@ $hover-color: #f8f9fa;
       padding: 0 40px 0 8px;
       height: 40px;
       line-height: 40px;
-      border: 1px solid $secondary-color;
+      @include border-radius;
+      border: 1px solid $common-border-color;
       box-sizing: border-box;
       cursor: pointer;
       position: relative;
       display: inline-block;
       font-size: 14px;
+      color: $primary-text-color;
       &:focus {
         outline: none;
-        -webkit-box-shadow: 0px 0px 3px 0px $secondary-color;
-        box-shadow: 0px 0px 3px 0px $secondary-color;
       }
     }
     .clear-button {
@@ -31,7 +31,7 @@ $hover-color: #f8f9fa;
       position: absolute;
       height: 40px;
       width: 40px;
-      border: 1px solid $secondary-color;
+      border: none;
       border-radius: 0;
       background: transparent;
       line-height: 40px;
@@ -46,7 +46,7 @@ $hover-color: #f8f9fa;
         height: 26%;
         width: 2px;
         transform: rotate(45deg);
-        background: $secondary-color;
+        background: $primary-color;
         top: 37%;
         left: 50%;
       }
@@ -56,96 +56,81 @@ $hover-color: #f8f9fa;
         height: 26%;
         width: 2px;
         transform: rotate(135deg);
-        background: $secondary-color;
+        background: $primary-color;
         top: 37%;
         left: 50%;
       }
     }
   }
-
   .datepicker-popup {
     position: absolute;
     top: 100%;
     left: 0;
     background: white;
-    border: 1px solid $secondary-color;
-    @include box-shadow-main;
-    border-radius: 0;
+    @include border-radius;
+    border: 1px solid $common-border-color;
     z-index: 1000;
     min-width: 300px;
     display: none;
-
     &.show {
       display: block;
     }
-
     .datepicker-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 10px;
-      background: $hover-color;
-      border-bottom: 1px solid $secondary-color;
-
+      background: color.adjust($background-color, $lightness: -2%);
+      border-bottom: $common-border-color;
       button {
         background: none;
         border: none;
         font-size: 16px;
         cursor: pointer;
         padding: 5px;
-
         &:hover {
           background: rgba(0, 0, 0, 0.05);
           border-radius: 4px;
         }
       }
-
       .current-month {
         font-weight: bold;
         font-size: 14px;
       }
     }
-
     .period-buttons {
       display: flex;
       gap: 5px;
       padding: 10px;
-      border-bottom: 1px solid $secondary-color;
-
+      border-bottom: 1px solid $common-border-color;
       button {
         flex: 1;
         padding: 5px 8px;
         background: white;
-        border: 1px solid $secondary-color;
+        border: 1px solid $common-border-color;
         border-radius: 3px;
         cursor: pointer;
         font-size: 12px;
-
         &:hover {
           background: $hover-color;
         }
-
         &.active {
-          border: 1px solid $secondary-color;
-          @include box-shadow-main;
+          border: 1px solid $common-border-color;
         }
       }
     }
-
     .calendar-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 2px;
       padding: 10px;
-
       .day-header {
         text-align: center;
         font-weight: bold;
         font-size: 12px;
-        color: $secondary-color;
+        color: $primary-text-color;
         padding: 5px;
       }
-
       .calendar-day {
         aspect-ratio: 1;
         display: flex;
@@ -154,30 +139,24 @@ $hover-color: #f8f9fa;
         border-radius: 50%;
         cursor: pointer;
         font-size: 13px;
-
         &:hover {
-          border: 1px solid $secondary-color;
+          border: 1px solid $primary-color;
         }
-
         &.in-range {
-          border: 1px solid $secondary-color;
-          @include box-shadow-main;
+          border: 1px solid $common-border-color;
           &:hover {
-            @include box-shadow-main(0, 0, 0, 0, transparent);
+            border: 1px solid $primary-color;
           }
         }
-
         &.start-date,
         &.end-date {
-          border: 1px solid $secondary-color;
-          background: $secondary-color;
+          border: 1px solid $primary-color;
+          background: $primary-color;
           color: #ffffff;
-          @include box-shadow-main;
           &:hover {
-            @include box-shadow-main(0, 0, 0, 0, transparent);
+
           }
         }
-
         &.disabled {
           color: #ccc;
           cursor: not-allowed;
@@ -188,21 +167,19 @@ $hover-color: #f8f9fa;
         }
       }
     }
-
     .datepicker-footer {
       padding: 10px;
       text-align: right;
-      border-top: 1px solid $secondary-color;
-
+      border-top: 1px solid $common-border-color;
       button {
         padding: 0 8px;
         height: 40px;
         line-height: 40px;
-        background: $secondary-color;
+        background: $primary-color;
+        @include border-radius;
+        border: 1px solid $common-border-color;
         color: white;
-        border: none;
         cursor: pointer;
-        @include box-shadow-main;
         &:hover {
           box-shadow: none;
         }

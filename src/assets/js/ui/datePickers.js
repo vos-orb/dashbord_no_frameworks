@@ -25,7 +25,7 @@
 
       const clearButton = document.createElement('button');
         clearButton.className = 'clear-button';
-        clearButton.innerHTML = '×';
+        clearButton.innerHTML = '';
         clearButton.title = 'Очистить выбор';
         clearButton.addEventListener('click', (e) => {
           e.stopPropagation();

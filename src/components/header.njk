@@ -6,6 +6,10 @@
     <a href="/analysis" class="menu-link{% if currentPath == '/analysis' %} active{% endif %}">Анализ</a>
     {% if debug %}
       <a href="/design-system" class="menu-link{% if currentPath == '/design-system' %} active{% endif %}">Дизайн-система</a>
+      <a id="theme-toggle" class="menu-link">
+        <span id="theme-icon">🌙</span>
+        <span id="theme-name">Dark</span>
+      </a>
     {% endif %}
   </nav>
 </header>

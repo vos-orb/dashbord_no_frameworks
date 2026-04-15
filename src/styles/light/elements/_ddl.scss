@@ -1,0 +1,87 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.dropdown {
+  position: relative;
+  display: inline-block;
+
+  .dropdown-toggle {
+    @include border-radius;
+    padding: 0 24px 0 8px;
+    height: 40px;
+    line-height: 40px;
+    box-sizing: border-box;
+    border: 1px solid $common-border-color;
+    background: white;
+    cursor: pointer;
+    min-width: 200px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: "Source Sans Pro", sans-serif;
+    font-size: 14px;
+    outline: none;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    position: relative;
+    color: $primary-text-color;
+    &:focus {
+      box-sizing: border-box;
+    }
+    .dropdown-arrow {
+      position: absolute;
+      right: 8px;
+      transition: transform 0.3s;
+      display: inline-block;
+      &:before {
+        content: '▼';
+        color: $primary-color;
+      }
+    }
+  }
+  &.expanded {
+    .dropdown-toggle {
+      @include border-radius(8px 8px 0 0);
+      .dropdown-arrow {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  .dropdown-menu {
+    @include border-radius(0 0 8px 8px);
+    box-sizing: border-box;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 100%;
+    width: auto;
+    background: white;
+    z-index: 1000;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid $common-border-color;
+    border-top: none;
+    box-shadow: 0 6px 16px 0 #00000014, 0 3px 6px -4px #0000001F, 0 9px 28px 8px #0000000D;
+    &.show {
+      display: block;
+    }
+    .dropdown-item {
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 14px;
+      &:nth-child(even) {
+        background-color: #f9f9f9;
+      }
+      &:hover,
+      &.focus {
+        background-color: #f0f0f0;
+      }
+      &.selected {
+        background-color: $primary-color;
+        color: white;
+      }
+    }
+  }
+}

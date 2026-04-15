@@ -8,6 +8,7 @@ import './ui/datePickers.js';
 import './ui/radios.js';
 import './ui/checkboxes.js';
 import './ui/calendar.js';
+import './themeSwitcher.js';
 import {  getRequest, postRequest } from '@/services/api.js';
 
 const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);

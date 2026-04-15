@@ -1,0 +1,54 @@
+@use '../_shared' as *;
+@use 'sass:color';
+.spoiler {
+  margin-bottom: 16px;
+  @include border-radius;
+  &>.header {
+    height: $field-height;
+    line-height: $field-height;
+    padding: 0 8px;
+    background: #fafafa;
+    @include border-radius(8px 8px 0 0);
+    border: 1px solid $common-border-color;
+    box-sizing: border-box;
+    vertical-align: top;
+    color: $primary-text-color;
+    cursor: pointer;
+    font-weight: bold;
+    position: relative;
+    &:after {
+      color: $primary-color;
+      content: '▼';
+      display: inline-block;
+      position: absolute;
+      right: 8px;
+      transition: transform 1s ease-in-out;
+    }
+  }
+  &>.contents {
+    border: none;
+    width: 100%;
+    height: 0px;
+    overflow: hidden;
+    padding: 0;
+    box-sizing: border-box;
+    overflow-x: auto;
+    background: #ffffff;
+  }
+  &.expanded {
+    &>.header {
+      &:after {
+        transform: rotate(540deg);
+      }
+    }
+    &>.contents {
+      padding: 8px 8px 8px 8px;
+      height: auto;
+      min-height: $field-height;
+      overflow: visible;
+      @include border-radius(0 0 8px 8px);
+      border: 1px solid $common-border-color;
+      border-width: 0 1px 1px 1px;
+    }
+  }
+}
