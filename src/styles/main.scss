@@ -17,6 +17,9 @@ body {
   padding: 0;
   background: $background-color;
 }
+.hidden.hidden.hidden {
+  display: none;
+}
 
 header, footer {
   background: $header-color;

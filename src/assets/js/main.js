@@ -18,10 +18,11 @@ if (debug) {
 }
 
 // Example GET request
-async function fetchData() {
+async function fetchData() { //TODO remove that into instructions
   try {
-    const data = await getRequest('/users');
-    console.log('Users:', data);
+    const data = await getRequest('/filter/user_name');
+    const data2 = await getRequest('/filter/user_name_lead');
+    console.log('Users:', data,data2);
   } catch (error) {
     console.error('Failed to fetch users:', error);
   }

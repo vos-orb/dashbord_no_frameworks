@@ -7,9 +7,6 @@ export default defineConfig(({ mode }) => {
   // The third argument '' ensures all VITE_ variables are loaded
   const env = loadEnv(mode, process.cwd(), '');
 
-  // console.log('FULL ENV:', env); // DEBUG: check what Vite actually loads
-  // console.log('CWD:', process.cwd());
-
   return {
     root: 'dist',
     publicDir: path.resolve('./src/assets'),
@@ -38,22 +35,31 @@ export default defineConfig(({ mode }) => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: `@use "sass:color";`,
+          additionalData: `
+            @use "sass:color";
+            @import "@/styles/_variables.scss";
+            @import "@/styles/_shared.scss";
+          `,
           api: 'modern-compiler'
         }
       },
       devSourcemap: true
     },
     optimizeDeps: {
-      exclude: ['**/*.scss']
+      include: ['@/styles/main.scss'],
+      exclude: []
     },
     build: {
       outDir: '../dist_build',
       emptyOutDir: true,
+      cssCodeSplit: false,
       rollupOptions: {
         input: {
-          main: path.resolve(__dirname, 'dist/index.html'),
-          about: path.resolve(__dirname, 'dist/about.html')
+          balance: path.resolve(__dirname, 'dist/balance.html'),
+          analysis: path.resolve(__dirname, 'dist/analysis.html'),
+          tradingHistory: path.resolve(__dirname, 'dist/trading-history.html'),
+          currentPositions: path.resolve(__dirname, 'dist/current-positions.html'),
+          designSystem: path.resolve(__dirname, 'dist/design-system.html')
         },
         output: {
           assetFileNames: 'assets/[name]-[hash].[ext]',

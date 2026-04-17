@@ -24,6 +24,7 @@
     <br />
     <br />
     <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
+    <div class="skeleton hidden" style="width:100%; height:400px;"></div>
   </div>
 </div>
 
@@ -171,34 +172,40 @@
 
 
 
-
-
-
-
   <script type="module">
 import { getRequest, postRequest } from '@/services/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  //charts
+  let chartPnl = {};
   // PnL
   initDropdowns('.dropdown.users-pnl', {
     data: async function() {
       if ({{ DEBUG }}) {
         console.log("API_URL", '{{ API_URL }}');
-        return ["user1","user2","user3","user4"];
+        //return ["user1","user2","user3","user4"];
       }
       try {
-        const response = await fetch('{{ API_URL }}/filter/user_name_lead');
-        const dta = await response?.json();
-        return dta.map(item => item.name);
+        const response = await getRequest('/filter/user_name_lead');
+        return response;
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
       }
     },
     onSelect: async function (selectedItem) {
-      console.log('Выбран Пользак:', selectedItem);
       const response = await postRequest('/get_pnl_roi_for_user', { "account": selectedItem } );
-      console.log('PnL data:', response);
+      if (chartPnl?.series ) {
+        chartPnl?.update({ //fill the chart
+          xAxis:{
+            categories:response?.x
+          },
+          series:[
+            {name:"PnL ($)", data:response?.series?.pnl},
+            {name:"ROI (%)", data:response?.series?.roi}
+          ]
+        });
+      }
     }
   });
   let pnlPeriodDatepicker = document.querySelector('.pnl-period-datepicker');
@@ -229,12 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initDropdowns('.dropdown.users-balance', {
     data: async function() {
       if ({{ DEBUG }}) {
-        return ["user1","user2","user3","user4","user5","user6"];
+        //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        const response = await fetch('{{ API_URL }}/filter/user_name');
-        const dta = await response?.json();
-        return dta.map(item => item.name);
+        return await getRequest('/filter/user_name');
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -244,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Выбран Пользак Balance:', selectedItem);
       const response = await postRequest('/get_data_balance_user', { "user": selectedItem } );
       console.log('Balance data:', response);
+      //TODO fill the chart
     }
   });
   let balancePeriodRadioGroup = document.querySelector('.balance-period');
@@ -275,12 +281,10 @@ document.addEventListener('DOMContentLoaded', () => {
   initDropdowns('.dropdown.users-balance-inv', {
     data: async function() {
       if ({{ DEBUG }}) {
-        return ["user1","user2","user3","user4","user5","user6"];
+        //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        const response = await fetch('{{ API_URL }}/filter/user_name');
-        const dta = await response?.json();
-        return dta.map(item => item.name);
+        return [...await getRequest('/filter/user_name'),'all'];
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -292,6 +296,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let tableHPU = await document.querySelector('.table-component.history-pop-up');
       let tableBOI = await document.querySelector('.table-component.balance-of-investor');
       console.log('tableGFCDF:', tableGFCDF);
+      //TODO fill the grids
       //const response = await postRequest('/get_filter_and_compute_daily_diff', { "name_account": selectedItem } );
 
       let dataDaylyDiff = [];
@@ -408,14 +413,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
       try {
-
+        const responseTopUp = await postRequest('/get_history_top_up', { "name_acc": selectedItem } );
       new UiTable(tableGFCDF, dataDaylyDiff, 10);
-      new UiTable(tableHPU, dataHistoryPopUp, 10);
+      //new UiTable(tableHPU, dataHistoryPopUp, 10);
+        new UiTable(tableHPU, responseTopUp, 10);
       new UiTable(tableBOI, dataBalanceUser, 10);
       } catch(err){
         console.log('ERRRORROROR', err)
       }
-      const response2 = await postRequest('/get_history_top_up', { "name_acc": selectedItem } );
+
       const response3 = await postRequest('/get_balance_diff_user', { "name_acc": selectedItem } );
       console.log('Balance data:', response);
       //TODO fiil up the tables
@@ -492,7 +498,7 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
     console.warn("Highcharts",Highcharts);
-  const chartPnl = Highcharts.chart('container_pnl_roi', {
+  /*const chartPnl = Highcharts.chart('container_pnl_roi', {
     chart:{
       backgroundColor: 'rgba(0,0,0,0)'
     },
@@ -513,11 +519,180 @@ document.addEventListener('DOMContentLoaded', () => {
     }, {
       name: 'com_pnl',
       data: mockChartsFloat2
-    }/*, {
-      name: 'ROI',
-      data: [5, 7, 3]
-    }*/]
-  });
+    }]
+  });*/
+
+  const chartPnlStructure = {
+    "chart": {
+      "type": "area",
+      "backgroundColor": "transparent",
+      "borderRadius": 16,
+      "spacing": [
+        30,
+        20,
+        30,
+        20
+      ]
+    },
+    "title": {
+      text: null
+    },
+    "xAxis": {
+      "categories": [],
+      "labels": {
+        "style": {
+          "color": "#64748b",
+          "fontSize": "12px"
+        }
+      },
+      "crosshair": {
+        "width": 1,
+        "color": "#e2e8f0"
+      },
+      "lineColor": "#e2e8f0"
+    },
+    "yAxis": [
+      {
+        "title": {
+          "text": "PnL ($)",
+          "style": {
+            "color": "#64748b",
+            "fontSize": "13px",
+            "fontWeight": 500
+          }
+        },
+        "labels": {
+          "style": {
+            "color": "#64748b",
+            "fontSize": "12px"
+          },
+          "x": -8
+        }
+      },
+      {
+        "title": {
+          "text": "ROI (%)",
+          "style": {
+            "color": "#64748b",
+            "fontSize": "13px",
+            "fontWeight": 500
+          }
+        },
+        "labels": {
+          "style": {
+            "color": "#64748b",
+            "fontSize": "12px"
+          },
+          "x": 8
+        },
+        "opposite": true
+      }
+    ],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 12,
+      "padding": 16
+    },
+    "plotOptions": {
+      "area": {
+        "marker": {
+          "radius": 4,
+          "fillColor": "#ffffff",
+          "lineWidth": 2
+        },
+        "lineWidth": 2
+      }
+    },
+    "series": [
+      {
+        "name": "PnL ($)",
+        "type": "area",
+        "data": [],
+        "yAxis": 0,
+        "color": "#7c3aed",
+        "fillColor": {
+          "linearGradient": {
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 1
+          },
+          "stops": [
+            [
+              0,
+              "#7c3aed33"
+            ],
+            [
+              1,
+              "#7c3aed05"
+            ]
+          ]
+        },
+        "lineColor": "#7c3aed",
+        "marker": {
+          "lineColor": "#7c3aed"
+        }
+      },
+      {
+        "name": "ROI (%)",
+        "type": "area",
+        "data": [],
+        "yAxis": 1,
+        "color": "#0891b2",
+        "fillColor": {
+          "linearGradient": {
+            "x1": 0,
+            "y1": 0,
+            "x2": 0,
+            "y2": 1
+          },
+          "stops": [
+            [
+              0,
+              "#0891b233"
+            ],
+            [
+              1,
+              "#0891b205"
+            ]
+          ]
+        },
+        "lineColor": "#0891b2",
+        "marker": {
+          "lineColor": "#0891b2"
+        },
+        "dashStyle": "Dash"
+      }
+    ],
+    "credits": {
+      "enabled": false
+    },
+    "responsive": {
+      "rules": [
+        {
+          "condition": {
+            "maxWidth": 600
+          },
+          "chartOptions": {
+            "legend": {
+              "layout": "horizontal",
+              "align": "center",
+              "verticalAlign": "bottom"
+            }
+          },
+          "_id": "highcharts-yg1mzm2-25"
+        }
+      ]
+    }
+  };
+  chartPnl = Highcharts.chart('container_pnl_roi', chartPnlStructure);
 
   const chartBalance = Highcharts.chart('container_balance', {
     chart:{
