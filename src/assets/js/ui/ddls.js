@@ -9,6 +9,8 @@
       this.items = [];
       this.isOpen = false;
       this.options = options;
+      this.multiSelect = options.multiSelect || false;
+      this.selectedItems = [];
       const existingArrow = this.toggleButton.querySelector('.dropdown-arrow');
       if (!existingArrow) {
         const arrow = document.createElement('span');
@@ -92,21 +94,41 @@
       this.container.classList.remove('expanded');
     }
 
-
     selectItem(item) {
       const selectedText = item.textContent;
+      const itemValue = item.dataset.value || selectedText;
       const arrow = this.toggleButton.querySelector('.dropdown-arrow');
       const arrowHtml = arrow ? arrow.outerHTML : '';
 
-      this.toggleButton.innerHTML = selectedText + arrowHtml;
-      this.items.forEach(i => i.classList.remove('selected'));
+      if (this.multiSelect) { // Multi-select
+        const index = this.selectedItems.indexOf(itemValue);
 
-      item.classList.add('selected');
-      this.close();
+        if (index === -1) { // Add to selection
+          this.selectedItems.push(itemValue);
+          item.classList.add('selected');
+        } else { // Remove from selection
+          this.selectedItems.splice(index, 1);
+          item.classList.remove('selected');
+        }
+
+        // Update button text
+        if (this.selectedItems.length === 0) {
+          this.toggleButton.innerHTML = this.options.placeholder || 'Select options' + arrowHtml;
+        } else if (this.selectedItems.length === 1) {
+          this.toggleButton.innerHTML = this.selectedItems[0] + arrowHtml;
+        } else {
+          this.toggleButton.innerHTML = `${this.selectedItems.length} selected` + arrowHtml;
+        }
+      } else { // Single select
+        this.toggleButton.innerHTML = selectedText + arrowHtml;
+        this.items.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        this.close();
+      }
 
       // callback on select
       if (typeof this.options.onSelect === 'function') {
-        this.options.onSelect(selectedText);
+        this.options.onSelect(this.multiSelect ? this.selectedItems : selectedText);
       }
     }
 
@@ -172,7 +194,13 @@
     const instances = [];
 
     dropdownContainers.forEach(container => {
-      const instance = new Dropdown(container, options);
+      // Allow per-instance options via data attributes
+      const containerOptions = {
+        ...options,
+        ...(container.dataset.dropdownOptions ? JSON.parse(container.dataset.dropdownOptions) : {}),
+        multiSelect: container.hasAttribute('data-multi-select') || options.multiSelect
+      };
+      const instance = new Dropdown(container, containerOptions);
       instances.push(instance);
     });
 

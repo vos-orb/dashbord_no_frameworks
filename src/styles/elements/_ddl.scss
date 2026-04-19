@@ -67,6 +67,8 @@
       padding: 8px 16px;
       cursor: pointer;
       font-size: 14px;
+      position: relative;
+      padding-right: 32px;
       &:nth-child(even) {
         background-color: #f9f9f9;
       }
@@ -75,8 +77,25 @@
         background-color: #f0f0f0;
       }
       &.selected {
-        background-color: #007bff;
+        background-color: $secondary-color;
         color: white;
+        &::after {
+          content: '✓';
+          position: absolute;
+          right: 12px;
+          color: white;
+          font-weight: bold;
+        }
+      }
+      .dropdown[data-multi-select] & {
+        padding-right: 32px;
+        &.selected {
+          background-color: #e7f3ff;
+          color: $secondary-color;
+          &::after {
+            color: $secondary-color;
+          }
+        }
       }
     }
   }

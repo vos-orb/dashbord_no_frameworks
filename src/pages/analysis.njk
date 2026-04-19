@@ -3,12 +3,14 @@
 
 <div class="flex-row">
   <div class="flex-column">
-    <div class="dropdown">
-      <button class="dropdown-toggle">Начальная дата</button>
-      <div class="dropdown-menu"></div>
-    </div>
-  </div>
 
+    <div class="ui-datepicker analyze-pnl-datepicker" data-range="true">
+      <div class="wrapper">
+        <input type="text" placeholder="Выберите период" readonly />
+      </div>
+    </div>
+
+  </div>
   <div class="flex-column">
     <div class="dropdown ddl-strategy">
       <button class="dropdown-toggle">Стратегия</button>
@@ -16,7 +18,7 @@
     </div>
   </div>
   <div class="flex-column">
-    <div class="dropdown">
+    <div class="dropdown ddl-coin">
       <button class="dropdown-toggle">Монета</button>
       <div class="dropdown-menu"></div>
     </div>
@@ -33,14 +35,14 @@
       <div class="dropdown-menu"></div>
     </div>
   </div>
+  <div class="flex-column">
+    <div class="ui-button primary apply-filters">Применить фильтры</div>
+  </div>
 </div>
 
 <br />
-<div class="ui-button primary">Применить фильтры</div>
-<br />
-<br />
 
-<div class="spoiler">
+<div class="spoiler expanded">
   <div class="header">PNL/ROI</div>
   <div class="contents">
     График
@@ -66,43 +68,49 @@
 
   <script type="module">
 import { getRequest, postRequest } from '@/services/api.js';
+let currentStrategy = '';
+let currentCoin = '';
+let currentDirection = '';
+let currentTradingSerie = '';
+let currentDatePeriod = [];
 
+
+function getStrategyResults(response) {
+  let strategyNames = response.data.strategy_info.map(s => s.name);
+  let coins = response.data.strategy_info.find(s => s.name === strategyNames[0])?.coins || [];
+
+  initDropdowns('.dropdown.ddl-strategy', {
+    data: strategyNames,
+    multiSelect: true,
+    onSelect: function(selectedStrategies) {
+      currentStrategy = selectedStrategies;
+
+      coins = [];
+      selectedStrategies.forEach(str => {
+        let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
+        coins.push(...cns);
+      });
+
+      initDropdowns('.dropdown.ddl-coin', {
+        multiSelect: true,
+        data: coins,
+        onSelect: function(selectedCoins) {
+          currentCoin = selectedCoins;
+        }
+      });
+
+    }
+  });
+}
 document.addEventListener('DOMContentLoaded', () => {
 
   const getDataForDddls = async function() {
     if ({{ DEBUG }}) {
-      console.log("API_URL", '{{ API_URL }}');
-      return [
-        {
-          "name": "grid_bot_strategy",
-          "coins": [
-            "BTC-USDT", "DOGE-USDT", "ETH-USDT", "PEPE-USDT", "SOL-USDT", "XRP-USDT"
-          ]
-        },
-        {
-          "name": "oneside_grid_bot",
-          "coins": [
-            "BTC-USDT"
-          ]
-        },
-        {
-          "name": "supertrend_15m_tp_ts_total_tp_sl_v1",
-          "coins": [
-            "2Z-USDT", "ACH-USDT", "ACT-USDT", "ADA-USDT", "AGLD-USDT", "AIXBT-USDT", "ALGO-USDT", "ALLO-USDT", "ANIME-USDT", "APE-USDT", "APR-USDT", "ARB-USDT", "ARKM-USDT", "ASTER-USDT", "AT-USDT", "ATH-USDT", "AVNT-USDT", "AZTEC-USDT", "BABY-USDT", "BARD-USDT", "BASED-USDT", "BEAT-USDT", "BICO-USDT", "BIGTIME-USDT", "BIO-USDT", "BLUR-USDT", "BOME-USDT", "BONK-USDT", "BRETT-USDT", "BREV-USDT", "BSB-USDT", "CFX-USDT", "CHZ-USDT", "CORE-USDT", "CRV-USDT", "DOGE-USDT", "DOOD-USDT", "DOT-USDT", "DYDX-USDT", "EDEN-USDT", "EDGE-USDT", "EIGEN-USDT", "ENA-USDT", "ENJ-USDT", "ENSO-USDT", "ESP-USDT", "ETHFI-USDT", "F-USDT", "FARTCOIN-USDT", "FIL-USDT", "FLOKI-USDT", "FLOW-USDT", "FOGO-USDT", "GALA-USDT", "GLM-USDT", "GMT-USDT", "GPS-USDT", "GRASS-USDT", "GRT-USDT", "H-USDT", "HBAR-USDT", "HMSTR-USDT", "HOME-USDT", "HUMA-USDT", "ICX-USDT", "IOST-USDT", "IOTA-USDT", "JELLYJELLY-USDT", "JTO-USDT", "JUP-USDT", "KAITO-USDT", "KAT-USDT", "KITE-USDT", "KMNO-USDT", "LA-USDT", "LAB-USDT", "LAYER-USDT", "LDO-USDT", "LIGHT-USDT", "LINEA-USDT", "LRC-USDT", "LUNA-USDT", "MAGIC-USDT", "ME-USDT", "MEME-USDT", "MERL-USDT", "MET-USDT", "MEW-USDT", "MINA-USDT", "MMT-USDT", "MON-USDT", "MOODENG-USDT", "MOVE-USDT", "MUBARAK-USDT", "NEAR-USDT", "NEIRO-USDT", "NIGHT-USDT", "NOT-USDT", "OFC-USDT", "OL-USDT", "ONDO-USDT", "ONE-USDT", "ONT-USDT", "OP-USDT", "OPN-USDT", "ORDER-USDT", "PARTI-USDT", "PENGU-USDT", "PEOPLE-USDT", "PEPE-USDT", "PI-USDT", "PIPPIN-USDT", "PLUME-USDT", "PNUT-USDT", "POL-USDT", "PROVE-USDT", "PUMP-USDT", "PYTH-USDT", "RAVE-USDT", "RECALL-USDT", "RESOLV-USDT", "RLS-USDT", "ROBO-USDT", "RSR-USDT", "RVN-USDT", "S-USDT", "SAHARA-USDT", "SAND-USDT", "SAPIEN-USDT", "SATS-USDT", "SEI-USDT", "SENT-USDT", "SHELL-USDT", "SHIB-USDT", "SIGN-USDT", "SOON-USDT", "SOPH-USDT", "SPACE-USDT", "SPK-USDT", "STABLE-USDT", "STRK-USDT", "SUI-USDT", "THETA-USDT", "TRIA-USDT", "TRUMP-USDT", "TRUTH-USDT", "TURBO-USDT", "UP-USDT", "USELESS-USDT", "W-USDT", "WCT-USDT", "WET-USDT", "WIF-USDT", "WLD-USDT", "WLFI-USDT", "WOO-USDT", "XLM-USDT", "XPL-USDT", "XRP-USDT", "YB-USDT", "YGG-USDT", "ZAMA-USDT", "ZBT-USDT", "ZETA-USDT", "ZIL-USDT", "ZK-USDT", "ZKP-USDT", "ZORA-USDT", "ZRX-USDT"
-          ]
-        },
-        {
-          "name": "supertrend_15m_tp_ts_total_tp_v2",
-          "coins": [
-            "2Z-USDT", "ACH-USDT", "ACT-USDT", "ADA-USDT", "AEVO-USDT", "AGLD-USDT", "AIXBT-USDT", "ALGO-USDT", "ALLO-USDT", "ANIME-USDT", "APE-USDT", "APR-USDT", "ARB-USDT", "ASTER-USDT", "AT-USDT", "ATH-USDT", "AVNT-USDT", "AZTEC-USDT", "BABY-USDT", "BARD-USDT", "BASED-USDT", "BEAT-USDT", "BICO-USDT", "BIGTIME-USDT", "BIO-USDT", "BLUR-USDT", "BOME-USDT", "BONK-USDT", "BRETT-USDT", "BREV-USDT", "BSB-USDT", "CC-USDT", "CFX-USDT", "CHZ-USDT", "CORE-USDT", "CRV-USDT", "DOGE-USDT", "DOOD-USDT", "DOT-USDT", "DYDX-USDT", "EDEN-USDT", "EDGE-USDT", "EIGEN-USDT", "ENA-USDT", "ENJ-USDT", "ENSO-USDT", "ESP-USDT", "F-USDT", "FARTCOIN-USDT", "FIL-USDT", "FLOKI-USDT", "FLOW-USDT", "FOGO-USDT", "GALA-USDT", "GLM-USDT", "GMT-USDT", "GPS-USDT", "GRASS-USDT", "GRT-USDT", "H-USDT", "HOME-USDT", "HUMA-USDT", "ICX-USDT", "IOST-USDT", "IOTA-USDT", "JELLYJELLY-USDT", "JUP-USDT", "KAITO-USDT", "KAT-USDT", "KMNO-USDT", "LA-USDT", "LAB-USDT", "LAYER-USDT", "LIGHT-USDT", "LINEA-USDT", "LRC-USDT", "LUNA-USDT", "MAGIC-USDT", "MEME-USDT", "MERL-USDT", "MET-USDT", "MEW-USDT", "MINA-USDT", "MMT-USDT", "MON-USDT", "MOODENG-USDT", "MOVE-USDT", "MUBARAK-USDT", "NEAR-USDT", "NEIRO-USDT", "NIGHT-USDT", "NOT-USDT", "OFC-USDT", "OL-USDT", "ONDO-USDT", "ONE-USDT", "ONT-USDT", "OP-USDT", "OPN-USDT", "ORDER-USDT", "PARTI-USDT", "PENGU-USDT", "PEOPLE-USDT", "PEPE-USDT", "PI-USDT", "PIPPIN-USDT", "PLUME-USDT", "PNUT-USDT", "PROVE-USDT", "PUMP-USDT", "PYTH-USDT", "RAVE-USDT", "RECALL-USDT", "RESOLV-USDT", "RLS-USDT", "ROBO-USDT", "RSR-USDT", "RVN-USDT", "S-USDT", "SAHARA-USDT", "SAND-USDT", "SATS-USDT", "SEI-USDT", "SENT-USDT", "SHELL-USDT", "SHIB-USDT", "SIGN-USDT", "SOON-USDT", "SOPH-USDT", "SPACE-USDT", "SPK-USDT", "STABLE-USDT", "STRK-USDT", "SUI-USDT", "THETA-USDT", "TRIA-USDT", "TRUMP-USDT", "TRUTH-USDT", "TURBO-USDT", "UP-USDT", "USELESS-USDT", "W-USDT", "WCT-USDT", "WET-USDT", "WIF-USDT", "WLD-USDT", "WLFI-USDT", "WOO-USDT", "XLM-USDT", "XPL-USDT", "YB-USDT", "YGG-USDT", "ZAMA-USDT", "ZBT-USDT", "ZETA-USDT", "ZIL-USDT", "ZK-USDT", "ZKP-USDT", "ZORA-USDT"
-          ]
-        }
-      ];
+      //console.log("API_URL", '{{ API_URL }}');
     }
     try {
-      const response = await getRequest('/get_strategy_results');
-      const dta = await response?.json();
-      return dta.map(item => item.name);
+      const response = await postRequest('/get_strategy_results', {"date_from": "2025-08-21"});
+      getStrategyResults(response);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
       return ['Ошибка загрузки'];
@@ -110,32 +118,33 @@ document.addEventListener('DOMContentLoaded', () => {
   };
   const ddlData = getDataForDddls();
 
-
-
-  initDropdowns('.dropdown.ddl-strategy', {
-    data: ['grid_bot_strategy', 'oneside_grid_bot', 'supertrend_15m_tp_ts_total_tp_sl_v1', 'supertrend_15m_tp_ts_total_tp_v2'],
-    onSelect: function(selectedItem) {
-      console.log('Выбрано направление:', selectedItem);
-    }
-  });
-  initDropdowns('.dropdown.ddl-coin', {
-    data: ['Long', 'Short'],
-    onSelect: function(selectedItem) {
-      console.log('Выбрано направление:', selectedItem);
-    }
+  let analyzePNLDatepicker = document.querySelector('.analyze-pnl-datepicker');
+  analyzePNLDatepicker.addEventListener('datechange', (e) => {
+    let p = e?.detail?.currentValue;
+    const [startDate, endDate] = p.split('—').map(date => date.trim());
+    currentDatePeriod = [startDate, endDate];
   });
 
   initDropdowns('.dropdown.ddl-direction', {
     data: ['Long', 'Short'],
+    multiSelect: true,
     onSelect: function(selectedItem) {
-      console.log('Выбрано направление:', selectedItem);
+      currentDirection = selectedItem;
     }
   });
   initDropdowns('.dropdown.ddl-trading-series', {
     data: ['Азия', 'Европа', 'Америка', 'Тихоокеания'],
+    multiSelect: true,
     onSelect: function(selectedItem) {
-      console.log('Выбрана серия:', selectedItem);
+      currentTradingSerie = selectedItem;
     }
+  });
+
+  document.querySelector('.apply-filters').addEventListener('click', function(evt) {
+    evt.stopPropagation();
+    console.warn('currentStrategy,currentCoin',currentStrategy,currentCoin, currentDirection, currentTradingSerie, currentDatePeriod);
+
+    //TODO {"strategy":["oneside_grid_bot"],"symbol":["BTC-USDT"],"direction":["long"],"session":["asia"],"date_from":"2025-08-21","date_to":"2025-09-20"}
   });
 
   //fill Trading calendar with meta
