@@ -42,6 +42,45 @@ const dateFormatter = async function(da) {
 }
 window.dateFormatter = dateFormatter;
 
+function formatTimeMs(ms) {
+  // Константы в миллисекундах
+  const SECOND = 1000;
+  const MINUTE = SECOND * 60;
+  const HOUR = MINUTE * 60;
+  const DAY = HOUR * 24;
+  const MONTH = DAY * 30.44; // Среднее количество дней в месяце
+  const YEAR = DAY * 365.25; // С учетом високосных лет
+
+  const years = Math.floor(ms / YEAR);
+  ms %= YEAR;
+
+  const months = Math.floor(ms / MONTH);
+  ms %= MONTH;
+
+  const days = Math.floor(ms / DAY);
+  ms %= DAY;
+
+  const hours = Math.floor(ms / HOUR);
+  ms %= HOUR;
+
+  const minutes = Math.floor(ms / MINUTE);
+  ms %= MINUTE;
+
+  const seconds = Math.floor(ms / SECOND);
+
+  // Собираем части (только те, что больше нуля)
+  const parts = [];
+  if (years) parts.push(`${years} years`);
+  if (months) parts.push(`${months} months`);
+  if (days) parts.push(`${days} days`);
+  if (hours) parts.push(`${hours} hours`);
+  if (minutes) parts.push(`${minutes} min`);
+  if (seconds) parts.push(`${seconds} sec`);
+
+  return parts.join(' ');
+}
+window.formatTimeMs = formatTimeMs;
+
 // Example GET request
 async function fetchData() { //TODO remove that into instructions
   try {

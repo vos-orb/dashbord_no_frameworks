@@ -56,48 +56,27 @@
       <table>
         <thead>
         <tr>
-          {# {
-            "concat":"BTC-USDT",
-            "tag":"oneside_grid_bot",
-            "start_time":"2026-04-09T22:17:23.5747",
-            "entry_price":72294.372,
-            "end_time":"2026-04-10T16:58:04.0837",
-            "exit_price":72624.1,
-            "delta_time":67240.509,
-              "pnl":2.9610416772,
-              "clean_profit_percent":0.568862784751461,
-              "gross_profit":2.3740416772,
-              "fee":-0.587,
-          "net_pnl_percent":0.4560908282044455,
-              "closeTotalPos":0.72,
-              "openMaxPos":0.72,
-              "cash":520.5194784,
-              "lever":5.0,
-              "direction":"long",
-                "account_name":"user2"},#}
-          <th data-column="concat">Тикер</th>
-          <th data-column="tag">Стратегия</th>
+          <th data-column="instId">Тикер</th>
           <th data-column="account_name">Аккаунт</th>
-          <th data-column="start_time">Вход (дата)</th>
           <th data-column="entry_price">Вход ($)</th>
-          <th data-column="end_time">Выход (дата)</th>
-          <th data-column="exit_price">Выход ($)</th>
+          <th data-column="start_time">Вход (дата)</th>
           <th data-column="delta_time">В сделке</th>
-          <th data-column="pnl">Процент (%)</th>
-          <th data-column="clean_profit_percent">Прибыль (%)</th>
-          <th data-column="gross_profit">Доход ($)</th>
+          <th data-column="percDeltaNow">Процент (%)</th>
+          <th data-column="income">Доход ($)</th>
           <th data-column="fee">Комиссия ($)</th>
-          <th data-column="closeTotalPos">Прибыль ($)</th>
-          <th data-column="openMaxPos">Макс объём</th>
-          <th data-column="cash">Объём ($)</th>
+          <th data-column="pnl">Прибыль ($)</th>
+          <th data-column="notionalUsd">Объём ($)</th>
           <th data-column="lever">Плечо</th>
-          <th data-column="direction">Сторона</th>
-          <th data-column="net_pnl_percent">net_pnl_percent??</th>
+          <th data-column="posSide">Сторона</th>
+          <th data-column="totalEq">Текущий баланс</th>
+          <th data-column="perc_pos">% от Депо</th>
+          <th data-column="time_delta_to_server">Отклонение по времени</th>
+          <th data-column="perc_delta_to_server">Отклонение в %</th>
+          <th data-column="sell">Продать</th>
         </tr>
         </thead>
         <tbody class="table-body">
         <tr>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
@@ -130,22 +109,23 @@
 
 
 
-
-
   <script type="module">
-import { getRequest, postRequest } from '@/services/api.js';
+import { getRequest, postRequest, webSocketManager } from '@/services/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  const tableUserStats = document.querySelector('.table-component.user-stats');
   initDropdowns('.dropdown.users-stats', {
     data: async function() {
       if ({{ DEBUG }}) {
-        return ["user1","user2","user3","user4","user5","user6"];
+        //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        const response = await getRequest('/filter/user_name');
-        const dta = await response?.json();
-        return dta.map(item => item.name);
+        const responseUsers = await getRequest('/cred_users/all',null,{uri:2});
+        const usersArr = await Promise.all(
+          responseUsers?.rows.map(async (item) =>item.username)
+        );
+        return usersArr;
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -154,135 +134,67 @@ document.addEventListener('DOMContentLoaded', () => {
     onSelect: async function (selectedUser) {
       console.log('Выбран Пользак :', selectedUser);
       if ({{ DEBUG }}) {
-        updateTable();
+        //updateTable();
       }
       try {
-        const response = await getRequest(`/ws/${selectedUser}`);
-        console.log('Balance data:', response);
+        const wsUrl = `${import.meta.env.VITE_API_URL}/ws/${selectedUser}`;
+        const connection = webSocketManager.connect(wsUrl, {
+          onMessage: async (data, ws) => {
+            let item = data?.data;
+            //TODO update in the table by account_name and push new obj if ney account selected so both updated
+            const formattedUsersStatsData = [{
+              instId: item.instId,
+              account_name: item.account,
+              entry_price: numberFormatter.format(item.avgPx),
+              start_time: await dateFormatter(item.timeStamp),
+              delta_time: formatTimeMs((item.cTime / 10000)),
+
+              percDeltaNow: numberFormatter.format(item.percDeltaNow),
+              income: numberFormatter.format(item.income),
+              fee: numberFormatter.format(item.fee),
+              pnl: numberFormatter.format(item.pnl),
+              notionalUsd: numberFormatter.format(item.notionalUsd),
+
+              lever: numberFormatter.format(item.lever),
+              posSide: item.posSide,
+              totalEq: numberFormatter.format(item.totalEq),
+              perc_pos: numberFormatter.format(item.perc_pos),
+
+              time_delta_to_server: 0,
+              perc_delta_to_server: 0,
+              sell: 0
+            }];
+            new UiTable(tableUserStats, formattedUsersStatsData, 10, {
+              numericColumns: [
+                'entry_price',
+                'percDeltaNow',
+                'income',
+                'fee',
+                'pnl',
+                'notionalUsd',
+                'lever',
+                'totalEq',
+                'perc_pos'
+              ]
+            });
+          },
+          onOpen: (ws) => {
+            console.log('WebSocket connected');
+            // Send initial message
+            webSocketManager.send(wsUrl, { type: 'init', data: 'Hello' });
+          },
+          onClose: (event, ws) => {
+            console.log('WebSocket disconnected', event);
+          },
+          onError: (error, ws) => {
+            console.error('WebSocket error:', error);
+          }
+        });
       } catch(err) {
         console.error('Ошибка загрузки данных:', err);
       }
-
     }
   });
-
-
-
-  function updateTable() {
-    let tableUserStats = document.querySelector('.table-component.user-stats');
-
-    let dataUserStats = [
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72294.372,"end_time":"2026-04-10T16:58:04.0837","exit_price":72624.1,"delta_time":67240.509,"pnl":2.9610416772,"clean_profit_percent":0.568862784751461,"gross_profit":2.3740416772,"fee":-0.587,"net_pnl_percent":0.4560908282044455,"closeTotalPos":0.72,"openMaxPos":0.72,"cash":520.5194784,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72346.5,"end_time":"2026-04-11T18:36:35.4567","exit_price":72832.7,"delta_time":159551.882,"pnl":6.0382,"clean_profit_percent":0.7728016020089411,"gross_profit":5.5542,"fee":-0.784,"net_pnl_percent":0.6724610276697326,"closeTotalPos":1.08,"openMaxPos":0.72,"cash":781.33896,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72294.372,"end_time":"2026-04-11T13:10:18.5397","exit_price":72624.1,"delta_time":139974.965,"pnl":2.9610416772,"clean_profit_percent":0.568862784751461,"gross_profit":2.3740416772,"fee":-0.587,"net_pnl_percent":0.4560908282044455,"closeTotalPos":0.72,"openMaxPos":0.72,"cash":520.5194784,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72265.125,"end_time":"2026-04-10T11:08:14.6627","exit_price":712.9,"delta_time":46251.088,"pnl":-0.1524057701045,"clean_profit_percent":-0.11716501485945019,"gross_profit":-0.4774057701046,"fee":-0.325,"net_pnl_percent":-0.367016514121138,"closeTotalPos":0.18,"openMaxPos":0.72,"cash":130.077225,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72265.125,"end_time":"2026-04-10T14:24:48.6397","exit_price":72499.9,"delta_time":58045.065,"pnl":1.723784229686,"clean_profit_percent":0.441733747010662,"gross_profit":1.567784229686,"fee":-0.456,"net_pnl_percent":0.3248800856568008,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":390.531675,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72325.469,"end_time":"2026-04-11T16:40:53.5957","exit_price":72699.56,"delta_time":152609.721,"pnl":4.08211822977,"clean_profit_percent":0.6271217927087002,"gross_profit":3.364118229774,"fee":-0.718,"net_pnl_percent":0.5168179414087138,"closeTotalPos":0.9,"openMaxPos":0.72,"cash":650.929221771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-09T22:17:23.5747","entry_price":72265.125,"end_time":"2026-04-10T15:49:18.4477","exit_price":72499.9,"delta_time":63114.873,"pnl":1.723784229686,"clean_profit_percent":0.441733747010662,"gross_profit":1.567784229686,"fee":-0.456,"net_pnl_percent":0.3248800856568008,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":390.531675,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71992.733,"end_time":"2026-04-08T13:58:44.0877","exit_price":72271.45,"delta_time":52167.57,"pnl":1.327381277151,"clean_profit_percent":0.5121586369002052,"gross_profit":1.00338127715,"fee":-0.324,"net_pnl_percent":0.387146011072601,"closeTotalPos":0.36,"openMaxPos":0.54,"cash":259.1738387224,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71992.733,"end_time":"2026-04-08T12:47:29.5770","exit_price":72043.0,"delta_time":47892.753,"pnl":0.349480677128,"clean_profit_percent":0.5696881765676211,"gross_profit":0.0904806771278,"fee":-0.559,"net_pnl_percent":0.06982232498383845,"closeTotalPos":0.18,"openMaxPos":0.54,"cash":129.586911227,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71460.518,"end_time":"2026-04-09T15:34:41.3397","exit_price":71689.775,"delta_time":144324.822,"pnl":4.46030072268,"clean_profit_percent":0.43344649574343813,"gross_profit":3.30130072268,"fee":-1.159,"net_pnl_percent":0.3208163142618107,"closeTotalPos":1.44,"openMaxPos":0.9,"cash":1029.0314592,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71569.695,"end_time":"2026-04-09T13:32:14.6687","exit_price":71669.733,"delta_time":136978.151,"pnl":2.0464103299848,"clean_profit_percent":0.5647523430754181,"gross_profit":1.0804103299848,"fee":-0.966,"net_pnl_percent":0.13977703831207594,"closeTotalPos":1.08,"openMaxPos":0.9,"cash":772.952706771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71569.695,"end_time":"2026-04-09T09:17:33.4447","exit_price":71669.733,"delta_time":121696.927,"pnl":2.0464103299848,"clean_profit_percent":0.5647523430754181,"gross_profit":1.0804103299848,"fee":-0.966,"net_pnl_percent":0.13977703831207594,"closeTotalPos":1.08,"openMaxPos":0.9,"cash":772.952706771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71765.901,"end_time":"2026-04-08T23:00:34.0277","exit_price":71885.675,"delta_time":84677.51,"pnl":1.572372877352,"clean_profit_percent":0.30430205441316205,"gross_profit":0.862372877351,"fee":-0.71,"net_pnl_percent":0.16689541736542107,"closeTotalPos":0.72,"openMaxPos":0.72,"cash":516.7144872,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71765.901,"end_time":"2026-04-09T01:08:15.7170","exit_price":71885.675,"delta_time":92339.11,"pnl":1.572372877352,"clean_profit_percent":0.30430205441316205,"gross_profit":0.862372877351,"fee":-0.71,"net_pnl_percent":0.16689541736542107,"closeTotalPos":0.72,"openMaxPos":0.9,"cash":516.7144872,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71438.368,"end_time":"2026-04-09T21:06:50.5387","exit_price":71851.92,"delta_time":164253.721,"pnl":8.7971522929,"clean_profit_percent":0.6841900730742032,"gross_profit":7.44315221,"fee":-1.354,"net_pnl_percent":0.578814036119022,"closeTotalPos":1.8,"openMaxPos":0.9,"cash":1285.890624771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71450.02,"end_time":"2026-04-09T22:17:23.4870","exit_price":71958.627,"delta_time":168486.963,"pnl":11.4904185299783,"clean_profit_percent":0.81220995702389,"gross_profit":10.0704185299783,"fee":-1.42,"net_pnl_percent":0.7118360498709294,"closeTotalPos":1.98,"openMaxPos":0.9,"cash":1414.710396772,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71765.901,"end_time":"2026-04-08T21:11:27.3777","exit_price":71885.675,"delta_time":78130.86,"pnl":1.572372877352,"clean_profit_percent":0.30430205441316205,"gross_profit":0.862372877351,"fee":-0.71,"net_pnl_percent":0.16689541736542107,"closeTotalPos":0.72,"openMaxPos":0.72,"cash":516.7144872,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71867.177,"end_time":"2026-04-08T16:49:44.137","exit_price":72014.567,"delta_time":62428.416,"pnl":1.376286770599,"clean_profit_percent":0.35463724667769947,"gross_profit":0.794286770598,"fee":-0.582,"net_pnl_percent":0.5046692330770291,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":388.0827558,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71424.126,"end_time":"2026-04-09T18:03:03.5870","exit_price":71779.789,"delta_time":153226.763,"pnl":6.98574067709,"clean_profit_percent":0.6037435523615031,"gross_profit":5.76174067708,"fee":-1.524,"net_pnl_percent":0.497959190988211,"closeTotalPos":1.62,"openMaxPos":0.9,"cash":1157.07084127004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71424.126,"end_time":"2026-04-09T17:15:57.5827","exit_price":71779.789,"delta_time":150401.065,"pnl":6.98574067709,"clean_profit_percent":0.6037435523615031,"gross_profit":5.76174067708,"fee":-1.524,"net_pnl_percent":0.497959190988211,"closeTotalPos":1.62,"openMaxPos":0.9,"cash":1157.07084127004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71867.177,"end_time":"2026-04-08T19:00:16.4977","exit_price":72014.567,"delta_time":70259.98,"pnl":1.376286770599,"clean_profit_percent":0.35463724667769947,"gross_profit":0.794286770598,"fee":-0.582,"net_pnl_percent":0.5046692330770291,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":388.0827558,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71992.733,"end_time":"2026-04-08T14:34:29.5317","exit_price":72271.45,"delta_time":54313.014,"pnl":1.327381277151,"clean_profit_percent":0.5121586369002052,"gross_profit":1.00338127715,"fee":-0.324,"net_pnl_percent":0.387146011072601,"closeTotalPos":0.36,"openMaxPos":0.72,"cash":259.1738387224,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T23:29:16.5177","entry_price":71648.177,"end_time":"2026-04-09T02:27:32.6547","exit_price":71708.52,"delta_time":97096.137,"pnl":1.444087770725,"clean_profit_percent":0.52394723470929226,"gross_profit":0.543087770724,"fee":-0.901,"net_pnl_percent":0.08422126357800847,"closeTotalPos":0.9,"openMaxPos":0.9,"cash":644.83351771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T22:59:04.1570","entry_price":71715.05,"end_time":"2026-04-07T23:29:16.4997","exit_price":72249.9,"delta_time":1812.349,"pnl":2.184452299685,"clean_profit_percent":0.846118619762795,"gross_profit":1.925452299684,"fee":-0.559,"net_pnl_percent":0.7457988246539481,"closeTotalPos":0.36,"openMaxPos":0.36,"cash":258.17418,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T22:32:40.6817","entry_price":70977.4,"end_time":"2026-04-07T22:59:03.7967","exit_price":71476.5,"delta_time":1583.115,"pnl":1.026387700105,"clean_profit_percent":0.803369961580814,"gross_profit":0.898387700105,"fee":-0.128,"net_pnl_percent":0.7031815761073326,"closeTotalPos":0.18,"openMaxPos":0.18,"cash":127.7511222,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-07T22:06:03.1757","entry_price":70534.5,"end_time":"2026-04-07T22:32:40.5670","exit_price":70990.9,"delta_time":1597.385,"pnl":0.9490522247,"clean_profit_percent":0.7475175950894072,"gross_profit":0.8220522247,"fee":-0.127,"net_pnl_percent":0.6474873182087514,"closeTotalPos":0.18,"openMaxPos":0.18,"cash":126.96155222,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69750.05,"end_time":"2026-04-06T17:02:09.5647","exit_price":629.9,"delta_time":17700.431,"pnl":0.638722299843,"clean_profit_percent":0.5087451550213817,"gross_profit":0.4497222998425,"fee":-0.189,"net_pnl_percent":0.35820762852498494,"closeTotalPos":0.18,"openMaxPos":0.36,"cash":125.55009,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":6115.351,"end_time":"2026-04-07T10:38:05.5947","exit_price":6136.0,"delta_time":81056.161,"pnl":0.672504677264,"clean_profit_percent":0.1796685540680502,"gross_profit":0.111504677264,"fee":-0.561,"net_pnl_percent":0.0297891787394208,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":374.3028954,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69750.05,"end_time":"2026-04-06T23:07:01.5127","exit_price":629.9,"delta_time":39592.079,"pnl":0.638722299843,"clean_profit_percent":0.5087451550213817,"gross_profit":0.4497222998425,"fee":-0.189,"net_pnl_percent":0.35820762852498494,"closeTotalPos":0.18,"openMaxPos":0.72,"cash":125.55009,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69072.014,"end_time":"2026-04-07T19:51:19.8737","exit_price":69108.529,"delta_time":114250.74,"pnl":1.135634229948,"clean_profit_percent":0.18268131962485715,"gross_profit":0.328634229948,"fee":-0.807,"net_pnl_percent":0.052865115537238,"closeTotalPos":0.9,"openMaxPos":0.9,"cash":621.648126,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69467.519,"end_time":"2026-04-07T01:50:02.6257","exit_price":69504.05,"delta_time":4173.492,"pnl":0.569591677201,"clean_profit_percent":0.527761944650317,"gross_profit":0.1325916772013,"fee":-0.437,"net_pnl_percent":0.053019252145397655,"closeTotalPos":0.36,"openMaxPos":0.72,"cash":250.0819883227,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":6115.351,"end_time":"2026-04-07T14:06:10.8917","exit_price":6136.0,"delta_time":1541.758,"pnl":0.672504677264,"clean_profit_percent":0.1796685540680502,"gross_profit":0.111504677264,"fee":-0.561,"net_pnl_percent":0.0297891787394208,"closeTotalPos":0.54,"openMaxPos":0.9,"cash":374.3028954,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69467.519,"end_time":"2026-04-07T00:05:59.5667","exit_price":69504.05,"delta_time":43130.433,"pnl":0.569591677201,"clean_profit_percent":0.527761944650317,"gross_profit":0.1325916772013,"fee":-0.437,"net_pnl_percent":0.053019252145397655,"closeTotalPos":0.36,"openMaxPos":0.72,"cash":250.0819883227,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":68984.543,"end_time":"2026-04-07T21:46:01","exit_price":6183.768,"delta_time":121131.867,"pnl":6.80683229874,"clean_profit_percent":0.68522117647918,"gross_profit":5.74883229874,"fee":-1.058,"net_pnl_percent":0.5787165974267471,"closeTotalPos":1.44,"openMaxPos":0.9,"cash":91.37741927001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69011.18,"end_time":"2026-04-07T20:07:06.5087","exit_price":69173.757,"delta_time":115197.075,"pnl":2.625831677517,"clean_profit_percent":0.35230818284435,"gross_profit":1.755831677516,"fee":-0.87,"net_pnl_percent":0.53558066968280325,"closeTotalPos":1.08,"openMaxPos":0.9,"cash":745.320744,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69163.566,"end_time":"2026-04-07T17:35:10.9797","exit_price":69127.611,"delta_time":106081.846,"pnl":0.488284770084,"clean_profit_percent":0.09805381692389048,"gross_profit":-0.556715229916,"fee":-0.745,"net_pnl_percent":-0.0515511220632298,"closeTotalPos":0.72,"openMaxPos":0.9,"cash":497.9755152,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":6115.351,"end_time":"2026-04-07T09:08:37.3137","exit_price":6136.0,"delta_time":75688.18,"pnl":0.672504677264,"clean_profit_percent":0.1796685540680502,"gross_profit":0.111504677264,"fee":-0.561,"net_pnl_percent":0.0297891787394208,"closeTotalPos":0.54,"openMaxPos":0.72,"cash":374.3028954,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69750.05,"end_time":"2026-04-06T16:11:45.7670","exit_price":629.9,"delta_time":14676.627,"pnl":0.638722299843,"clean_profit_percent":0.5087451550213817,"gross_profit":0.4497222998425,"fee":-0.189,"net_pnl_percent":0.35820762852498494,"closeTotalPos":0.18,"openMaxPos":0.36,"cash":125.55009,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":68997.622,"end_time":"2026-04-07T22:06:03.1147","exit_price":69504.394,"delta_time":122333.981,"pnl":9.33170632255,"clean_profit_percent":0.8348566842771138,"gross_profit":8.50970632256,"fee":-1.122,"net_pnl_percent":0.7344774867748299,"closeTotalPos":1.62,"openMaxPos":0.9,"cash":1117.76147647002,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-04-06T12:07:09.1337","entry_price":69750.05,"end_time":"2026-04-06T22:53:08.9577","exit_price":629.9,"delta_time":38759.824,"pnl":0.638722299843,"clean_profit_percent":0.5087451550213817,"gross_profit":0.4497222998425,"fee":-0.189,"net_pnl_percent":0.35820762852498494,"closeTotalPos":0.18,"openMaxPos":0.54,"cash":125.55009,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72841.533,"end_time":"2026-03-19T19:12:10.9137","exit_price":72062.081,"delta_time":240925.733,"pnl":-19.657217529972,"clean_profit_percent":-0.170234942443729,"gross_profit":-22.448217529972,"fee":-2.791,"net_pnl_percent":-1.0700653430783647,"closeTotalPos":2.88,"openMaxPos":2.52,"cash":2097.8361504,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":75231.65,"end_time":"2026-03-17T13:52:05.7547","exit_price":75499.9,"delta_time":48920.574,"pnl":0.6858577701,"clean_profit_percent":0.5064727116549721,"gross_profit":0.48285,"fee":-0.503,"net_pnl_percent":0.35656535513975834,"closeTotalPos":0.18,"openMaxPos":0.9,"cash":135.41697,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74695.317,"end_time":"2026-03-17T15:22:00.1947","exit_price":74665.033,"delta_time":54315.014,"pnl":0.4404664770187,"clean_profit_percent":0.10920075732706534,"gross_profit":-0.163533522981,"fee":-0.604,"net_pnl_percent":-0.04054337168152008,"closeTotalPos":0.54,"openMaxPos":0.9,"cash":403.3547118,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74501.846,"end_time":"2026-03-18T01:28:45.6477","exit_price":74498.98,"delta_time":90720.467,"pnl":0.911205229184,"clean_profit_percent":0.13589611069650814,"gross_profit":-0.02579477081727,"fee":-0.17,"net_pnl_percent":-0.0038468845456649226,"closeTotalPos":0.9,"openMaxPos":0.9,"cash":670.516614771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74602.0,"end_time":"2026-03-17T22:37:38.5017","exit_price":74623.75,"delta_time":80453.321,"pnl":0.8946,"clean_profit_percent":0.16655049462480895,"gross_profit":0.1566,"fee":-0.738,"net_pnl_percent":0.02915471435082161,"closeTotalPos":0.72,"openMaxPos":0.9,"cash":537.1344,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74602.0,"end_time":"2026-03-18T00:37:37.5037","exit_price":74623.75,"delta_time":87652.023,"pnl":0.8946,"clean_profit_percent":0.16655049462480895,"gross_profit":0.1566,"fee":-0.738,"net_pnl_percent":0.02915471435082161,"closeTotalPos":0.72,"openMaxPos":0.9,"cash":537.1344,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T11:36:37.9027","exit_price":74499.133,"delta_time":127192.722,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":1.08,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74045.041,"end_time":"2026-03-18T17:37:01.5837","exit_price":73747.325,"delta_time":148816.103,"pnl":-2.63311047705,"clean_profit_percent":-0.54695089153761052,"gross_profit":-4.58711047705,"fee":-1.654,"net_pnl_percent":-0.40207419157212754,"closeTotalPos":1.44,"openMaxPos":1.8,"cash":1066.5485904,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T12:30:53.5527","exit_price":74499.133,"delta_time":130448.372,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":1.56,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74829.4,"end_time":"2026-03-17T14:34:04.0657","exit_price":74749.9,"delta_time":51438.885,"pnl":0.5508,"clean_profit_percent":0.0110066186106888,"gross_profit":-0.5862,"fee":-0.537,"net_pnl_percent":-0.10624166437255946,"closeTotalPos":0.36,"openMaxPos":0.9,"cash":269.38584,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74226.596,"end_time":"2026-03-18T16:35:50.6527","exit_price":74068.386,"delta_time":145145.472,"pnl":-0.464666770442,"clean_profit_percent":-0.049683543374247685,"gross_profit":-1.989666770441,"fee":-1.525,"net_pnl_percent":-0.51274131744362332,"closeTotalPos":1.56,"openMaxPos":1.8,"cash":15.55132967001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T13:56:20.6597","exit_price":74499.133,"delta_time":135575.479,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":1.44,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74226.596,"end_time":"2026-03-18T15:57:36.7197","exit_price":74068.386,"delta_time":142851.539,"pnl":-0.464666770442,"clean_profit_percent":-0.049683543374247685,"gross_profit":-1.989666770441,"fee":-1.525,"net_pnl_percent":-0.51274131744362332,"closeTotalPos":1.56,"openMaxPos":1.8,"cash":15.55132967001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T14:43:17.3827","exit_price":74499.133,"delta_time":138392.502,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":1.62,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74602.0,"end_time":"2026-03-17T17:50:01.3147","exit_price":74623.75,"delta_time":63196.134,"pnl":0.8946,"clean_profit_percent":0.16655049462480895,"gross_profit":0.1566,"fee":-0.738,"net_pnl_percent":0.02915471435082161,"closeTotalPos":0.72,"openMaxPos":0.9,"cash":537.1344,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74045.041,"end_time":"2026-03-18T18:56:59.6917","exit_price":73747.325,"delta_time":153614.511,"pnl":-2.63311047705,"clean_profit_percent":-0.54695089153761052,"gross_profit":-4.58711047705,"fee":-1.654,"net_pnl_percent":-0.40207419157212754,"closeTotalPos":1.44,"openMaxPos":1.8,"cash":1066.5485904,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73863.099,"end_time":"2026-03-18T20:31:23.8437","exit_price":73442.067,"delta_time":159278.663,"pnl":-4.9757184700107,"clean_profit_percent":-0.415827544835504,"gross_profit":-6.8207184700107,"fee":-1.845,"net_pnl_percent":-0.5700167007615081,"closeTotalPos":1.62,"openMaxPos":1.98,"cash":1196.58220387001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73537.87,"end_time":"2026-03-19T07:36:56.7197","exit_price":72951.564,"delta_time":199211.539,"pnl":-9.383858729918,"clean_profit_percent":-0.6444737420682154,"gross_profit":-11.608858729918,"fee":-2.525,"net_pnl_percent":-0.7972844467755144,"closeTotalPos":1.98,"openMaxPos":2.34,"cash":1456.049826,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73717.546,"end_time":"2026-03-19T04:06:42.1657","exit_price":73246.73,"delta_time":186596.985,"pnl":-6.565688771125,"clean_profit_percent":-0.494808175571263,"gross_profit":-8.47468877112,"fee":-1.909,"net_pnl_percent":-0.6386756281876315,"closeTotalPos":1.8,"openMaxPos":1.98,"cash":1326.915828771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T03:25:27.9777","exit_price":74499.133,"delta_time":97722.797,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":0.9,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":75231.65,"end_time":"2026-03-17T01:10:33.3387","exit_price":75499.9,"delta_time":3228.158,"pnl":0.6858577701,"clean_profit_percent":0.5064727116549721,"gross_profit":0.48285,"fee":-0.503,"net_pnl_percent":0.35656535513975834,"closeTotalPos":0.18,"openMaxPos":0.36,"cash":135.41697,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73388.141,"end_time":"2026-03-19T11:37:27.5417","exit_price":72747.542,"delta_time":213642.361,"pnl":-11.5554184700105,"clean_profit_percent":-0.7289639263025873,"gross_profit":-13.8434184700106,"fee":-2.588,"net_pnl_percent":-0.873300496874563,"closeTotalPos":2.16,"openMaxPos":2.34,"cash":1585.18384567003,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73388.141,"end_time":"2026-03-19T12:48:20.5617","exit_price":72747.542,"delta_time":217895.081,"pnl":-11.5554184700105,"clean_profit_percent":-0.7289639263025873,"gross_profit":-13.8434184700106,"fee":-2.588,"net_pnl_percent":-0.873300496874563,"closeTotalPos":2.16,"openMaxPos":2.34,"cash":1585.18384567003,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":75231.65,"end_time":"2026-03-17T03:40:39.1667","exit_price":75499.9,"delta_time":12233.986,"pnl":0.6858577701,"clean_profit_percent":0.5064727116549721,"gross_profit":0.48285,"fee":-0.503,"net_pnl_percent":0.35656535513975834,"closeTotalPos":0.18,"openMaxPos":0.54,"cash":135.41697,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":75231.65,"end_time":"2026-03-17T04:39:53.8157","exit_price":75499.9,"delta_time":15788.635,"pnl":0.6858577701,"clean_profit_percent":0.5064727116549721,"gross_profit":0.48285,"fee":-0.503,"net_pnl_percent":0.35656535513975834,"closeTotalPos":0.18,"openMaxPos":0.72,"cash":135.41697,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":74435.077,"end_time":"2026-03-18T05:35:09.7767","exit_price":74499.133,"delta_time":105504.596,"pnl":1.695804722661,"clean_profit_percent":0.5109475388370456,"gross_profit":0.691804722661,"fee":-1.004,"net_pnl_percent":0.08605620170178215,"closeTotalPos":1.08,"openMaxPos":0.9,"cash":803.89883167001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72841.533,"end_time":"2026-03-19T22:36:23.3637","exit_price":72062.081,"delta_time":253178.183,"pnl":-19.657217529972,"clean_profit_percent":-0.170234942443729,"gross_profit":-22.448217529972,"fee":-2.791,"net_pnl_percent":-1.0700653430783647,"closeTotalPos":2.88,"openMaxPos":2.52,"cash":2097.8361504,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71636.579,"end_time":"2026-03-23T09:34:36.0797","exit_price":70853.727,"delta_time":551870.899,"pnl":-37.4738072279,"clean_profit_percent":-0.9687262056246717,"gross_profit":-42.5578072279,"fee":-4.784,"net_pnl_percent":-1.092396214414918,"closeTotalPos":5.4,"openMaxPos":3.06,"cash":3868.359066,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73086.81,"end_time":"2026-03-19T15:56:20.6557","exit_price":72320.086,"delta_time":229175.475,"pnl":-16.65953647715,"clean_profit_percent":-0.9045297824956314,"gross_profit":-19.32353647716,"fee":-2.664,"net_pnl_percent":-1.0491717030576204,"closeTotalPos":2.52,"openMaxPos":2.52,"cash":1841.7897036,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72362.136,"end_time":"2026-03-20T19:53:10.5977","exit_price":71644.129,"delta_time":329785.417,"pnl":-23.65666452214,"clean_profit_percent":-0.8648690080551042,"gross_profit":-27.14066452216,"fee":-3.484,"net_pnl_percent":-0.9922413014452722,"closeTotalPos":3.78,"openMaxPos":2.52,"cash":2735.5887408,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73717.546,"end_time":"2026-03-19T03:19:09.7757","exit_price":73246.73,"delta_time":183744.595,"pnl":-6.565688771125,"clean_profit_percent":-0.494808175571263,"gross_profit":-8.47468877112,"fee":-1.909,"net_pnl_percent":-0.6386756281876315,"closeTotalPos":1.8,"openMaxPos":1.98,"cash":1326.915828771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73717.546,"end_time":"2026-03-19T06:57:49.7027","exit_price":73246.73,"delta_time":196864.522,"pnl":-6.565688771125,"clean_profit_percent":-0.494808175571263,"gross_profit":-8.47468877112,"fee":-1.909,"net_pnl_percent":-0.6386756281876315,"closeTotalPos":1.8,"openMaxPos":1.98,"cash":1326.915828771,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71795.604,"end_time":"2026-03-23T03:02:50.1987","exit_price":71039.346,"delta_time":528365.018,"pnl":-33.5764032778,"clean_profit_percent":-0.9279098427676404,"gross_profit":-38.1154032778,"fee":-4.539,"net_pnl_percent":-1.0533486144917754,"closeTotalPos":5.04,"openMaxPos":3.06,"cash":3618.4984416,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71962.432,"end_time":"2026-03-22T22:09:25.0127","exit_price":71252.15,"delta_time":510759.832,"pnl":-28.848459670014,"clean_profit_percent":-0.8565859432364376,"gross_profit":-33.504459670014,"fee":-4.356,"net_pnl_percent":-0.985926147650771,"closeTotalPos":4.68,"openMaxPos":3.06,"cash":3367.8418176,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71795.604,"end_time":"2026-03-23T06:42:36.7700","exit_price":71039.346,"delta_time":541551.52,"pnl":-33.5764032778,"clean_profit_percent":-0.9279098427676404,"gross_profit":-38.1154032778,"fee":-4.539,"net_pnl_percent":-1.0533486144917754,"closeTotalPos":5.04,"openMaxPos":3.06,"cash":3618.4984416,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72050.538,"end_time":"2026-03-22T08:28:05.1317","exit_price":71383.056,"delta_time":461479.951,"pnl":-25.9876977016,"clean_profit_percent":-0.8015265926567069,"gross_profit":-30.0366977016,"fee":-4.049,"net_pnl_percent":-0.9264080720674197,"closeTotalPos":4.5,"openMaxPos":2.7,"cash":3242.57421,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72050.538,"end_time":"2026-03-22T03:35:49.6287","exit_price":71383.056,"delta_time":443944.448,"pnl":-25.9876977016,"clean_profit_percent":-0.8015265926567069,"gross_profit":-30.0366977016,"fee":-4.049,"net_pnl_percent":-0.9264080720674197,"closeTotalPos":4.5,"openMaxPos":2.7,"cash":3242.57421,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72050.538,"end_time":"2026-03-22T21:19:27.1817","exit_price":71383.056,"delta_time":507762.001,"pnl":-25.9876977016,"clean_profit_percent":-0.8015265926567069,"gross_profit":-30.0366977016,"fee":-4.049,"net_pnl_percent":-0.9264080720674197,"closeTotalPos":4.5,"openMaxPos":3.06,"cash":3242.57421,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71713.195,"end_time":"2026-03-23T07:34:19.4227","exit_price":7014.81,"delta_time":544654.542,"pnl":-35.904364470055,"clean_profit_percent":-0.9591304261327994,"gross_profit":-40.627364470055,"fee":-4.723,"net_pnl_percent":-1.0852981797840837,"closeTotalPos":5.52,"openMaxPos":3.06,"cash":3743.428779773,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72208.84,"end_time":"2026-03-21T15:18:03.5237","exit_price":71566.587,"delta_time":399678.343,"pnl":-22.9772741299876,"clean_profit_percent":-0.7686131271301447,"gross_profit":-26.5892741299874,"fee":-3.612,"net_pnl_percent":-0.8894381906702794,"closeTotalPos":4.14,"openMaxPos":2.52,"cash":2989.445976,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72450.582,"end_time":"2026-03-20T18:37:40.9557","exit_price":71726.34,"delta_time":325255.775,"pnl":-22.7029127736,"clean_profit_percent":-0.870440289582167,"gross_profit":-26.06191277362,"fee":-3.359,"net_pnl_percent":-0.52259243380309,"closeTotalPos":3.6,"openMaxPos":2.52,"cash":2608.510152776,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72542.86,"end_time":"2026-03-20T17:34:22.4847","exit_price":71816.626,"delta_time":321457.304,"pnl":-21.604202729989,"clean_profit_percent":-0.8707980857899823,"gross_profit":-24.837202729989,"fee":-3.533,"net_pnl_percent":-1.0011102402083356,"closeTotalPos":3.42,"openMaxPos":2.52,"cash":2480.965812,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72208.84,"end_time":"2026-03-21T23:52:13.8037","exit_price":71566.587,"delta_time":430528.623,"pnl":-22.9772741299876,"clean_profit_percent":-0.7686131271301447,"gross_profit":-26.5892741299874,"fee":-3.612,"net_pnl_percent":-0.8894381906702794,"closeTotalPos":4.14,"openMaxPos":2.52,"cash":2989.445976,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72282.004,"end_time":"2026-03-20T21:18:59.7327","exit_price":71592.118,"delta_time":33414.552,"pnl":-23.7714855225,"clean_profit_percent":-0.8304833944615579,"gross_profit":-27.31948552247,"fee":-3.548,"net_pnl_percent":-0.954436736424738,"closeTotalPos":3.96,"openMaxPos":2.52,"cash":2862.36735847003,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72208.84,"end_time":"2026-03-21T14:12:38.5187","exit_price":71566.587,"delta_time":395753.038,"pnl":-22.9772741299876,"clean_profit_percent":-0.7686131271301447,"gross_profit":-26.5892741299874,"fee":-3.612,"net_pnl_percent":-0.8894381906702794,"closeTotalPos":4.14,"openMaxPos":2.52,"cash":2989.445976,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72640.509,"end_time":"2026-03-20T13:32:06.3027","exit_price":71917.556,"delta_time":306921.122,"pnl":-20.432957270019,"clean_profit_percent":-0.8681787068653665,"gross_profit":-23.4139572700187,"fee":-2.981,"net_pnl_percent":-0.994838822669144,"closeTotalPos":3.54,"openMaxPos":2.52,"cash":2353.54277167004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72640.509,"end_time":"2026-03-20T15:08:17.3237","exit_price":71917.556,"delta_time":312692.143,"pnl":-20.432957270019,"clean_profit_percent":-0.8681787068653665,"gross_profit":-23.4139572700187,"fee":-2.981,"net_pnl_percent":-0.994838822669144,"closeTotalPos":3.54,"openMaxPos":2.52,"cash":2353.54277167004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72640.509,"end_time":"2026-03-20T08:09:16.3697","exit_price":71917.556,"delta_time":287551.189,"pnl":-20.432957270019,"clean_profit_percent":-0.8681787068653665,"gross_profit":-23.4139572700187,"fee":-2.981,"net_pnl_percent":-0.994838822669144,"closeTotalPos":3.54,"openMaxPos":2.52,"cash":2353.54277167004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72050.538,"end_time":"2026-03-22T07:39:52.9957","exit_price":71383.056,"delta_time":458587.815,"pnl":-25.9876977016,"clean_profit_percent":-0.8015265926567069,"gross_profit":-30.0366977016,"fee":-4.049,"net_pnl_percent":-0.9264080720674197,"closeTotalPos":4.5,"openMaxPos":2.7,"cash":3242.57421,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72734.95,"end_time":"2026-03-20T01:39:41.8097","exit_price":71970.412,"delta_time":264176.629,"pnl":-20.4778628772,"clean_profit_percent":-0.920068278887082,"gross_profit":-23.39486287716,"fee":-2.917,"net_pnl_percent":-1.0511287902170834,"closeTotalPos":3.06,"openMaxPos":2.52,"cash":2225.689477703,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72640.509,"end_time":"2026-03-20T09:24:37.1787","exit_price":71917.556,"delta_time":292071.998,"pnl":-20.432957270019,"clean_profit_percent":-0.8681787068653665,"gross_profit":-23.4139572700187,"fee":-2.981,"net_pnl_percent":-0.994838822669144,"closeTotalPos":3.54,"openMaxPos":2.52,"cash":2353.54277167004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71962.432,"end_time":"2026-03-23T00:40:05.1197","exit_price":71252.15,"delta_time":519799.19,"pnl":-28.848459670014,"clean_profit_percent":-0.8565859432364376,"gross_profit":-33.504459670014,"fee":-4.356,"net_pnl_percent":-0.985926147650771,"closeTotalPos":4.68,"openMaxPos":3.06,"cash":3367.8418176,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71875.929,"end_time":"2026-03-23T01:16:51.1670","exit_price":71133.01,"delta_time":522005.98,"pnl":-31.6238296700498,"clean_profit_percent":-0.9053045871651091,"gross_profit":-36.10182967005,"fee":-4.478,"net_pnl_percent":-1.0334975983406214,"closeTotalPos":4.86,"openMaxPos":3.06,"cash":341.17014947004,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72542.86,"end_time":"2026-03-20T16:04:53.1957","exit_price":71816.626,"delta_time":316088.015,"pnl":-21.604202729989,"clean_profit_percent":-0.8707980857899823,"gross_profit":-24.837202729989,"fee":-3.533,"net_pnl_percent":-1.0011102402083356,"closeTotalPos":3.42,"openMaxPos":2.52,"cash":2480.965812,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":72126.391,"end_time":"2026-03-22T00:17:43.5267","exit_price":71460.375,"delta_time":432058.046,"pnl":-24.785891270014,"clean_profit_percent":-0.7954751007595606,"gross_profit":-28.771891270014,"fee":-3.986,"net_pnl_percent":-0.923401255443383,"closeTotalPos":4.32,"openMaxPos":2.7,"cash":3115.8600912,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71636.579,"end_time":"2026-03-23T08:06:45.5597","exit_price":70853.727,"delta_time":546600.079,"pnl":-37.4738072279,"clean_profit_percent":-0.9687262056246717,"gross_profit":-42.5578072279,"fee":-4.784,"net_pnl_percent":-1.092396214414918,"closeTotalPos":5.4,"openMaxPos":3.06,"cash":3868.359066,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73237.884,"end_time":"2026-03-19T13:54:56.0017","exit_price":72537.023,"delta_time":221890.821,"pnl":-13.9231474700104,"clean_profit_percent":-0.812429669719873,"gross_profit":-16.4001474700105,"fee":-2.477,"net_pnl_percent":-0.9569651138473695,"closeTotalPos":2.34,"openMaxPos":2.34,"cash":1713.76648567001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73388.141,"end_time":"2026-03-19T09:49:59.6627","exit_price":72747.542,"delta_time":207194.482,"pnl":-11.5554184700105,"clean_profit_percent":-0.7289639263025873,"gross_profit":-13.8434184700106,"fee":-2.588,"net_pnl_percent":-0.873300496874563,"closeTotalPos":2.16,"openMaxPos":2.34,"cash":1585.18384567003,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":73237.884,"end_time":"2026-03-19T14:14:16.6067","exit_price":72537.023,"delta_time":223051.426,"pnl":-13.9231474700104,"clean_profit_percent":-0.812429669719873,"gross_profit":-16.4001474700105,"fee":-2.477,"net_pnl_percent":-0.9569651138473695,"closeTotalPos":2.34,"openMaxPos":2.34,"cash":1713.76648567001,"lever":5.0,"direction":"long","account_name":"user2"},
-      {"concat":"BTC-USDT","tag":"oneside_grid_bot","start_time":"2026-03-17T00:16:45.1870","entry_price":71561.492,"end_time":"2026-03-23T10:09:02.0747","exit_price":70777.797,"delta_time":55316.894,"pnl":-38.8231802258,"clean_profit_percent":-0.9722490580543429,"gross_profit":-43.7301802258,"fee":-4.907,"net_pnl_percent":-1.0951350762781644,"closeTotalPos":5.58,"openMaxPos":3.06,"cash":391.1312536,"lever":5.0,"direction":"long","account_name":"user2"}
-    ];
-
-
-    try {
-      new UiTable(tableUserStats, dataUserStats, 10);
-    } catch(err){
-      console.log('ERRRORROROR', err)
-    }
-    //const response2 = await postRequest('/get_history_top_up', { "name_acc": selectedItem } );
-  }
-
 });
   </script>
   <script type="application/javascript">

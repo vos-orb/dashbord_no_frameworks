@@ -48,35 +48,49 @@
   }
   .table-container {
     overflow-x: auto;
-
     & > table {
       width: 100%;
       border-collapse: collapse;
       margin-bottom: 15px;
-
       & tbody > tr:nth-child(even) {
         background-color: #f9f9f9;
       }
-
       & thead > tr > th,
       & tbody > tr > td {
         border: 1px solid color.adjust($secondary-color, $alpha: -0.8);
         padding: 12px;
         text-align: left;
-      }
+        &:first-child {
 
+        }
+        &:last-child {
+
+        }
+        &>.value {
+          padding: 8px;
+          box-sizing: border-box;
+          display: inline-block;
+          min-width: calc(100% - 8px);
+          &.negative {
+            background-color: #ff6060;
+            color: #ffffff;
+          }
+          &.positive {
+            background-color: #49cc90;
+            color: #ffffff;
+          }
+        }
+      }
       & thead > tr > th {
         background-color: #f8f8f8;
         cursor: pointer;
         position: relative;
         color: $primary-text-color;
-
         &.sorted-asc::after {
           content: " ▲";
           color: #666;
           font-size: 12px;
         }
-
         &.sorted-desc::after {
           content: " ▼";
           color: #666;

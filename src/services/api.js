@@ -5,7 +5,7 @@
  * @returns {Promise<any>} - API response
  */
 export async function apiRequest(endpoint, options = {}) {
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = (options.uri === 2) ? import.meta.env.VITE_API_URL_2 : import.meta.env.VITE_API_URL;
   const apiTimeout = import.meta.env.VITE_API_TIMEOUT;
   const apiHeaders = JSON.parse(import.meta.env.VITE_API_HEADERS);
   const debug = (import.meta.env.VITE_DEBUG === 'true' || import.meta.env.VITE_DEBUG === true);
@@ -21,7 +21,8 @@ export async function apiRequest(endpoint, options = {}) {
   const defaultOptions = {
     method: 'GET',
     headers: apiHeaders,
-    signal: controller.signal
+    signal: controller.signal,
+    uri: ''
   };
 
   const mergedOptions = { ...defaultOptions, ...options };
@@ -56,17 +57,144 @@ export async function apiRequest(endpoint, options = {}) {
 }
 
 /**
+ * WebSocket connection manager
+ */
+class WebSocketManager {
+  constructor() {
+    this.connections = new Map();
+    this.reconnectAttempts = new Map();
+    this.maxReconnectAttempts = 5;
+    this.reconnectDelay = 1000;
+  }
+
+  /**
+   * Connect to WebSocket
+   * @param {string} url - WebSocket URL
+   * @param {object} options - Connection options
+   * @param {Function} onMessage - Message handler
+   * @param {Function} onOpen - Open handler
+   * @param {Function} onClose - Close handler
+   * @param {Function} onError - Error handler
+   * @returns {WebSocket} - WebSocket connection
+   */
+  connect(url, {
+    onMessage = () => {},
+    onOpen = () => {},
+    onClose = () => {},
+    onError = () => {},
+    reconnect = true,
+    protocols = []
+  } = {}) {
+    if (this.connections.has(url)) {
+      return this.connections.get(url);
+    }
+
+    const ws = new WebSocket(url, protocols);
+
+    ws.onopen = () => {
+      this.reconnectAttempts.delete(url);
+      onOpen(ws);
+    };
+
+    ws.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        onMessage(data, ws);
+      } catch (e) {
+        onMessage(event.data, ws);
+      }
+    };
+
+    ws.onclose = (event) => {
+      this.connections.delete(url);
+      onClose(event, ws);
+
+      if (reconnect && this.reconnectAttempts.get(url) < this.maxReconnectAttempts) {
+        const attempts = this.reconnectAttempts.get(url) || 0;
+        this.reconnectAttempts.set(url, attempts + 1);
+
+        setTimeout(() => {
+          this.connect(url, {
+            onMessage,
+            onOpen,
+            onClose,
+            onError,
+            reconnect,
+            protocols
+          });
+        }, this.reconnectDelay * (attempts + 1));
+      }
+    };
+
+    ws.onerror = (error) => {
+      onError(error, ws);
+    };
+
+    this.connections.set(url, ws);
+    return ws;
+  }
+
+  /**
+   * Disconnect from WebSocket
+   * @param {string} url - WebSocket URL
+   */
+  disconnect(url) {
+    if (this.connections.has(url)) {
+      const ws = this.connections.get(url);
+      ws.close();
+      this.connections.delete(url);
+      this.reconnectAttempts.delete(url);
+    }
+  }
+
+  /**
+   * Send message through WebSocket
+   * @param {string} url - WebSocket URL
+   * @param {any} message - Message to send
+   */
+  send(url, message) {
+    if (this.connections.has(url)) {
+      const ws = this.connections.get(url);
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(message));
+      } else {
+        throw new Error('WebSocket is not open');
+      }
+    } else {
+      throw new Error('WebSocket connection not found');
+    }
+  }
+
+  /**
+   * Check if WebSocket is connected
+   * @param {string} url - WebSocket URL
+   * @returns {boolean} - Connection status
+   */
+  isConnected(url) {
+    if (this.connections.has(url)) {
+      const ws = this.connections.get(url);
+      return ws.readyState === WebSocket.OPEN;
+    }
+    return false;
+  }
+}
+
+// Export singleton instance
+export const webSocketManager = new WebSocketManager();
+
+/**
  * GET request helper
  * @param {string} endpoint - API endpoint
  * @param {object} params - Query parameters
  * @returns {Promise<any>} - API response
  */
-export async function getRequest(endpoint, params = {}) {
+export async function getRequest(endpoint, params = {}, opts= {}) {
   const queryString = new URLSearchParams(params).toString();
   const url = queryString ? `${endpoint}?${queryString}` : endpoint;
 
   return apiRequest(url, {
-    method: 'GET'
+    method: 'GET',
+    ...opts
   });
 }
 

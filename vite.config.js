@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
     publicDir: path.resolve('./src/assets'),
     define: {
       'import.meta.env.VITE_API_URL': JSON.stringify(env.VITE_API_URL),
+      'import.meta.env.VITE_API_URL_2': JSON.stringify(env.VITE_API_URL_2),
       'import.meta.env.VITE_API_TIMEOUT': JSON.stringify(env.VITE_API_TIMEOUT),
       'import.meta.env.VITE_API_HEADERS': JSON.stringify(env.VITE_API_HEADERS),
       'import.meta.env.VITE_DEBUG': JSON.stringify(env.VITE_DEBUG)
