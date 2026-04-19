@@ -62,7 +62,8 @@
   <button class="dropdown-toggle">Загрузите данные</button>
   <div class="dropdown-menu"></div>
 </div>
-
+<br />
+Multiselect
 <div class="dropdown dropdown-complex">
   <button class="dropdown-toggle">Выберите год</button>
   <div class="dropdown-menu"></div>
@@ -308,6 +309,7 @@ const sampleData1 = [
           }
           return years;
         },
+        multiSelect: true,
         onSelect: function(selectedYear) {
           console.log('Выбранный год:', selectedYear);
         }

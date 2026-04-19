@@ -45,7 +45,7 @@
 <div class="spoiler expanded">
   <div class="header">PNL/ROI</div>
   <div class="contents">
-    График
+    <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
   </div>
 </div>
 
@@ -73,12 +73,21 @@ let currentCoin = '';
 let currentDirection = '';
 let currentTradingSerie = '';
 let currentDatePeriod = [];
+let chartPnl = {};
 
-
-function getStrategyResults(response) {
+function getStrategyResults(response, isUpdate=false) {
   let strategyNames = response.data.strategy_info.map(s => s.name);
   let coins = response.data.strategy_info.find(s => s.name === strategyNames[0])?.coins || [];
+  let pnlRoiChartData = response?.data?.pnl_roi_chart;
 
+  if (chartPnl?.series ) {
+    chartPnl.series[0].setData(pnlRoiChartData.roi, false); // false, чтобы не перерисовывать сразу
+    chartPnl.series[1].setData(pnlRoiChartData.pnl, false);
+    chartPnl.series[2].setData(pnlRoiChartData.balance_changing, false);
+    chartPnl.series[3].setData(pnlRoiChartData.amount, false);
+    chartPnl.redraw();
+  }
+  if (isUpdate) {return;}
   initDropdowns('.dropdown.ddl-strategy', {
     data: strategyNames,
     multiSelect: true,
@@ -140,12 +149,98 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.querySelector('.apply-filters').addEventListener('click', function(evt) {
+  document.querySelector('.apply-filters').addEventListener('click', async function(evt) {
     evt.stopPropagation();
     console.warn('currentStrategy,currentCoin',currentStrategy,currentCoin, currentDirection, currentTradingSerie, currentDatePeriod);
-
-    //TODO {"strategy":["oneside_grid_bot"],"symbol":["BTC-USDT"],"direction":["long"],"session":["asia"],"date_from":"2025-08-21","date_to":"2025-09-20"}
+    //TODO send empty object if no contents filled
+    const response = await postRequest('/get_strategy_results', {
+      "date_from": currentDatePeriod[0],
+      "date_to": currentDatePeriod[1],
+      "strategy": currentStrategy || [],
+      "symbol": currentCoin || [],
+      "direction": currentDirection || [],
+      "session": currentTradingSerie || []
+    });
+    getStrategyResults(response, true);
   });
+
+  const chartPnlRoiOptions = {
+    chart: {
+      zooming: {
+        type: 'x'
+      },
+      animation: false
+    },
+    credits: {
+      enabled: false
+    },
+    title: {
+      text: 'PnL/ROI'
+    },
+    xAxis: {
+      type: 'datetime'
+    },
+    yAxis: {
+      title: {
+        text: 'Value'
+      }
+    },
+    legend: {
+      enabled: true
+    },
+    accessibility: {
+      enabled: false,
+    },
+    tooltip: {
+      shared: true,
+      crosshairs: true
+    },
+    plotOptions: {
+      series: {
+        animation: false,
+        marker: {
+          radius: 2
+        },
+        lineWidth: 2,
+        states: {
+          hover: {
+            lineWidth: 3
+          }
+        }
+      }
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'ROI',
+        data: [],
+        color: '#4CAF50',
+        dashStyle: 'Solid'
+      },
+      {
+        type: 'line',
+        name: 'PnL',
+        data: [],
+        color: '#2196F3',
+        dashStyle: 'Solid'
+      },
+      {
+        type: 'line',
+        name: 'Баланс',
+        data: [],
+        color: '#FFC107',
+        dashStyle: 'Solid'
+      },
+      {
+        type: 'line',
+        name: 'Amount',
+        data: [],
+        color: '#F44336',
+        dashStyle: 'ShortDot'
+      },
+    ]
+  };
+  chartPnl = Highcharts.chart('container_pnl_roi', chartPnlRoiOptions);
 
   //fill Trading calendar with meta
   (function() {
