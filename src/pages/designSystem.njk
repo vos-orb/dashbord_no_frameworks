@@ -168,10 +168,11 @@ const sampleData1 = [
 
   // table2 data
   const sampleData2 = [
-    { product: 'Ноутбук', price: '50 000 руб.', category: 'Электроника' },
-    { product: 'Мышь', price: '1 500 руб.', category: 'Аксессуары' },
-    { product: 'Клавиатура', price: '3 000 руб.', category: 'Аксессуары' },
-    { product: 'Монитор', price: '25 000 руб.', category: 'Электроника' }
+    { product: 'Ноутбук', price: '-500000', category: 'Электроника' },
+    { product: 'Мышь', price: '1,3434343', category: 'Аксессуары' },
+    { product: 'Клавиатура', price: '345', category: 'Аксессуары' },
+    { product: 'Монитор', price: '-0.4343', category: 'Электроника' },
+    { product: 'Монитор', price: '0.0', category: 'Доставка' }
   ];
   document.addEventListener('DOMContentLoaded', () => {
     console.log('HELLO WORLD:TABLES FILL');
@@ -181,7 +182,11 @@ const sampleData1 = [
       // apply data
       console.log('FOUND TABLE', index, container);
       const data = index === 0 ? sampleData1 : sampleData2;
-      new UiTable(container, data, 3);
+      new UiTable(container, data, 5, {
+        numericColumns: [
+          'price'
+        ]
+      });
     });
   });
 

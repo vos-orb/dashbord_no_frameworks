@@ -306,11 +306,13 @@ document.addEventListener('DOMContentLoaded', () => {
       // fill the grids
       try {
         const responseTopUp = await postRequest('/get_history_top_up', { "name_acc": selectedItem } );
-        const formattedTopUpData = await responseTopUp.map((item) => ({
-          account_name: item.account_name,
-          amount: numberFormatter.format(item.amount),
-          datetime: dateFormatter(item.datetime)
-        }));
+        const formattedTopUpData = await Promise.all(
+          responseTopUp.map( async (item) => ({
+              account_name: item.account_name,
+              amount: numberFormatter.format(item.amount),
+              datetime: await dateFormatter(item.datetime)
+          }))
+        );
         const responseBalanceDiff = await postRequest('/get_balance_diff_user', { "name_acc": selectedItem } );
         const formattedBalanceDiffData = await responseBalanceDiff.map((item) => ({
           account_name: item.account_name,
@@ -326,9 +328,24 @@ document.addEventListener('DOMContentLoaded', () => {
           diff: numberFormatter.format(Number(item.diff))
         }));
 
-        new UiTable(tableGFCDF, formattedGFCDFData, 10);
-        new UiTable(tableHPU, formattedTopUpData, 10);
-        new UiTable(tableBOI, formattedBalanceDiffData, 10);
+        new UiTable(tableGFCDF, formattedGFCDFData, 10, {
+          numericColumns: [
+            'start_balance',
+            'end_balance',
+            'diff'
+          ]
+        });
+        new UiTable(tableHPU, formattedTopUpData, 10, {
+          numericColumns: [
+            'amount'
+          ]
+        });
+        new UiTable(tableBOI, formattedBalanceDiffData, 10, {
+          numericColumns: [
+            'first_balance',
+            'last_balance'
+          ]
+        });
 
       } catch(err) {
         console.log('ERRRORROROR', err)

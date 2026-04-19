@@ -131,7 +131,22 @@ document.addEventListener('DOMContentLoaded', () => {
           net_pnl_percent: numberFormatter.format(item.net_pnl_percent) // 2.443280977312374,
         }))
       );
-      new UiTable(tableConcatStats, formattedInvestorBalanceData, 10);
+      new UiTable(tableConcatStats, formattedInvestorBalanceData, 10, {
+        numericColumns: [
+          'entry_price',
+          'exit_price',
+          'delta_time' ,
+          'pnl',
+          'clean_profit_percent',
+          'gross_profit',
+          'fee',
+          'closeTotalPos',
+          'openMaxPos',
+          'cash',
+          'lever',
+          'net_pnl_percent'
+        ]
+      });
     }
   });
 });

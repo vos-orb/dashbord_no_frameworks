@@ -1,7 +1,7 @@
 (function() {
   'use strict';
   class TableComponent {
-    constructor(container, data, pageSize = 3) {
+    constructor(container, data, pageSize = 3, options = {}) {
       this.container = container;
       this.data = data;
       this.filteredData = [...data];
@@ -10,6 +10,7 @@
       this.sortColumn = null;
       this.sortOrder = 'asc';
       this.autocompleteItems = [];
+      this.numericColumns = options.numericColumns || []; // Set numeric columns from options
 
       this.init();
     }
@@ -28,6 +29,16 @@
       this.buildAutocompleteItems();
       this.renderTable();
       this.updatePagination();
+    }
+    formatNumericValue(value) {
+      // Convert to number if it's a string
+      const numValue = typeof value === 'string' ? parseFloat(value.replace(/,/g, '')) : value;
+
+      if (typeof numValue === 'number' && !isNaN(numValue)) {
+        const className = (numValue == 0)? 'neutral':((numValue >= 0) ? 'positive' : 'negative');
+        return `<span class="value ${className}">${value}</span>`;
+      }
+      return value;
     }
 
     cacheElements() {
@@ -172,11 +183,22 @@
       const end = start + this.pageSize;
       const pageData = this.filteredData.slice(start, end);
 
+      // Get column headers to match data keys
+      const headers = this.container.querySelectorAll('th');
+      const columnKeys = Array.from(headers).map(header => header.dataset.column);
+
       pageData.forEach(item => {
         const row = document.createElement('tr');
-        Object.values(item).forEach(value => {
+        columnKeys.forEach((key, index) => {
           const cell = document.createElement('td');
-          cell.textContent = value;
+          const value = item[key];
+
+          // Check if this column should be formatted as numeric
+          if (this.numericColumns.includes(key)) {
+            cell.innerHTML = this.formatNumericValue(value);
+          } else {
+            cell.innerHTML = `<span class="value">${value}</span>`;
+          }
           row.appendChild(cell);
         });
         this.tableBody.appendChild(row);
