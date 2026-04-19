@@ -178,11 +178,6 @@
 import { getRequest, postRequest } from '@/services/api.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  //TODO move formatter to global namespace
-  const numberFormatter = new Intl.NumberFormat('ru-RU', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
   //charts
   let chartPnl = {};
   let chartBalance = {};
@@ -257,11 +252,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const response = await postRequest('/get_data_balance_user', { "user": selectedItem } );
       console.log('Balance data:', response);
       // aggregate data and  fill the chart
-      const formattedData = await response.map(item => [
-        item.date,
-        parseFloat(item.avg)
-      ]);
-      chartBalance.series[0].setData(formattedData);
+      const formattedData = await Promise.all(
+        response.map(async (item) => [
+          await dateFormatter(item.date),
+          parseFloat(item.avg)
+        ])
+      );
+      await chartBalance.series[0].setData(formattedData);
     }
   });
   let balancePeriodRadioGroup = document.querySelector('.balance-period');
@@ -312,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const formattedTopUpData = await responseTopUp.map((item) => ({
           account_name: item.account_name,
           amount: numberFormatter.format(item.amount),
-          datetime: new Date(item.datetime).toLocaleString('ru-RU').replace(',', ' ').replaceAll('.', '-')
+          datetime: dateFormatter(item.datetime)
         }));
         const responseBalanceDiff = await postRequest('/get_balance_diff_user', { "name_acc": selectedItem } );
         const formattedBalanceDiffData = await responseBalanceDiff.map((item) => ({
@@ -527,8 +524,11 @@ document.addEventListener('DOMContentLoaded', () => {
       text: null
     },
     "xAxis": {
+      "type": 'datetime',
       "categories": [],
       "labels": {
+        "format": '{value:%Y-%m-%d}',
+        "padding": 7,
         "style": {
           "color": "#64748b",
           "fontSize": "12px"
@@ -562,6 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
     "tooltip": {
       "shared": true,
       "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
       "backgroundColor": "rgba(255, 255, 255, 0.96)",
       "style": {
         "color": "#1e293b",

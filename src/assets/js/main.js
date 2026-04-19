@@ -17,6 +17,31 @@ if (debug) {
   console.log('is debug:', apiUrl, debug);
 }
 
+// Global number formatter
+const numberFormatter = new Intl.NumberFormat('ru-RU', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+window.numberFormatter = numberFormatter;
+//Global date formatter
+const dateFormatter = async function(da) {
+  let d = await new Date();
+  try {
+    d = new Date(da);
+  } catch(err) {
+    console.warn('dateFormatter -> ERROR:', err);
+  }
+
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0') + ' ' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0') + ':' +
+    String(d.getSeconds()).padStart(2, '0')
+  ;
+}
+window.dateFormatter = dateFormatter;
+
 // Example GET request
 async function fetchData() { //TODO remove that into instructions
   try {
