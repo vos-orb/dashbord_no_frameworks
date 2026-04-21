@@ -80,7 +80,30 @@ function formatTimeMs(ms) {
   return parts.join(' ');
 }
 window.formatTimeMs = formatTimeMs;
-
+//TODO move to separate highchartHelpers.js
+function updateChartWithDateRange(chart, start, end) {
+  if (chart) {
+    try {
+      // Parse the start and end dates
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+      // Validate the dates
+      if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+        throw new Error('Invalid date format');
+      }
+      // Convert dates to timestamps
+      const startTime = startDate.getTime();
+      const endTime = endDate.getTime();
+      // Update the chart's x-axis extremes
+      chart.xAxis[0].setExtremes(start? startTime: start, end? endTime: end);
+      // Redraw the chart to ensure changes are applied
+      chart.redraw();
+    } catch (error) {
+      console.error('Error updating chart:', error);
+    }
+  }
+}
+window.updateChartWithDateRange = updateChartWithDateRange;
 // Example GET request
 async function fetchData() { //TODO remove that into instructions
   try {

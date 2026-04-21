@@ -198,14 +198,22 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     onSelect: async function (selectedItem) {
       const response = await postRequest('/get_pnl_roi_for_user', { "account": selectedItem } );
-      if (chartPnl?.series ) {
-        chartPnl?.update({ //fill the chart
-          xAxis:{
-            categories:response?.x
-          },
-          series:[
-            {name:"PnL ($)", data:response?.series?.pnl},
-            {name:"ROI (%)", data:response?.series?.roi}
+      if (chartPnl?.series && response?.x && response?.series) {
+        // Convert data to proper [timestamp, value] format
+        const pnlData = response.series.pnl.map((value, index) => [
+          new Date(response.x[index]).getTime(),
+          value
+        ]);
+
+        const roiData = response.series.roi.map((value, index) => [
+          new Date(response.x[index]).getTime(),
+          value
+        ]);
+
+        chartPnl.update({
+          series: [
+            {name: "PnL ($)", data: pnlData},
+            {name: "ROI (%)", data: roiData}
           ]
         });
       }
@@ -231,9 +239,14 @@ document.addEventListener('DOMContentLoaded', () => {
     pnlPeriodDatepicker._datepicker.setPeriod(tr[e.detail.value]);
   });
   pnlPeriodDatepicker.addEventListener('datechange', (e) => {
-    console.warn('PL DATE CHANGED, e.detail', e.detail);
-    //TODO apply date filter to chart
-
+    let p = e?.detail?.currentValue;
+    const [startDate, endDate] =
+      (p!='')
+      ? p.split('—').map(date => date.trim())
+      : [null, null]
+    ;
+    //apply date filter to chart
+    updateChartWithDateRange(chartPnl, startDate, endDate);
   });
   //Balance
   initDropdowns('.dropdown.users-balance', {
@@ -250,7 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     onSelect: async function (selectedItem) {
       const response = await postRequest('/get_data_balance_user', { "user": selectedItem } );
-      console.log('Balance data:', response);
       // aggregate data and  fill the chart
       const formattedData = await Promise.all(
         response.map(async (item) => [
@@ -283,7 +295,14 @@ document.addEventListener('DOMContentLoaded', () => {
   balancePeriodDatepicker.addEventListener('datechange', (e) => {
     console.warn('BALANCE DATE CHANGED, e.detail', e.detail);
     //TODO apply date filter to chart
-
+    let p = e?.detail?.currentValue;
+    const [startDate, endDate] =
+      (p!='')
+        ? p.split('—').map(date => date.trim())
+        : [null, null]
+    ;
+    //apply date filter to chart
+    updateChartWithDateRange(chartBalance, startDate, endDate);
   });
 
   // Balance and Investors
@@ -369,8 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
       text: null
     },
     "xAxis": {
-      "categories": [],
+      "type": 'datetime',
       "labels": {
+        "format": '{value:%Y-%m-%d}',
         "style": {
           "color": "#64748b",
           "fontSize": "12px"
