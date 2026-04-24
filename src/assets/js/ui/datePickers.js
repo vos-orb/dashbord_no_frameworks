@@ -33,6 +33,7 @@
         })
       ;
       this.input.parentNode.appendChild(clearButton);
+      const showPeriods = this.element.hasAttribute('data-show-periods');
 
       this.popup.innerHTML = `
 <div class="datepicker-header">
@@ -40,7 +41,7 @@
   <span class="current-month"></span>
   <button class="next-month">›</button>
 </div>
-${this.isRange ? `
+${this.isRange && showPeriods ? `
   <div class="period-buttons">
     <button data-days="7">7 дней</button>
     <button data-days="30" class="active">30 дней</button>
@@ -101,14 +102,15 @@ ${this.isRange ? `
         }
       });
 
-      if (this.isRange) { // period-buttons
+      if (this.isRange && this.element.hasAttribute('data-show-periods')) { // period-buttons
         this.popup.querySelectorAll('.period-buttons button').forEach(btn => {
           btn.addEventListener('click', (e) => {
             const days = parseInt(e.target.dataset.days, 10);
             this._setPeriod(days);
           });
         });
-
+      }
+      if (this.isRange) {
         // apply button
         this.popup.querySelector('.apply-dates').addEventListener('click', () => {
           this.applyRange();
