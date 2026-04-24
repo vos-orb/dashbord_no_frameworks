@@ -6,7 +6,8 @@
       this.data = data;
       this.filteredData = [...data];
       this.currentPage = 1;
-      this.pageSize = pageSize;
+      this.pageSize = options.noPagination ? this.filteredData.length : pageSize;
+      this.noPagination = options.noPagination || false;
       this.sortColumn = null;
       this.sortOrder = 'asc';
       this.autocompleteItems = [];
@@ -21,6 +22,14 @@
       this.renderTable();
       this.updatePagination();
       this.buildAutocompleteItems();
+      const initEvent = new CustomEvent('tableinitialized', {
+        detail: {
+          table: this,
+          timestamp: new Date()
+        },
+        bubbles: true
+      });
+      this.container.dispatchEvent(initEvent);
     }
     updateData(newData) {
       this.data = newData;
@@ -178,11 +187,15 @@
 
     renderTable() {
       this.tableBody.innerHTML = '';
-
-      const start = (this.currentPage - 1) * this.pageSize;
-      const end = start + this.pageSize;
-      const pageData = this.filteredData.slice(start, end);
-
+      let pageData;
+      if (this.noPagination) {
+        // Show all data when pagination is disabled
+        pageData = this.filteredData;
+      } else {
+        const start = (this.currentPage - 1) * this.pageSize;
+        const end = start + this.pageSize;
+        pageData = this.filteredData.slice(start, end);
+      }
       // Get column headers to match data keys
       const headers = this.container.querySelectorAll('th');
       const columnKeys = Array.from(headers).map(header => header.dataset.column);
@@ -204,41 +217,54 @@
         this.tableBody.appendChild(row);
       });
 
-      this.prevPageBtn.disabled = this.currentPage === 1;
-      this.nextPageBtn.disabled = end >= this.filteredData.length;
-    }
-
-    updatePagination() {
-      const totalPages = Math.ceil(this.filteredData.length / this.pageSize);
-      this.pageInfo.textContent = `Страница ${this.currentPage} из ${totalPages}`;
-    }
-
-    prevPage() {
-      if (this.currentPage > 1) {
-        this.currentPage--;
-        this.renderTable();
-        this.updatePagination();
-
-        //fire pagination events
-        const pageEvent = new CustomEvent('pagechange', {
-          detail: {
-            page: this.currentPage,
-            timestamp: new Date()
-          },
-          bubbles: true
-        });
-        this.container.dispatchEvent(pageEvent);
+      if (this.noPagination) {
+        this.prevPageBtn.style.display = 'none';
+        this.nextPageBtn.style.display = 'none';
+        this.pageInfo.style.display = 'none';
+      } else {
+        this.prevPageBtn.style.display = '';
+        this.nextPageBtn.style.display = '';
+        this.pageInfo.style.display = '';
+        this.prevPageBtn.disabled = this.currentPage === 1;
+        this.nextPageBtn.disabled = end >= this.filteredData.length;
       }
     }
 
+    updatePagination() {
+      if (this.noPagination) {
+        this.pageInfo.textContent = `Показано все ${this.filteredData.length} записей`;
+      } else {
+        const totalPages = Math.ceil(this.filteredData.length / this.pageSize);
+        this.pageInfo.textContent = `Страница ${this.currentPage} из ${totalPages}`;
+      }
+    }
+
+    prevPage() {
+      if (this.noPagination || this.currentPage <= 1) return;
+
+      this.currentPage--;
+      this.renderTable();
+      this.updatePagination();
+      //fire pagination events
+      const pageEvent = new CustomEvent('pagechange', {
+        detail: {
+          page: this.currentPage,
+          timestamp: new Date()
+        },
+        bubbles: true
+      });
+      this.container.dispatchEvent(pageEvent);
+    }
+
     nextPage() {
+      if (this.noPagination) return;
+
       const totalPages = Math.ceil(this.filteredData.length / this.pageSize);
       if (this.currentPage < totalPages) {
         this.currentPage++;
         this.renderTable();
         this.updatePagination();
-
-        //fire pagination events
+       //fire pagination events
         const pageEvent = new CustomEvent('pagechange', {
           detail: {
             page: this.currentPage,
@@ -249,68 +275,7 @@
         this.container.dispatchEvent(pageEvent);
       }
     }
+
   }
-
-  // init All
-  // table1 data
-  /*const sampleData1 = [
-    { name: 'Анна Иванова', email: 'anna@example.com', role: 'Администратор' },
-    { name: 'Пётр Сидоров', email: 'peter@example.com', role: 'Модератор' },
-    { name: 'Мария Петрова', email: 'maria@example.com', role: 'Пользователь' },
-    { name: 'Иван Кузнецов', email: 'ivan@example.com', role: 'Гость' },
-    { name: 'Ольга Смирнова', email: 'olga@example.com', role: 'Администратор' },
-    { name: 'Алексей Попов', email: 'alex@example.com', role: 'Модератор' },
-    { name: 'Елена Волкова', email: 'elena@example.com', role: 'Пользователь' },
-    { name: 'Дмитрий Новиков', email: 'dmitry@example.com', role: 'Гость' }
-  ];
-
-  // table2 data
-  const sampleData2 = [
-    { product: 'Ноутбук', price: '50 000 руб.', category: 'Электроника' },
-    { product: 'Мышь', price: '1 500 руб.', category: 'Аксессуары' },
-    { product: 'Клавиатура', price: '3 000 руб.', category: 'Аксессуары' },
-    { product: 'Монитор', price: '25 000 руб.', category: 'Электроника' }
-  ];
-  document.addEventListener('DOMContentLoaded', () => {
-    const tableContainers = document.querySelectorAll('.table-component');
-
-    tableContainers.forEach((container, index) => {
-      // apply data
-      const data = index === 0 ? sampleData1 : sampleData2;
-      new UiTable(container, data, 3);
-    });
-  });*/
-/* events handling
-  const tableContainers = document.querySelectorAll('.table-component');
-
-  tableContainers.forEach((container, index) => {
-    const data = index === 0 ? sampleData1 : sampleData2;
-    const tableInstance = new UiTable(container, data, 3);
-
-    // search event
-    container.addEventListener('search', (e) => {
-      console.log('Поиск:', e.detail.query);
-    });
-
-    // sort event
-    container.addEventListener('sort', (e) => {
-      console.log('Сортировка:', e.detail.column, e.detail.order);
-    });
-
-    // pagechange event
-    container.addEventListener('pagechange', (e) => {
-      console.log('Страница:', e.detail.page);
-    });
-  });
-*/
   window.UiTable = TableComponent;
 })();
-/* USAGE example
-*
-// get obj while init
-const table1 = new UiTable(container1, sampleData1, 3);
-
-// update data later
-table1.updateData(newSampleData);
-
-* */

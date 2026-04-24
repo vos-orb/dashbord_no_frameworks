@@ -1,6 +1,10 @@
 import { routes } from '@/routes';
 import './vendors/highcharts.js';
+import './vendors/highcharts_stock.js';
+import './vendors/highcharts_heatmap.js';
+import './vendors/highcharts_xrange.js';
 import './ui/spoilers.js';
+import './ui/tooltips.js';
 import './ui/table.js';
 import './ui/ddls.js';
 import './ui/datePickers.js';
@@ -105,7 +109,7 @@ function updateChartWithDateRange(chart, start, end) {
 }
 window.updateChartWithDateRange = updateChartWithDateRange;
 // Example GET request
-async function fetchData() { //TODO remove that into instructions
+/*async function fetchData() { //TODO remove that into instructions
   try {
     const data = await getRequest('/filter/user_name');
     const data2 = await getRequest('/filter/user_name_lead');
@@ -113,10 +117,10 @@ async function fetchData() { //TODO remove that into instructions
   } catch (error) {
     console.error('Failed to fetch users:', error);
   }
-}
+}*/
 
 // Example POST request
-async function createUser() {
+/*async function createUser() {
   try {
     const newUser = {
       name: 'John Doe',
@@ -127,11 +131,11 @@ async function createUser() {
   } catch (error) {
     console.error('Failed to create user:', error);
   }
-}
+}*/
 
 // Call the functions
-fetchData();
-createUser();
+/*fetchData();
+createUser();*/
 
 (function(window, undefined) {
   let that = this;

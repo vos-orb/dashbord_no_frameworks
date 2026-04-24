@@ -2,13 +2,6 @@
 {% block content %}
 
   <div class="spoiler expanded">
-    <div class="header">Настройки пользователей</div>
-    <div class="contents">
-
-      <button class="ui-button">Добавить</button>
-    </div>
-  </div>
-  <div class="spoiler">
     <div class="header">Настройки ботов</div>
     <div class="contents">
 
@@ -61,17 +54,17 @@
           <th data-column="entry_price">Вход ($)</th>
           <th data-column="start_time">Вход (дата)</th>
           <th data-column="delta_time">В сделке</th>
+
           <th data-column="percDeltaNow">Процент (%)</th>
           <th data-column="income">Доход ($)</th>
           <th data-column="fee">Комиссия ($)</th>
           <th data-column="pnl">Прибыль ($)</th>
           <th data-column="notionalUsd">Объём ($)</th>
+
           <th data-column="lever">Плечо</th>
           <th data-column="posSide">Сторона</th>
           <th data-column="totalEq">Текущий баланс</th>
           <th data-column="perc_pos">% от Депо</th>
-          <th data-column="time_delta_to_server">Отклонение по времени</th>
-          <th data-column="perc_delta_to_server">Отклонение в %</th>
           <th data-column="sell">Продать</th>
         </tr>
         </thead>
@@ -82,13 +75,13 @@
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
+
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
+
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
@@ -159,9 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
               posSide: item.posSide,
               totalEq: numberFormatter.format(item.totalEq),
               perc_pos: numberFormatter.format(item.perc_pos),
-
-              time_delta_to_server: 0,
-              perc_delta_to_server: 0,
               sell: 0
             }];
             new UiTable(tableUserStats, formattedUsersStatsData, 10, {

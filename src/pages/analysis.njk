@@ -42,14 +42,14 @@
 
 <br />
 
-<div class="spoiler expanded">
+<div class="spoiler ">
   <div class="header">PNL/ROI</div>
   <div class="contents">
     <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
   </div>
 </div>
 
-<div class="spoiler expanded">
+<div class="spoiler ">
   <div class="header">Детализация</div>
   <div class="contents">
 
@@ -57,16 +57,130 @@
 
   </div>
 </div>
+<div class="spoiler expanded">
+  <div class="header">Отчёт риск-профиль</div>
+  <div class="contents">
+
+    <div class="flex-row">
+      <div class="flex-column">
+        charts
+<div class="ui-chartjs" id="container_cumulative_returns" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_cumulative_returns_scaled" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_eoy_returns" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_daily_active_returns" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_rolling_volatility" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_rolling_sharpe" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_rolling_sortino" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_monthly_returns" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_underwater_plot" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_drawdown_periods" style="width:100%; height:400px;"></div>
+<div class="ui-chartjs" id="container_return_quantiles" style="width:100%; height:400px;"></div>
+      </div>
+      <div class="flex-column">
+
+        <h3>Key Performance Indicators</h3>
+        <div class="table-component table-performance-indicators">
+          <div class="search-container">
+            <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+            <div class="autocomplete-items"></div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+              <tr>
+                <th data-column="indicators">Indicators</th>
+                <th data-column="strategy">Strategy</th>
+              </tr>
+              </thead>
+              <tbody class="table-body">
+              <tr>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button class="btn prev-page" disabled>Назад</button>
+            <span class="page-info">Страница 1 из 1</span>
+            <button class="btn next-page">Вперёд</button>
+          </div>
+        </div>
+
+        <h3>EOY indicators</h3>
+        <div class="table-component table-eoy-indicators">
+          <div class="search-container">
+            <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+            <div class="autocomplete-items"></div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+              <tr>
+                <th data-column="year">Year</th>
+                <th data-column="return">Return</th>
+                <th data-column="cumulative">Cumulative</th>
+              </tr>
+              </thead>
+              <tbody class="table-body">
+              <tr>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button class="btn prev-page" disabled>Назад</button>
+            <span class="page-info">Страница 1 из 1</span>
+            <button class="btn next-page">Вперёд</button>
+          </div>
+        </div>
+
+
+        <h3>Worst 10 Drawdowns</h3>
+        <div class="table-component table-drawdowns">
+          <div class="search-container">
+            <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+            <div class="autocomplete-items"></div>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+              <tr>
+                <th data-column="started">Started</th>
+                <th data-column="recovered">Recovered</th>
+                <th data-column="drawdown">Drawdown</th>
+                <th data-column="days">Days</th>
+              </tr>
+              </thead>
+              <tbody class="table-body">
+              <tr>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+                <td><div class="skeleton" style="height: 40px;"></div></td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button class="btn prev-page" disabled>Назад</button>
+            <span class="page-info">Страница 1 из 1</span>
+            <button class="btn next-page">Вперёд</button>
+          </div>
+        </div>
 
 
 
+      </div>
+    </div>
 
+  </div>
+</div>
 
-
-
-
-
-  <script type="module">
+<script type="module">
 import { getRequest, postRequest } from '@/services/api.js';
 let currentStrategy = '';
 let currentCoin = '';
@@ -74,6 +188,18 @@ let currentDirection = '';
 let currentTradingSerie = '';
 let currentDatePeriod = [];
 let chartPnl = {};
+
+let chartCumulativeReturns = {};
+let chartCumulativeReturnsScaled = {};
+let chartEoyReturns = {};
+let chartDailyActiveReturns = {};
+let chartRollingVolatility = {};
+let chartRollingSharpe = {};
+let chartRollingSortino = {};
+let chartMonthlyReturns = {};
+let chartUnderwaterPlot = {};
+let chartDrawdownPeriods = {};
+let chartReturnQuantiles = {};
 
 function getStrategyResults(response, isUpdate=false) {
   let strategyNames = response.data.strategy_info.map(s => s.name);
@@ -126,6 +252,463 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   const ddlData = getDataForDddls();
+  const processResponse = async function(res) {
+    let cumulativeReturnsChartData = res?.data?.cumulative_returns_chart;
+    let cumulativeReturnsChartScaledData = res?.data?.cumulative_returns_chart_scaled;
+    let eoyReturnsChartData = res?.data?.eoy_returns_chart;
+    let dailyActiveReturnsChartData = res?.data?.daily_active_returns_chart;
+    let rollingVolatilityChartData = res?.data?.rolling_volatility_chart;
+
+    let rollingSharpeChartData = res?.data?.rolling_sharpe_chart;
+    let rollingSortinoChartData = res?.data?.rolling_sortino_chart;
+    let heatmapReturnChartData = res?.data?.heatmap_return_chart;
+    let underwaterPlotChartData = res?.data?.underwater_plot_chart;
+    let drowdownPeriodsChartData = res?.data?.drowdown_periods_chart;
+
+    let returnQuantiliesChartData = res?.data?.return_quantilies_chart;
+
+    let distrMontlyReturnsChartData = res?.data?.distribution_of_montly_returns;
+
+    let tablePerformanceIndicators = document.querySelector('.table-performance-indicators');
+    tablePerformanceIndicators.addEventListener('tableinitialized', function(e) {
+      window.ui_tooltip.methods.initBySelector('.table-performance-indicators .ui-tooltip');
+    });
+    tablePerformanceIndicators.addEventListener('pagechange', function(e) {
+      window.ui_tooltip.methods.initBySelector('.table-performance-indicators .ui-tooltip');
+    });
+
+    const dataArr = await res?.data?.metrics?.basic;
+    const formattedTPIData = await dataArr.map((item) => ({
+      indicators: `<div class="ui-tooltip newbee" data-position="r" data-is-hover="true">
+          <div class="container">⚠ ${item.title}</div>
+          <div class="tooltip-contents">${item.description}</div>
+        </div>`,
+      strategy: numberFormatter.format((item.value?.returns)
+        ? item.value.returns
+        : item.value)
+      + ((item.measurement)
+         ? ' '+ item.measurement
+         : '')
+    }));
+
+    new UiTable(tablePerformanceIndicators, formattedTPIData, null, {
+      noPagination: true,
+      numericColumns: [
+        'indicators',
+        'strategy'
+      ]
+    });
+
+    let tableEoyIndicators = document.querySelector('.table-eoy-indicators');
+    const dataArrEoyIndicators = await res?.data?.metrics?.eoy;
+    const formattedEoyData = await dataArrEoyIndicators.map((item) => ({
+      year: item.year,
+      return: numberFormatter.format(item.return),
+      cumulative: numberFormatter.format(item.cumulative)
+    }));
+
+    new UiTable(tableEoyIndicators, formattedEoyData, null, {
+      noPagination: true,
+      numericColumns: [
+        'return',
+        'cumulative'
+      ]
+    });
+
+    let tableDrawdowns = document.querySelector('.table-drawdowns');
+    const dataArrDrawdownsIndicators = await res?.data?.metrics?.worst_drawdowns;
+
+    const formattedDrawdownsData = await Promise.all(
+      dataArrDrawdownsIndicators.map(async (item) => ({
+        started: await dateFormatter(item.started),
+        recovered: await dateFormatter(item.recovered),
+        drawdown: numberFormatter.format(item.drawdown),
+        days: item.days
+      }))
+    );
+
+    new UiTable(tableDrawdowns, formattedDrawdownsData, null, {
+      noPagination: true,
+      numericColumns: [
+        'drawdown'
+      ]
+    });
+
+
+    if (chartCumulativeReturns?.series ) {
+      const formattedData = await Promise.all(
+        cumulativeReturnsChartData.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ])
+      );
+      await chartCumulativeReturns.series[0].setData(formattedData);
+    }
+
+    if (chartCumulativeReturnsScaled?.series ) {
+      const formattedData2 = await Promise.all(
+        cumulativeReturnsChartScaledData.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ])
+      );
+      await chartCumulativeReturnsScaled.series[0].setData(formattedData2);
+    }
+
+    if (chartEoyReturns?.series ) {
+      const formattedData3 = await Promise.all(
+        eoyReturnsChartData?.data?.map(item => ({ name: item.date, y: item.value }))
+      );
+      const formattedData3_1 = await Promise.all(
+        (new Array(formattedData3?.length)).fill(eoyReturnsChartData?.threshold)
+      )
+      await chartEoyReturns.series[0].setData(formattedData3);
+      await chartEoyReturns.series[1].setData(formattedData3_1);
+    }
+
+    if (chartDailyActiveReturns?.series ) {
+      const formattedData4 = await Promise.all(
+        dailyActiveReturnsChartData.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ])
+      );
+      await chartDailyActiveReturns.series[0].setData(formattedData4);
+    }
+
+    if (chartRollingVolatility?.series ) {
+      const getThreshold = async () => {
+        const t = await rollingVolatilityChartData?.threshold;
+        return parseFloat(t?.toFixed(2));
+      };
+      const getData = async () => {
+        const promises = rollingVolatilityChartData?.data.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ]) || [];
+        return Promise.all(promises);
+      };
+      const [trashy, daty] = await Promise.all([
+        getThreshold(),
+        getData(),
+      ]);
+      chartRollingVolatility.yAxis[0].update({
+        plotLines: [{
+          id: 'threshold-plot-line', // По этому ID Highcharts найдет линию
+          color: 'red',
+          dashStyle: "Dash",
+          value: trashy,    // Обновляем значение
+          zIndex: 5,
+          label: {
+            text: `Уровень: ${trashy}`, // Обновляем текст
+            align: 'right',
+            style: {
+              color: 'red'
+            }
+          }
+        }]
+      });
+      await chartRollingVolatility.series[0].setData(daty);
+    }
+
+    if (chartRollingSharpe?.series ) {
+      const getThreshold = async () => {
+        const t = await rollingSharpeChartData?.threshold;
+        return parseFloat(t?.toFixed(2));
+      };
+      const getData = async () => {
+        const promises = rollingSharpeChartData?.data.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ]) || [];
+        return Promise.all(promises);
+      };
+      const [trashy, daty] = await Promise.all([
+        getThreshold(),
+        getData(),
+      ]);
+      chartRollingSharpe.yAxis[0].update({
+        plotLines: [{
+          id: 'threshold-plot-line2', // По этому ID Highcharts найдет линию
+          color: 'red',
+          dashStyle: "Dash",
+          value: trashy,    // Обновляем значение
+          zIndex: 5,
+          label: {
+            text: `Уровень: ${trashy}`, // Обновляем текст
+            align: 'right',
+            style: {
+              color: 'red'
+            }
+          }
+        }]
+      });
+      await chartRollingSharpe.series[0].setData(daty);
+    }
+
+    if (chartRollingSortino?.series ) {
+      const getThreshold = async () => {
+        const t = await rollingSortinoChartData?.threshold;
+        return parseFloat(t?.toFixed(2));
+      };
+      const getData = async () => {
+        const promises = rollingSortinoChartData?.data.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ]) || [];
+        return Promise.all(promises);
+      };
+      const [trashy, daty] = await Promise.all([
+        getThreshold(),
+        getData(),
+      ]);
+      chartRollingSortino.yAxis[0].update({
+        plotLines: [{
+          id: 'threshold-plot-line3', // По этому ID Highcharts найдет линию
+          color: 'red',
+          dashStyle: "Dash",
+          value: trashy,    // Обновляем значение
+          zIndex: 5,
+          label: {
+            text: `Уровень: ${trashy}`, // Обновляем текст
+            align: 'right',
+            style: {
+              color: 'red'
+            }
+          }
+        }]
+      });
+      await chartRollingSortino.series[0].setData(daty);
+    }
+
+    if (chartMonthlyReturnsOptions?.series ) {
+      const years = Array.from(new Set(heatmapReturnChartData.map(el => el.year)));
+      const months = ["ЯНВ", "ФЕВ", "МАРТ", "АПР", "МАЙ", "ИЮНЬ", "ИЮЛЬ", "АВГ", "СЕН", "ОКТ", "НОЯБ", "ДЕК"];
+
+      const formattedData = heatmapReturnChartData.map(item => [
+        item.month - 1,           // X: индекс месяца
+        years.indexOf(item.year), // Y: индекс года
+        item.value                // Значение
+      ]);
+
+      chartMonthlyReturns.update({
+        xAxis: {
+          categories: months
+        },
+        yAxis: {
+          categories: years
+        },
+        series: [{
+          data: formattedData
+        }],
+        tooltip: {
+          formatter: function() {
+            const monthName = this.series.xAxis.categories[this.point.x];
+            const yearName = this.series.yAxis.categories[this.point.y];
+            const val = this.point.value;
+
+            return `${yearName} ${monthName} - <b>${val}</b>`;
+          }
+        },
+      }, true, true);
+    }
+
+    if (chartUnderwaterPlot?.series ) {
+      const getThreshold = async () => {
+        const t = await underwaterPlotChartData?.threshold;
+        return parseFloat(t?.toFixed(2));
+      };
+      const getData = async () => {
+        const promises = underwaterPlotChartData?.data.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ]) || [];
+        return Promise.all(promises);
+      };
+      const [trashy, daty] = await Promise.all([
+        getThreshold(),
+        getData(),
+      ]);
+      chartUnderwaterPlot.yAxis[0].update({
+        plotLines: [{
+          id: 'threshold-plot-line4', // По этому ID Highcharts найдет линию
+          color: 'red',
+          dashStyle: "Dash",
+          value: trashy,    // Обновляем значение
+          zIndex: 5,
+          label: {
+            text: `Уровень: ${trashy}`, // Обновляем текст
+            align: 'right',
+            style: {
+              color: 'red'
+            }
+          }
+        }]
+      });
+      await chartUnderwaterPlot.series[0].setData(daty);
+    }
+
+    if (chartDrawdownPeriods?.series ) {
+      const getData = async () => {
+        const promises = drowdownPeriodsChartData?.data.map(async (item) => [
+          await new Date(item.date).getTime(),
+          parseFloat(item.value)
+        ]) || [];
+        return Promise.all(promises);
+      };
+      const getSdata = async () => {
+        const data = drowdownPeriodsChartData.data;
+        const periods = drowdownPeriodsChartData.periods;
+
+        const yValues = data.map(item => item.value);
+        const yMin = Math.min(...yValues);
+        const yMax = Math.max(...yValues);
+
+        const allDates = Array.from(new Set([
+          ...data.map(el => el.date),
+          ...periods.map(el => el.end_date),
+          ...periods.map(el => el.start_date),
+        ])).sort((prev, next) => new Date(prev).getTime() - new Date(next).getTime());
+
+        const seriesData = periods.map((el) => ({
+          x: allDates.indexOf(el.start_date),
+          x2: allDates.indexOf(el.end_date),
+          y: yMin + (yMax - yMin) / 2,
+          pointRange: 100,
+          color: "rgba(255, 0, 0, 0.15)",
+        }));
+
+        return { seriesData, allDates, yMin, yMax };
+      };
+
+      const [daty, { seriesData: sData, allDates, yMin, yMax }] = await Promise.all([
+        getData(),
+        getSdata(),
+      ]);
+      await chartDrawdownPeriods.series[0].setData(daty);
+      await chartDrawdownPeriods.series[1].setData(sData);
+      await chartDrawdownPeriods?.update({
+        xAxis: {
+          categories:allDates,
+          labels: {
+            formatter: function() {
+              const d = new Date(this.value);
+              if (isNaN(d.getTime())) return this.value;
+
+              return d.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: '2-digit'
+              });
+            }
+          }
+        },
+        yAxis: {
+          min: yMin,
+          max: yMax,
+          title: {
+            text: null
+          }
+        },
+      });
+    }
+
+    if (chartReturnQuantiles?.series) {
+      let chartData = returnQuantiliesChartData;
+      const scatterData = [
+        ...chartData.daily.map((value, i) => ({ x: 0, y: value, name: 'Daily' })),    // Сдвигаем точки daily влево
+        ...chartData.weekly.map((value, i) => ({ x: 1, y: value, name: 'Weekly' })),   // Сдвигаем точки weekly влево
+        ...chartData.monthly.map((value, i) => ({ x: 2, y: value, name: 'Monthly' })), // и т. д.
+        ...chartData.quarterly.map((value, i) => ({ x: 3, y: value, name: 'Quarterly' })),
+        ...chartData.yearly.map((value, i) => ({ x: 4, y: value, name: 'Yearly' })),
+      ];
+      const candleData = [
+        {
+          name: 'Daily',
+          x: 0,
+          open: chartData.mean.daily,
+          high: Math.max(chartData.mean.daily, chartData.median.daily),
+          low: Math.min(chartData.mean.daily, chartData.median.daily),
+          close: chartData.median.daily,
+        },
+        {
+          name: 'Weekly',
+          x: 1,
+          open: chartData.mean.weekly,
+          high: Math.max(chartData.mean.weekly, chartData.median.weekly),
+          low: Math.min(chartData.mean.weekly, chartData.median.weekly),
+          close: chartData.median.weekly,
+        },
+        {
+          name: 'Monthly',
+          x: 2,
+          open: chartData.mean.monthly,
+          high: Math.max(chartData.mean.monthly, chartData.median.monthly),
+          low: Math.min(chartData.mean.monthly, chartData.median.monthly),
+          close: chartData.median.monthly,
+        },
+        {
+          name: 'Quarterly',
+          x: 3,
+          open: chartData.mean.quarterly,
+          high: Math.max(chartData.mean.quarterly, chartData.median.quarterly),
+          low: Math.min(chartData.mean.quarterly, chartData.median.quarterly),
+          close: chartData.median.quarterly,
+        },
+        {
+          name: 'Yearly',
+          x: 4,
+          open: chartData.mean.yearly,
+          high: Math.max(chartData.mean.yearly, chartData.median.yearly),
+          low: Math.min(chartData.mean.yearly, chartData.median.yearly),
+          close: chartData.median.yearly,
+        },
+      ];
+      await chartReturnQuantiles.series[0].setData(
+        candleData.map((item, index) => ({
+          name: item.name,
+          open: item.open,
+          high: item.high,
+          low: item.low,
+          close: item.close,
+          x: index
+        }))
+      );
+      await chartReturnQuantiles.series[1].setData(scatterData);
+      await chartReturnQuantiles?.update({
+        xAxis: {
+          type: 'category',
+          categories: candleData.map(item => item.name),
+          labels: {
+            formatter: function(data) {
+              return `${candleData[data.pos].name}`;
+            }
+          }
+        },
+      });
+    }
+
+  };
+
+  const getDataForQsReports = async function() {
+    try {
+      //const response = await postRequest('/analys/get_strategy_qs_report', {
+      //const response = await postRequest('/get_strategy_qs_report', {"date_from":"2025-08-21"});
+      /*console.log('keys', Object.keys(response?.data));
+      console.log('keys returns', Object.keys(response?.data?.returns));
+      console.log('keys metrics', Object.keys(response?.data?.metrics));*/
+      //processResponse(response);
+      processResponse(testmetrics);
+
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+
+    }
+  };
+  setTimeout(function(){
+    getDataForQsReports();
+  },13);
+
 
   let analyzePNLDatepicker = document.querySelector('.analyze-pnl-datepicker');
   analyzePNLDatepicker.addEventListener('datechange', (e) => {
@@ -151,16 +734,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.querySelector('.apply-filters').addEventListener('click', async function(evt) {
     evt.stopPropagation();
-    console.warn('currentStrategy,currentCoin',currentStrategy,currentCoin, currentDirection, currentTradingSerie, currentDatePeriod);
-    //TODO send empty object if no contents filled
-    const response = await postRequest('/get_strategy_results', {
-      "date_from": currentDatePeriod[0],
-      "date_to": currentDatePeriod[1],
-      "strategy": currentStrategy || [],
-      "symbol": currentCoin || [],
-      "direction": currentDirection || [],
-      "session": currentTradingSerie || []
-    });
+    // send empty object if no contents filled
+    let params = {};
+    if (currentDatePeriod[0]) { params.date_from = currentDatePeriod[0]; }
+    if (currentDatePeriod[1]) { params.date_to = currentDatePeriod[1]; }
+    if (currentStrategy) { params.strategy = currentStrategy; }
+    if (currentCoin) { params.symbol = currentCoin; }
+    if (currentDirection) { params.direction = currentDirection; }
+    if (currentTradingSerie) { params.session = currentTradingSerie; }
+    const response = await postRequest('/get_strategy_results', params);
     getStrategyResults(response, true);
   });
 
@@ -241,6 +823,662 @@ document.addEventListener('DOMContentLoaded', () => {
     ]
   };
   chartPnl = Highcharts.chart('container_pnl_roi', chartPnlRoiOptions);
+
+  const chartCumulativeReturnsOptions = {
+        title: {
+          text: 'Cumulative returns'
+        },
+        xAxis: {
+          "type": 'datetime',
+          title: {
+            text: null
+          },
+          labels: {
+              format: '{value:%Y-%m-%d}'
+          }
+        },
+        credits: { enabled: false },
+        yAxis: {
+          title: {
+            text: null
+          },
+          plotLines: [{
+            color: 'red',
+            width: 1,
+            value: 0,
+            zIndex: 5,
+            dashStyle: "Dash",
+            label: {
+              text: `Уровень 0`,
+              align: 'right',
+              style: {
+                color: 'red'
+              }
+            },
+          }]
+        },
+        series: [
+            {
+                type: 'line',
+                name: 'Данные',
+                data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
+            },
+        ],
+        plotOptions: {
+            line: {
+                marker: {
+                    enabled: false,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            radius: 5
+                        }
+                    }
+                }
+            }
+        },
+        accessibility: {
+            enabled: false
+        },
+        legend: {
+            enabled: false
+        }
+    };
+  chartCumulativeReturns = Highcharts.chart('container_cumulative_returns', chartCumulativeReturnsOptions);
+
+  const chartCumulativeReturnsScaledOptions = {
+        title: {
+          text: 'Cumulative returns (Log Scaled)'
+        },
+        xAxis: {
+          "type": 'datetime',
+          title: {
+            text: null
+          },
+          labels: {
+              format: '{value:%Y-%m-%d}'
+          }
+        },
+        credits: { enabled: false },
+        yAxis: {
+          title: {
+            text: null
+          },
+          plotLines: [{
+            color: 'red',
+            width: 1,
+            value: 0,
+            zIndex: 5,
+            dashStyle: "Dash",
+            label: {
+              text: `Уровень 0`,
+              align: 'right',
+              style: {
+                color: 'red'
+              }
+            },
+          }]
+        },
+        series: [
+            {
+                type: 'line',
+                name: 'Данные',
+                data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
+            },
+        ],
+        plotOptions: {
+            line: {
+                marker: {
+                    enabled: false,
+                    states: {
+                        hover: {
+                            enabled: true,
+                            radius: 5
+                        }
+                    }
+                }
+            }
+        },
+        accessibility: {
+            enabled: false
+        },
+        legend: {
+            enabled: false
+        }
+    };
+  chartCumulativeReturnsScaled = Highcharts.chart('container_cumulative_returns_scaled', chartCumulativeReturnsScaledOptions);
+
+  const chartEoyReturnsOptions = {
+    chart: {
+      type: 'column'
+    },
+    title: {
+      text: 'EOY returns'
+    },
+    xAxis: {
+      type: 'category',
+      title: {
+        text: null
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      }
+    },
+    series: [
+      {
+        type: 'column',
+        name: 'Данные',
+        data: [{name:'', y:4}],
+        color: '#7cb5ec'
+      },
+      {
+        type: 'line',
+        name: 'Граница',
+        data: (new Array(2)).fill(3),
+        color: 'red',
+        dashStyle: 'Dash',
+      }
+    ],
+    legend: {
+      enabled: false
+    },
+    credits: { enabled: false },
+    plotOptions: {
+      column: {
+        borderRadius: 3,
+        groupPadding: 0.1
+      }
+    },
+    accessibility: {
+      enabled: false
+    },
+  };
+  chartEoyReturns = Highcharts.chart('container_eoy_returns', chartEoyReturnsOptions);
+
+  const chartDailyActiveReturnsOptions = {
+    title: {
+      text: 'Daily active returns'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+        format: '{value:%Y-%m-%d}'
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      }
+    },
+    series: [{
+      type: 'line',
+      name: 'Данные',
+      data: [['', 0]]//data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
+    }],
+    legend: {
+      enabled: false
+    },
+    credits: { enabled: false },
+    accessibility: {
+      enabled: false
+    },
+  };
+  chartDailyActiveReturns = Highcharts.chart('container_daily_active_returns', chartDailyActiveReturnsOptions);
+
+  const chartRollingVolatilityOptions = {
+    title: {
+      text: 'Rolling Volatility (6-month)'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+        format: '{value:%Y-%m-%d}'
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        id: 'threshold-plot-line',
+        color: 'red',
+        width: 1,
+        value: 8,//chartData.threshold,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень 8`,//${chartData.threshold.toFixed(2)}`,
+          align: 'right',
+          style: {
+            color: 'red'
+          }
+        },
+      }]
+    },
+    credits: { enabled: false },
+    accessibility: {
+      enabled: false
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'Данные',
+        data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
+      },
+    ],
+    legend: {
+      enabled: false
+    }
+  };
+  chartRollingVolatility = Highcharts.chart('container_rolling_volatility', chartRollingVolatilityOptions);
+  //Rolling Sharpe (6-month)
+  const chartRollingSharpeOptions = {
+    title: {
+      text: 'Rolling Sharpe (6-month)'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+        format: '{value:%Y-%m-%d}'
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        id: 'threshold-plot-line2',
+        color: 'red',
+        width: 1,
+        value: 8,//chartData.threshold,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень 8`,//${chartData.threshold.toFixed(2)}`,
+          align: 'right',
+          style: {
+            color: 'red'
+          }
+        },
+      }]
+    },
+    credits: { enabled: false },
+    accessibility: {
+      enabled: false
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'Данные',
+        data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
+      },
+    ],
+    legend: {
+      enabled: false
+    }
+  };
+  chartRollingSharpe = Highcharts.chart('container_rolling_sharpe', chartRollingSharpeOptions);
+  //Rolling Sortino (6-month)
+  const chartRollingSortinoOptions = {
+    title: {
+      text: 'Rolling Sortino (6-month)'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+        format: '{value:%Y-%m-%d}'
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        id: 'threshold-plot-line3',
+        color: 'red',
+        width: 1,
+        value: 8,//chartData.threshold,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень 8`,//${chartData.threshold.toFixed(2)}`,
+          align: 'right',
+          style: {
+            color: 'red'
+          }
+        },
+      }]
+    },
+    credits: { enabled: false },
+    accessibility: {
+      enabled: false
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'Данные',
+        data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
+      },
+    ],
+    legend: {
+      enabled: false
+    }
+  };
+  chartRollingSortino = Highcharts.chart('container_rolling_sortino', chartRollingSortinoOptions);
+
+  const chartMonthlyReturnsOptions = {
+    chart: {
+      type: 'heatmap',
+      marginTop: 40,
+      marginBottom: 80,
+      plotBorderWidth: 1
+    },
+    title: {
+      text: 'Monthly returns',
+    },
+    xAxis: {
+      categories: [],//months,
+      title: {
+        text: null
+      }
+    },
+    yAxis: {
+      categories: [],// years,
+      title: null,
+      reversed: true
+    },
+    accessibility: {
+      enabled: false
+    },
+    colorAxis: {
+      visible: false,
+      minColor: "#16ff125a",
+      maxColor: "green",
+    },
+    credits: { enabled: false },
+    legend: {
+      align: 'right',
+      layout: 'vertical',
+      margin: 0,
+      verticalAlign: 'top',
+      y: 25,
+      symbolHeight: 280
+    },
+    tooltip: {
+      /*formatter: function(this) {
+        const data = this.point.options;
+        return `${years[data.y]} ${months[data.x]} - ${data.value}`
+      }*/
+    },
+    series: [{
+      name: 'Monthly returns',
+      borderWidth: 1,
+      data: [],//data,
+      dataLabels: {
+        enabled: true,
+        color: '#000000'
+      }
+    }],
+    responsive: {
+      rules: [{
+        condition: {
+          maxWidth: 500
+        },
+        chartOptions: {
+          yAxis: {
+            labels: {
+              format: '{substr value 0 1}'
+            }
+          }
+        }
+      }]
+    },
+  };
+  chartMonthlyReturns = Highcharts.chart('container_monthly_returns', chartMonthlyReturnsOptions);
+
+  const chartUnderwaterPlotOptions = {
+    chart: {
+      type: "area",
+    },
+    title: {
+      text: "Underwater plot"
+    },
+    xAxis: {
+      opposite: true,
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+        format: '{value:%Y-%m-%d}'
+      }
+    },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        id: 'threshold-plot-line4',
+        color: 'red',
+        width: 1,
+        value: 8, //chartData.threshold,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень `,//${chartData.threshold.toFixed(2)}`,
+          align: 'right',
+          style: {
+            color: 'red'
+          }
+        },
+      }]
+    },
+    accessibility: {
+      enabled: false
+    },
+    credits: { enabled: false },
+    series: [
+      {
+        type: 'area',
+        name: 'Данные',
+        data: [], //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value]),
+        fillColor: {
+          linearGradient: { x1: 0, y1: 1, x2: 0, y2: 0 },
+          stops: [
+            [0, 'rgba(124, 181, 236, 0.5)'],
+            [1, 'rgba(0, 132, 255, 0.1)']
+          ]
+        },
+        threshold: 0
+      },
+    ],
+    legend: {
+      enabled: false
+    }
+  };
+  chartUnderwaterPlot = Highcharts.chart('container_underwater_plot', chartUnderwaterPlotOptions);
+
+  const chartDrawdownPeriodsOptions = {
+    chart: {
+      type: "xrange"
+    },
+    title: {
+      text: 'Strategy - Worst 5 Drawdown Periods'
+    },
+    xAxis: {
+      type: 'category',
+      categories: [],//allDates,
+      title: {
+        text: null
+      },
+      labels: {
+        /*formatter: function(data: Highcharts.AxisLabelsFormatterContextObject) {
+          return dayjs(data.value).format('DD.MM.YY');
+        }*/
+      }
+    },
+    yAxis: {
+      min: -8,//yMin,
+      max: 8,//yMax,
+      title: {
+        text: null
+      }
+    },
+    credits: { enabled: false },
+    plotOptions: {
+      xrange: {
+        pointWidth: 400,
+      }
+    },
+    series: [
+      {
+        type: 'line',
+        name: 'Данные',
+        data: [],//chartData.data.map(item => item.value),
+        color: '#7cb5ec',
+        zIndex: 10,
+      },
+      {
+        type: 'xrange',
+        name: 'Диапазоны',
+        data: [],/*chartData.periods.map(el => {
+          return {
+            x: allDates.indexOf(el.start_date),
+            x2: allDates.indexOf(el.end_date),
+            y: yMin + (yMax - yMin) / 2,
+            pointRange: 100,
+            color: "rgba(255, 0, 0, 0.15)",
+          }
+        }),*/
+        borderRadius: 0,
+        grouping: false,
+      },
+    ],
+    tooltip: {
+      /*formatter: function(this: any) {
+    if (this.series.type === 'xrange') {
+      const point = this.point as any;
+      const startDate = allDates[point.x];
+      const endDate = allDates[point.x2];
+
+
+      const period = chartData.periods.find(p =>
+        p.start_date === startDate && p.end_date === endDate
+      );
+      if (period) {
+        return `
+                            <b>Drawdown Period</b><br/>
+                            Start: ${dayjs(period.start_date).format('DD.MM.YY HH:mm:ss')}<br/>
+                            End: ${dayjs(period.end_date).format('DD.MM.YY HH:mm:ss')}<br/>
+                            Difference: ${
+          dayjs(period.end_date).diff(dayjs(period.start_date), "day")
+        } day<br/>
+                        `;
+      }
+    }
+
+    if (this.series.type === 'line') {
+      return `Value: ${this.y?.toFixed(2)}`;
+    }
+
+    return this.y;
+  }*/
+},
+  accessibility: {
+    enabled: false
+  },
+};
+  chartDrawdownPeriods = Highcharts.chart('container_drawdown_periods', chartDrawdownPeriodsOptions);
+  //Return Quantiles (Candlestick)
+    const chartReturnQuantilesOptions = {
+      navigator: { enabled: false },
+      rangeSelector: { enabled: false },
+      chart: {
+        type: 'candlestick',
+        ignoreHiddenSeries: false,
+        reflow: false
+      },
+      title: {
+        text: 'Return Quantiles (Candlestick)',
+      },
+      xAxis: {
+        type: 'category',
+        categories: [],//candleData.map(item => item.name),
+        labels: {
+          /*formatter: function(data: Highcharts.AxisLabelsFormatterContextObject) {
+            return `${candleData[data.pos].name}`;
+          }*/
+        }
+      },
+      accessibility: {
+        enabled: false
+      },
+      yAxis: {
+        title: {
+          text: '%',
+        },
+        opposite: false,
+      },
+      credits: { enabled: false },
+      plotOptions: {
+        scatter: {
+          marker: {
+            radius: 4,
+            symbol: 'circle',
+          },
+          tooltip: {
+            pointFormat: '<b>{point.name}</b><br>Value: {point.y}',
+          },
+        },
+      },
+      series: [
+        {
+          type: 'candlestick',
+          name: 'Returns',
+          data: [],/*candleData.map((item, index) => ({
+            name: item.name,
+            open: item.open,
+            high: item.high,
+            low: item.low,
+            close: item.close,
+            x: index
+          })),*/
+          tooltip: {
+            pointFormat:
+              '<span style="color:{point.color}">\u25CF</span> <b>{point.name}</b><br/>' +
+              'Open: {point.open}<br/>' +
+              'High: {point.high}<br/>' +
+              'Low: {point.low}<br/>' +
+              'Close: {point.close}<br/>',
+          },
+        },
+        {
+          type: 'scatter',
+          name: 'Raw Data',
+          data: [],//scatterData,
+          color: 'rgba(255, 99, 132, 0.7)',
+          marker: {
+            symbol: 'circle',
+          },
+        },
+      ],
+    };
+  chartReturnQuantiles = Highcharts.chart('container_return_quantiles', chartReturnQuantilesOptions);
+
 
   //fill Trading calendar with meta
   (function() {
