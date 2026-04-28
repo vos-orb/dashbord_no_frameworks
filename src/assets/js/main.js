@@ -74,12 +74,12 @@ function formatTimeMs(ms) {
 
   // Собираем части (только те, что больше нуля)
   const parts = [];
-  if (years) parts.push(`${years} years`);
-  if (months) parts.push(`${months} months`);
-  if (days) parts.push(`${days} days`);
-  if (hours) parts.push(`${hours} hours`);
-  if (minutes) parts.push(`${minutes} min`);
-  if (seconds) parts.push(`${seconds} sec`);
+  if (years) parts.push(`${years} г`);
+  if (months) parts.push(`${months} м`);
+  if (days) parts.push(`${days} д`);
+  if (hours) parts.push(`${hours} ч`);
+  if (minutes) parts.push(`${minutes} м`);
+  if (seconds) parts.push(`${seconds} с`);
 
   return parts.join(' ');
 }

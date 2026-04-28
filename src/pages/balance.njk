@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       try {
         const response = await getRequest('/filter/user_name_lead');
-        return response;
+        return response.map(item => item.trader_name);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -255,7 +255,8 @@ document.addEventListener('DOMContentLoaded', () => {
         //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        return await getRequest('/filter/user_name');
+        const response = await getRequest('/filter/user_name');
+        return response.map(item => item.trader_name);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -312,7 +313,8 @@ document.addEventListener('DOMContentLoaded', () => {
         //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        return [...await getRequest('/filter/user_name'),'all'];
+        const response = await getRequest('/filter/user_name');
+        return response.map(item => item.trader_name);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -332,12 +334,33 @@ document.addEventListener('DOMContentLoaded', () => {
               datetime: await dateFormatter(item.datetime)
           }))
         );
+        console.warn('TEBLE formattedTopUpData', formattedTopUpData);
+        new UiTable(tableHPU, formattedTopUpData, 10, {
+          numericColumns: [
+            'amount'
+          ]
+        });
+      } catch(err) {
+        console.log('ERROR', err)
+      }
+      try {
         const responseBalanceDiff = await postRequest('/get_balance_diff_user', { "name_acc": selectedItem } );
         const formattedBalanceDiffData = await responseBalanceDiff.map((item) => ({
           account_name: item.account_name,
           first_balance: numberFormatter.format(item.first_balance),
           last_balance: numberFormatter.format(item.last_balance)
         }));
+        console.warn('TEBLE formattedBalanceDiffData', formattedBalanceDiffData);
+        new UiTable(tableBOI, formattedBalanceDiffData, 10, {
+          numericColumns: [
+            'first_balance',
+            'last_balance'
+          ]
+        });
+      } catch(err) {
+        console.log('ERROR', err)
+      }
+      try {
         const responseGFCDF = await postRequest('/get_filter_and_compute_daily_diffs', { "name_account": selectedItem } );
         const formattedGFCDFData = await responseGFCDF[0]?.items.map((item) => ({
           day: item.day,
@@ -346,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
           end_balance: numberFormatter.format(Number(item.end_balance)),
           diff: numberFormatter.format(Number(item.diff))
         }));
-
+        console.warn('TEBLE formattedGFCDFData', formattedGFCDFData);
         new UiTable(tableGFCDF, formattedGFCDFData, 10, {
           numericColumns: [
             'start_balance',
@@ -354,20 +377,8 @@ document.addEventListener('DOMContentLoaded', () => {
             'diff'
           ]
         });
-        new UiTable(tableHPU, formattedTopUpData, 10, {
-          numericColumns: [
-            'amount'
-          ]
-        });
-        new UiTable(tableBOI, formattedBalanceDiffData, 10, {
-          numericColumns: [
-            'first_balance',
-            'last_balance'
-          ]
-        });
-
       } catch(err) {
-        console.log('ERRRORROROR', err)
+        console.log('ERROR', err)
       }
     }
   });

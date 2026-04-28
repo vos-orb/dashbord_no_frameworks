@@ -27,24 +27,24 @@
       <table>
         <thead>
         <tr>
-          <th data-column="concat">Тикер</th>
+          <th data-column="concat">Тикер filltimefilltimefilltime</th>
           <th data-column="tag">Стратегия</th>
           <th data-column="account_name">Аккаунт</th>
           <th data-column="start_time">Вход (дата)</th>
-          <th data-column="entry_price">Вход ($)</th>
           <th data-column="end_time">Выход (дата)</th>
-          <th data-column="exit_price">Выход ($)</th>
+
+          <th data-column="entry_price">Цена покупки ($)</th>
+          <th data-column="exit_price">Цена продажи ($)</th>
+          <th data-column="cash">Маржа ($)</th>
+          <th data-column="lever">Плечо</th>
+          <th data-column="openMaxPos">Стоимость позиции</th>
+
           <th data-column="delta_time">В сделке</th>
-          <th data-column="pnl">Процент (%)</th>
-          <th data-column="clean_profit_percent">Прибыль (%)</th>
+          <th data-column="net_pnl_percent">PnL (%)</th>
           <th data-column="gross_profit">Доход ($)</th>
           <th data-column="fee">Комиссия ($)</th>
-          <th data-column="closeTotalPos">Прибыль ($)</th>
-          <th data-column="openMaxPos">Макс объём</th>
-          <th data-column="cash">Объём ($)</th>
-          <th data-column="lever">Плечо</th>
           <th data-column="direction">Сторона</th>
-          <th data-column="net_pnl_percent">net_pnl_percent??</th>
+
         </tr>
         </thead>
         <tbody class="table-body">
@@ -54,14 +54,13 @@
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
+
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
-          <td><div class="skeleton" style="height: 40px;"></div></td>
+
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
@@ -95,12 +94,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initDropdowns('.dropdown.tags', {
     data: async function() {
       if ({{ DEBUG }}) {
-        return ["supertrend_15m_tp_ts_total_tp_v2", "supertrend_15m_tp_ts_total_tp_sl_v1", "oneside_grid_bot"];
+        //return ["supertrend_15m_tp_ts_total_tp_v2", "supertrend_15m_tp_ts_total_tp_sl_v1", "oneside_grid_bot"];
       }
       try {
-        const response = await fetch('{{ API_URL }}/filter/user_name_lead');
+        const response = await fetch('{{ API_URL }}/filter/get_strategy_name');
         const dta = await response?.json();
-        return dta.map(item => item.name);
+        return dta.map(item => item.strategy_name);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
@@ -118,13 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
           entry_price: numberFormatter.format(item.entry_price), // 0.573,
           end_time: await dateFormatter(item.end_time), // "2026-04-18T12:45:01.361000",
           exit_price: numberFormatter.format(item.exit_price), // 0.559,
-          delta_time: numberFormatter.format(item.delta_time), // 6247.927,
+          delta_time: formatTimeMs((item.delta_time * 1000)), // 6247.927,
           pnl: numberFormatter.format(item.pnl), // 1.3689999999999907,
           clean_profit_percent: numberFormatter.format(item.clean_profit_percent), // 2.541680591140304,
           gross_profit: numberFormatter.format(item.gross_profit), // 1.3159999999999907,
           fee: numberFormatter.format(item.fee), // -0.053,
           closeTotalPos: numberFormatter.format(item.closeTotalPos), // 94.0,
-          openMaxPos: numberFormatter.format(item.openMaxPos), // 94.0,
+          openMaxPos: numberFormatter.format(item.cash * item.lever), // 94.0,
           cash: numberFormatter.format(item.cash), // 53.861999999999995,
           lever: numberFormatter.format(item.lever), // 3.0,
           direction: item.direction, // "short",

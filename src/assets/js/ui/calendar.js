@@ -210,15 +210,34 @@
 
       this.renderCalendar();
     }
-
+    /*
+    * sets meta data
+    * removes any previous meta-data
+    */
     setMeta(metaDataArray) {
+      this.metaData = {};
       metaDataArray.forEach(item => {
         const dateKey = new Date(item.date).toDateString();
         this.metaData[dateKey] = item.htmltext;
       });
       this.renderCalendar();
     }
-
+    /*
+    * adds meta data
+    * replaces meta-data for day new meta comes for
+    * does not remove old meta data for other days
+    */
+    addMeta(metaDataArray) {
+      metaDataArray.forEach(item => {
+        const dateKey = new Date(item.date).toDateString();
+        this.metaData[dateKey] = item.htmltext;
+      });
+      this.renderCalendar();
+    }
+    /*
+    * sets meta-data for one day
+    * replaces old meta-data for that day
+    */
     setMetaForDay(date, htmltext) {
       const dateKey = new Date(date).toDateString();
       this.metaData[dateKey] = htmltext;

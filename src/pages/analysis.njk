@@ -42,22 +42,123 @@
 
 <br />
 
-<div class="spoiler ">
+<div class="spoiler expanded">
   <div class="header">PNL/ROI</div>
   <div class="contents">
     <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
   </div>
 </div>
 
-<div class="spoiler ">
+<div class="spoiler expanded">
   <div class="header">Детализация</div>
   <div class="contents">
 
     <div class="ui-calendar full-width trading-calendar"></div>
 
+
+    <h3>Выбран день </h3>
+    <div class="table-component table-day-details">
+      <div class="search-container">
+        <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
+        <div class="autocomplete-items"></div>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+          <tr>
+            {# "ccy": "USDT",
+            "fee": -0.053,
+            "pnl": -1.814,
+            "uly": "TRUTH-USDT",
+            "type": "2",
+
+            "ctime": "2026-04-22T00:00:32.708000",
+            "lever": 3,
+            "posid": "3089841044435443712",
+            "utime": "2026-04-23T09:46:11.068000",
+            "instid": "TRUTH-USDT-SWAP",
+
+            "mgnmode": "isolated",
+            "posside": "long",
+            "insttype": "SWAP",
+            "pnlratio": -0.106,
+            "direction": "long",
+
+            "openavgpx": 0.01,
+            "triggerpx": "",
+            "closeavgpx": 0.009,
+            "fundingfee": -0.034,
+            "liqpenalty": 0,
+
+            "openmaxpos": 56,
+            "settledpnl": "",
+            "realizedpnl": -1.901,
+            "trader_name": "ks_berezina",
+            "closetotalpos": 56,
+
+            "nonsettleavgpx": "",
+            "strategy_name": "supertrend_15m_tp_ts_total_tp_v2",
+            "size_contracts": 56
+            #}
+
+            <th data-column="ccy">Тикер</th>
+            <th data-column="return">Стратегия</th>
+            <th data-column="cumulative">Дата Входа</th>
+            <th data-column="cumulative">Вход ($)</th>
+            <th data-column="cumulative">Дата Выхода</th>
+
+            <th data-column="cumulative">Выход ($)</th>
+            <th data-column="cumulative">В сделке</th>
+            <th data-column="pnl">Процент (%)</th>
+            <th data-column="cumulative">Прибыль (%)</th>
+            <th data-column="cumulative">Доход ($)</th>
+
+            <th data-column="fee">Комиссия ($)</th>
+            <th data-column="cumulative">Прибыль ($)</th>
+            <th data-column="cumulative">Оборот ($)</th>
+            <th data-column="cumulative">Макс. объем</th>
+            <th data-column="cumulative">Объем ($)</th>
+
+            <th data-column="cumulative">Плечо</th>
+            <th data-column="cumulative">Сторона</th>
+          </tr>
+          </thead>
+          <tbody class="table-body">
+          <tr>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <td><div class="skeleton" style="height: 40px;"></div></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn prev-page" disabled>Назад</button>
+        <span class="page-info">Страница 1 из 1</span>
+        <button class="btn next-page">Вперёд</button>
+      </div>
+    </div>
+
   </div>
 </div>
-<div class="spoiler expanded">
+<div class="spoiler">
   <div class="header">Отчёт риск-профиль</div>
   <div class="contents">
 
@@ -172,8 +273,6 @@
           </div>
         </div>
 
-
-
       </div>
     </div>
 
@@ -188,6 +287,7 @@ let currentDirection = '';
 let currentTradingSerie = '';
 let currentDatePeriod = [];
 let chartPnl = {};
+let calendarDetails;
 
 let chartCumulativeReturns = {};
 let chartCumulativeReturnsScaled = {};
@@ -201,18 +301,21 @@ let chartUnderwaterPlot = {};
 let chartDrawdownPeriods = {};
 let chartReturnQuantiles = {};
 
-function getStrategyResults(response, isUpdate=false) {
-  let strategyNames = response.data.strategy_info.map(s => s.name);
-  let coins = response.data.strategy_info.find(s => s.name === strategyNames[0])?.coins || [];
-  let pnlRoiChartData = response?.data?.pnl_roi_chart;
+async function getStrategyResults(response, isUpdate=false) {
+  //let strategyNames = response.data.strategy_info.map(s => s.name);
+  const responsestrNames = await getRequest('/filter/get_strategy_name' );
+  const strategyNames = responsestrNames.map(item => item.strategy_names);
 
-  if (chartPnl?.series ) {
+ // let coins = response.data.strategy_info.find(s => s.name === strategyNames[0])?.coins || [];
+  let pnlRoiChartData = response?.data?.pnl_roi_chart;
+////TODO HERE CHART
+  /*if (chartPnl?.series ) {
     chartPnl.series[0].setData(pnlRoiChartData.roi, false); // false, чтобы не перерисовывать сразу
     chartPnl.series[1].setData(pnlRoiChartData.pnl, false);
     chartPnl.series[2].setData(pnlRoiChartData.balance_changing, false);
     chartPnl.series[3].setData(pnlRoiChartData.amount, false);
     chartPnl.redraw();
-  }
+  }*/
   if (isUpdate) {return;}
   initDropdowns('.dropdown.ddl-strategy', {
     data: strategyNames,
@@ -220,15 +323,15 @@ function getStrategyResults(response, isUpdate=false) {
     onSelect: function(selectedStrategies) {
       currentStrategy = selectedStrategies;
 
-      coins = [];
+      //coins = [];
       selectedStrategies.forEach(str => {
         let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
-        coins.push(...cns);
+        //coins.push(...cns);
       });
 
       initDropdowns('.dropdown.ddl-coin', {
         multiSelect: true,
-        data: coins,
+        data: [],//coins,
         onSelect: function(selectedCoins) {
           currentCoin = selectedCoins;
         }
@@ -244,14 +347,154 @@ document.addEventListener('DOMContentLoaded', () => {
       //console.log("API_URL", '{{ API_URL }}');
     }
     try {
-      const response = await postRequest('/get_strategy_results', {"date_from": "2025-08-21"});
-      getStrategyResults(response);
+      //const response = await postRequest('/get_strategy_results', {"date_from": "2025-08-21"});
+      //getStrategyResults(response);
+      const responsestrNames = await getRequest('/filter/get_strategy_name' );
+      const strategyNames = responsestrNames.map(item => item.strategy_name);
+      const responseCoins = await getRequest('/filter/get_coin_name' );
+      const coinsList = responseCoins.map(item => item.uly);
+      const responseDirections = await getRequest('/filter/get_direction_name' );
+      //const directionsList = responseDirections.map(item => item.name);
+      const responseTimezones = await getRequest('/filter/get_timezone_name' );
+      //const timezonesList = responseTimezones.map(item => item.name);
+
+      initDropdowns('.dropdown.ddl-strategy', {
+        data: strategyNames,
+        multiSelect: true,
+        onSelect: function(selectedStrategies) {
+          //currentStrategy = selectedStrategies;
+          currentStrategy = selectedStrategies[0]; //TODO remove aFTER BACK FIXED
+
+          //coins = [];
+          selectedStrategies.forEach(str => {
+            //let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
+            //coins.push(...cns);
+          });
+
+          /*initDropdowns('.dropdown.ddl-coin', {
+            multiSelect: true,
+            data: [],//coins,
+            onSelect: function(selectedCoins) {
+              currentCoin = selectedCoins;
+            }
+          });*/
+
+        }
+
+      });
+
+      initDropdowns('.dropdown.ddl-coin', {
+        multiSelect: true,
+        data: coinsList || [],//coins,
+        onSelect: function(selectedCoins) {
+          currentCoin = selectedCoins;
+        }
+      });
+
+      initDropdowns('.dropdown.ddl-direction', {
+        data: responseDirections || ['Long', 'Short'],
+        multiSelect: true,
+        onSelect: function(selectedItem) {
+          currentDirection = selectedItem;
+        }
+      });
+
+      initDropdowns('.dropdown.ddl-trading-series', {
+        data: responseTimezones || ['Азия', 'Европа', 'Америка', 'Тихоокеания'],
+        multiSelect: true,
+        onSelect: function(selectedItem) {
+          currentTradingSerie = selectedItem;
+        }
+      });
+
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
       return ['Ошибка загрузки'];
     }
   };
   const ddlData = getDataForDddls();
+  const getPnlCharData = async function(params = {}) {
+    const response = await postRequest('/analys/vidjets/get_pnl_roi_graph_for_strategy', params);
+    //chartPnl.
+    if (chartPnl?.series ) {
+      /*chartPnl.series[0].setData(response?.items, false);
+      chartPnl.series[0].setData(pnlRoiChartData.roi, false); // false, чтобы не перерисовывать сразу
+      chartPnl.series[1].setData(pnlRoiChartData.pnl, false);
+      chartPnl.series[2].setData(pnlRoiChartData.balance_changing, false);
+      chartPnl.series[3].setData(pnlRoiChartData.amount, false);
+      chartPnl.redraw();*/
+      const parseDate = (dateStr) => {
+        const [day, month, year] = dateStr.split('.').map(Number);
+        return new Date(year, month - 1, day).getTime();
+      };
+      const rawData = response?.items;
+// Преобразуем данные для каждой серии
+      const roiData = rawData.map(item => [parseDate(item.date), item.roi]);
+      const pnlData = rawData.map(item => [parseDate(item.date), item.pnl]);
+      const balanceData = rawData.map(item => [parseDate(item.date), item.balance]);
+      chartPnl.update({
+        series: [
+          { name: 'ROI', data: roiData },
+          { name: 'PnL', data: pnlData },
+          { name: 'Баланс', data: balanceData },
+          { name: 'Amount', data: [] } //TODO integrate when back is ready
+        ]
+      });
+    }
+  };
+
+  const fillCalendarWithData = async function(params={
+    "month": 4,
+    "strategy": "supertrend_15m_tp_ts_total_tp_v2",
+    "year": 2026
+  }) {
+    let p = {
+      month: (new Date().getMonth() + 1),
+      year: new Date().getFullYear()
+    };
+    if (params?.strategy) {
+      p.strategy = params.strategy;
+    }
+    const response = await postRequest('/analys/calendar/calendar_table', p);
+
+    const formattedResponse = await response.map((item) => ({
+      htmltext: `<span class="event${(item.pnl < 0)? ' negative': ((item.pnl == 0)?'':' positive')}">
+          <span class="pnl">${numberFormatter.format(item.pnl)} USDT</span>
+          <span class="count">${item.count} Позиций</span>
+        </span>`,
+      date: new Date((item.day).split('.').reverse().join('-'))
+    }));
+
+    calendarDetails?._calendar?.setMeta(formattedResponse);
+    calendarDetails.addEventListener('dayselected', (e) => {
+      console.warn('DAYSELECTED-> ', e?.detail?.date);
+      handleCalendarDayClick(e?.detail?.date);
+    });
+  };
+
+  const handleCalendarDayClick = async function(date) {
+    let tableDayDetails = document.querySelector('.table-day-details');
+    console.warn('DAYSELECTED-> HANDLER', date);
+    const dataArrDayDetails = await postRequest('/analys/calendar/daily_table', {
+      "date": "22.04.2026",
+      "strategy": "supertrend_15m_tp_ts_total_tp_v2"
+    });
+
+    const dayDetailData = await dataArrDayDetails.map((item) => ({
+      ccy: item.ccy,
+      fee: numberFormatter.format(item.fee),
+      pnl: numberFormatter.format(item.pnl)
+    }));
+
+    new UiTable(tableDayDetails, dayDetailData, null, {
+      numericColumns: [
+        'fee',
+        'pnl'
+      ]
+    });
+  };
+
+
   const processResponse = async function(res) {
     let cumulativeReturnsChartData = res?.data?.cumulative_returns_chart;
     let cumulativeReturnsChartScaledData = res?.data?.cumulative_returns_chart_scaled;
@@ -717,20 +960,11 @@ document.addEventListener('DOMContentLoaded', () => {
     currentDatePeriod = [startDate, endDate];
   });
 
-  initDropdowns('.dropdown.ddl-direction', {
-    data: ['Long', 'Short'],
-    multiSelect: true,
-    onSelect: function(selectedItem) {
-      currentDirection = selectedItem;
-    }
-  });
-  initDropdowns('.dropdown.ddl-trading-series', {
-    data: ['Азия', 'Европа', 'Америка', 'Тихоокеания'],
-    multiSelect: true,
-    onSelect: function(selectedItem) {
-      currentTradingSerie = selectedItem;
-    }
-  });
+const getStrategyQsReport = async function(params) {
+  const response = postRequest('/analys/get_strategy_qs_report', params);
+  console.warn('getStrategyQsReport -> response', response);
+};
+
 
   document.querySelector('.apply-filters').addEventListener('click', async function(evt) {
     evt.stopPropagation();
@@ -742,12 +976,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (currentCoin) { params.symbol = currentCoin; }
     if (currentDirection) { params.direction = currentDirection; }
     if (currentTradingSerie) { params.session = currentTradingSerie; }
-    const response = await postRequest('/get_strategy_results', params);
-    getStrategyResults(response, true);
+    //const response = await postRequest('/get_strategy_results', params);
+    getPnlCharData(params);
+    fillCalendarWithData(params);
+    getStrategyQsReport(params);
+    //getStrategyResults(response, true);
   });
 
   const chartPnlRoiOptions = {
     chart: {
+      "backgroundColor": "transparent",
       zooming: {
         type: 'x'
       },
@@ -825,68 +1063,74 @@ document.addEventListener('DOMContentLoaded', () => {
   chartPnl = Highcharts.chart('container_pnl_roi', chartPnlRoiOptions);
 
   const chartCumulativeReturnsOptions = {
-        title: {
-          text: 'Cumulative returns'
-        },
-        xAxis: {
-          "type": 'datetime',
-          title: {
-            text: null
-          },
-          labels: {
-              format: '{value:%Y-%m-%d}'
+    chart:{
+      "backgroundColor": "transparent",
+    },
+    title: {
+      text: 'Cumulative returns'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+          format: '{value:%Y-%m-%d}'
+      }
+    },
+    credits: { enabled: false },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        color: 'red',
+        width: 1,
+        value: 0,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень 0`,
+          align: 'right',
+          style: {
+            color: 'red'
           }
         },
-        credits: { enabled: false },
-        yAxis: {
-          title: {
-            text: null
-          },
-          plotLines: [{
-            color: 'red',
-            width: 1,
-            value: 0,
-            zIndex: 5,
-            dashStyle: "Dash",
-            label: {
-              text: `Уровень 0`,
-              align: 'right',
-              style: {
-                color: 'red'
-              }
-            },
-          }]
+      }]
+    },
+    series: [
+        {
+            type: 'line',
+            name: 'Данные',
+            data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
         },
-        series: [
-            {
-                type: 'line',
-                name: 'Данные',
-                data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
-            },
-        ],
-        plotOptions: {
-            line: {
-                marker: {
-                    enabled: false,
-                    states: {
-                        hover: {
-                            enabled: true,
-                            radius: 5
-                        }
+    ],
+    plotOptions: {
+        line: {
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: true,
+                        radius: 5
                     }
                 }
             }
-        },
-        accessibility: {
-            enabled: false
-        },
-        legend: {
-            enabled: false
         }
-    };
+    },
+    accessibility: {
+        enabled: false
+    },
+    legend: {
+        enabled: false
+    }
+  };
   chartCumulativeReturns = Highcharts.chart('container_cumulative_returns', chartCumulativeReturnsOptions);
 
   const chartCumulativeReturnsScaledOptions = {
+    chart: {
+      "backgroundColor": "transparent",
+    },
         title: {
           text: 'Cumulative returns (Log Scaled)'
         },
@@ -950,7 +1194,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const chartEoyReturnsOptions = {
     chart: {
-      type: 'column'
+      type: 'column',
+      "backgroundColor": "transparent",
     },
     title: {
       text: 'EOY returns'
@@ -998,6 +1243,9 @@ document.addEventListener('DOMContentLoaded', () => {
   chartEoyReturns = Highcharts.chart('container_eoy_returns', chartEoyReturnsOptions);
 
   const chartDailyActiveReturnsOptions = {
+    chart: {
+      "backgroundColor": "transparent",
+    },
     title: {
       text: 'Daily active returns'
     },
@@ -1482,9 +1730,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //fill Trading calendar with meta
   (function() {
-    const calendarElement = document.querySelector('.ui-calendar.trading-calendar');
+    calendarDetails = document.querySelector('.ui-calendar.trading-calendar');
 
-    calendarElement.addEventListener('calendarinitialized', (e) => {
+    calendarDetails.addEventListener('calendarinitialized', (e) => {
       e.detail.calendar.setMeta([
         {
           date: new Date('2023-10-15'),

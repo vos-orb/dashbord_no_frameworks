@@ -187,13 +187,13 @@
 
     renderTable() {
       this.tableBody.innerHTML = '';
-      let pageData;
+      let pageData, start, end;
       if (this.noPagination) {
         // Show all data when pagination is disabled
         pageData = this.filteredData;
       } else {
-        const start = (this.currentPage - 1) * this.pageSize;
-        const end = start + this.pageSize;
+        start = (this.currentPage - 1) * this.pageSize;
+        end = start + this.pageSize;
         pageData = this.filteredData.slice(start, end);
       }
       // Get column headers to match data keys
