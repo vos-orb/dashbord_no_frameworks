@@ -933,26 +933,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   };
 
-  const getDataForQsReports = async function() {
-    try {
-      //const response = await postRequest('/analys/get_strategy_qs_report', {
-      //const response = await postRequest('/get_strategy_qs_report', {"date_from":"2025-08-21"});
-      /*console.log('keys', Object.keys(response?.data));
-      console.log('keys returns', Object.keys(response?.data?.returns));
-      console.log('keys metrics', Object.keys(response?.data?.metrics));*/
-      //processResponse(response);
-      processResponse(testmetrics);
-
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
-
-    }
-  };
-  setTimeout(function(){
-    getDataForQsReports();
-  },13);
-
-
   let analyzePNLDatepicker = document.querySelector('.analyze-pnl-datepicker');
   analyzePNLDatepicker.addEventListener('datechange', (e) => {
     let p = e?.detail?.currentValue;
@@ -961,8 +941,15 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
 const getStrategyQsReport = async function(params) {
-  const response = postRequest('/analys/get_strategy_qs_report', params);
-  console.warn('getStrategyQsReport -> response', response);
+  if({{ DEBUG }}) {
+    console.warn('getStrategyQsReport -> params', params);
+    //processResponse(testmetrics2);
+  }
+  if (params?.strategy) {
+    params.strategy = [params.strategy];
+  }
+  const response = await postRequest('/analys/get_strategy_qs_report', params);
+  await processResponse(response);
 };
 
 
