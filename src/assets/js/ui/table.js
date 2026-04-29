@@ -6,8 +6,8 @@
       this.data = data;
       this.filteredData = [...data];
       this.currentPage = 1;
-      this.pageSize = options.noPagination ? this.filteredData.length : pageSize;
       this.noPagination = options.noPagination || false;
+      this.pageSize = this.noPagination ? this.filteredData.length : pageSize;
       this.sortColumn = null;
       this.sortOrder = 'asc';
       this.autocompleteItems = [];

@@ -65,87 +65,48 @@
       <div class="table-container">
         <table>
           <thead>
-          <tr>
-            {# "ccy": "USDT",
-            "fee": -0.053,
-            "pnl": -1.814,
-            "uly": "TRUTH-USDT",
-            "type": "2",
+            <tr>
 
-            "ctime": "2026-04-22T00:00:32.708000",
-            "lever": 3,
-            "posid": "3089841044435443712",
-            "utime": "2026-04-23T09:46:11.068000",
-            "instid": "TRUTH-USDT-SWAP",
 
-            "mgnmode": "isolated",
-            "posside": "long",
-            "insttype": "SWAP",
-            "pnlratio": -0.106,
-            "direction": "long",
+              <th data-column="uly">Тикер</th>
+              <th data-column="strategy">Стратегия</th>
+              <th data-column="trader_name">Аккаунт</th>
+              <th data-column="ctime">Вход (дата)</th>
+              <th data-column="utime">Выход (дата)</th>
 
-            "openavgpx": 0.01,
-            "triggerpx": "",
-            "closeavgpx": 0.009,
-            "fundingfee": -0.034,
-            "liqpenalty": 0,
+              <th data-column="price_buy">Цена покупки ($)</th>
+              <th data-column="price_sell">Цена продажи ($)</th>
+              <th data-column="marg">Маржа ($)</th>
+              <th data-column="lever">Плечо</th>
+              <th data-column="pos_cost">Стоимость позиции</th>
 
-            "openmaxpos": 56,
-            "settledpnl": "",
-            "realizedpnl": -1.901,
-            "trader_name": "ks_berezina",
-            "closetotalpos": 56,
-
-            "nonsettleavgpx": "",
-            "strategy_name": "supertrend_15m_tp_ts_total_tp_v2",
-            "size_contracts": 56
-            #}
-
-            <th data-column="ccy">Тикер</th>
-            <th data-column="return">Стратегия</th>
-            <th data-column="cumulative">Дата Входа</th>
-            <th data-column="cumulative">Вход ($)</th>
-            <th data-column="cumulative">Дата Выхода</th>
-
-            <th data-column="cumulative">Выход ($)</th>
-            <th data-column="cumulative">В сделке</th>
-            <th data-column="pnl">Процент (%)</th>
-            <th data-column="cumulative">Прибыль (%)</th>
-            <th data-column="cumulative">Доход ($)</th>
-
-            <th data-column="fee">Комиссия ($)</th>
-            <th data-column="cumulative">Прибыль ($)</th>
-            <th data-column="cumulative">Оборот ($)</th>
-            <th data-column="cumulative">Макс. объем</th>
-            <th data-column="cumulative">Объем ($)</th>
-
-            <th data-column="cumulative">Плечо</th>
-            <th data-column="cumulative">Сторона</th>
-          </tr>
+              <th data-column="delta_time">В сделке</th>
+              <th data-column="pnl_ratio">PnL (%)</th>
+              <th data-column="pnl">Доход ($)</th>
+              <th data-column="fee">Комиссия ($)</th>
+              <th data-column="posside">Сторона</th>
+            </tr>
           </thead>
           <tbody class="table-body">
-          <tr>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
+            <tr>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
 
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
 
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-            <td><div class="skeleton" style="height: 40px;"></div></td>
-          </tr>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+              <td><div class="skeleton" style="height: 40px;"></div></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -319,15 +280,15 @@ async function getStrategyResults(response, isUpdate=false) {
   if (isUpdate) {return;}
   initDropdowns('.dropdown.ddl-strategy', {
     data: strategyNames,
-    multiSelect: true,
+    multiSelect: false,
     onSelect: function(selectedStrategies) {
       currentStrategy = selectedStrategies;
 
       //coins = [];
-      selectedStrategies.forEach(str => {
+      /*selectedStrategies.forEach(str => {
         let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
-        //coins.push(...cns);
-      });
+        coins.push(...cns);
+      });*/
 
       initDropdowns('.dropdown.ddl-coin', {
         multiSelect: true,
@@ -360,16 +321,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
       initDropdowns('.dropdown.ddl-strategy', {
         data: strategyNames,
-        multiSelect: true,
+        multiSelect: false,
         onSelect: function(selectedStrategies) {
           //currentStrategy = selectedStrategies;
-          currentStrategy = selectedStrategies[0]; //TODO remove aFTER BACK FIXED
+          currentStrategy = selectedStrategies;
 
           //coins = [];
-          selectedStrategies.forEach(str => {
-            //let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
-            //coins.push(...cns);
-          });
+          /*selectedStrategies.forEach(str => {
+            let cns = response.data.strategy_info.find(s => s.name === str)?.coins || [];
+            coins.push(...cns);
+          });*/
 
           /*initDropdowns('.dropdown.ddl-coin', {
             multiSelect: true,
@@ -445,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const fillCalendarWithData = async function(params={
     "month": 4,
-    "strategy": "supertrend_15m_tp_ts_total_tp_v2",
+    "strategy": currentStrategy,//"supertrend_15m_tp_ts_total_tp_v2",
     "year": 2026
   }) {
     let p = {
@@ -458,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const response = await postRequest('/analys/calendar/calendar_table', p);
 
     const formattedResponse = await response.map((item) => ({
-      htmltext: `<span class="event${(item.pnl < 0)? ' negative': ((item.pnl == 0)?'':' positive')}">
+      htmltext: `<span class="event${(item.pnl < 0)? ' negative': ((item.pnl === 0)?'':' positive')}">
           <span class="pnl">${numberFormatter.format(item.pnl)} USDT</span>
           <span class="count">${item.count} Позиций</span>
         </span>`,
@@ -474,22 +435,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const handleCalendarDayClick = async function(date) {
     let tableDayDetails = document.querySelector('.table-day-details');
-    console.warn('DAYSELECTED-> HANDLER', date);
     const dataArrDayDetails = await postRequest('/analys/calendar/daily_table', {
-      "date": "22.04.2026",
-      "strategy": "supertrend_15m_tp_ts_total_tp_v2"
+      "date": dateFormatterByPattern(date),//"22.04.2026",
+      "strategy": currentStrategy,//"supertrend_15m_tp_ts_total_tp_v2"
     });
 
-    const dayDetailData = await dataArrDayDetails.map((item) => ({
-      ccy: item.ccy,
-      fee: numberFormatter.format(item.fee),
-      pnl: numberFormatter.format(item.pnl)
-    }));
+    const formattedTableData = await Promise.all(
+      dataArrDayDetails.map( async (item) => ({
+        uly: item?.uly,//Тикер
+        strategy: item?.strategy_name,
+        trader_name: item?.trader_name,
+        ctime: await dateFormatter(item?.ctime),
+        utime: await dateFormatter(item?.utime),
 
-    new UiTable(tableDayDetails, dayDetailData, null, {
+        price_buy: numberFormatter.format(item?.openavgpx),
+        price_sell: numberFormatter.format(item?.closeavgpx),
+        marg: numberFormatter.format(((item?.size_contracts * item?.openavgpx) / item?.lever)),
+        lever: numberFormatter.format(item?.lever),
+        pos_cost: numberFormatter.format(item?.openmaxpos),
+
+        delta_time: await formatTimeMs((new Date(item?.utime) - new Date(item?.ctime))),
+        pnl_ratio: numberFormatter.format((item?.pnlratio * 100)),
+        pnl: numberFormatter.format(item?.pnl),
+        fee: numberFormatter.format(item?.fee),
+        posside: item?.posside
+      }))
+    );
+    new UiTable(tableDayDetails, formattedTableData, 10, {
       numericColumns: [
-        'fee',
-        'pnl'
+        'pnl_ratio',
+        'pnl',
+        'fee'
       ]
     });
   };
@@ -945,9 +921,6 @@ const getStrategyQsReport = async function(params) {
     console.warn('getStrategyQsReport -> params', params);
     //processResponse(testmetrics2);
   }
-  if (params?.strategy) {
-    params.strategy = [params.strategy];
-  }
   const response = await postRequest('/analys/get_strategy_qs_report', params);
   await processResponse(response);
 };
@@ -987,11 +960,37 @@ const getStrategyQsReport = async function(params) {
     xAxis: {
       type: 'datetime'
     },
-    yAxis: {
-      title: {
-        text: 'Value'
-      }
-    },
+    yAxis:
+      [
+        {
+          title: {
+            text: 'PnL',
+            style: { color: '#2196F3' }
+          },
+          labels: {
+            style: { color: '#2196F3' }
+          },
+        },
+        {
+          title: {
+            text: 'Баланс',
+            style: { color: '#FFC107' }
+          },
+          labels: {
+            style: { color: '#FFC107' }
+          }
+        },
+        {
+          title: {
+            text: 'ROI',
+            style: { color: '#4CAF50' }
+          },
+          labels: {
+            style: { color: '#4CAF50' }
+          }
+        }
+      ]
+    ,
     legend: {
       enabled: true
     },
@@ -1022,28 +1021,32 @@ const getStrategyQsReport = async function(params) {
         name: 'ROI',
         data: [],
         color: '#4CAF50',
-        dashStyle: 'Solid'
+        dashStyle: 'Solid',
+        yAxis: 2,
       },
       {
         type: 'line',
         name: 'PnL',
         data: [],
         color: '#2196F3',
-        dashStyle: 'Solid'
+        dashStyle: 'Solid',
+        yAxis: 0
       },
       {
         type: 'line',
         name: 'Баланс',
         data: [],
         color: '#FFC107',
-        dashStyle: 'Solid'
+        dashStyle: 'Solid',
+        yAxis: 1
       },
       {
         type: 'line',
         name: 'Amount',
         data: [],
         color: '#F44336',
-        dashStyle: 'ShortDot'
+        dashStyle: 'ShortDot',
+        yAxis: 0
       },
     ]
   };

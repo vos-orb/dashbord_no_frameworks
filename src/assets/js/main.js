@@ -46,6 +46,32 @@ const dateFormatter = async function(da) {
 }
 window.dateFormatter = dateFormatter;
 
+/**
+ * Профессиональный форматтер даты по шаблону
+ * @param {Date|string} dateInput - Объект даты или строка
+ * @param {string} pattern - Шаблон (например, 'DD.MM.YYYY' или 'YYYY-MM-DD')
+ * @returns {string}
+ */
+const dateFormatterByPattern = (dateInput, pattern = 'DD.MM.YYYY') => {
+  const date = new Date(dateInput);
+
+  if (isNaN(date)) return 'Invalid Date';
+
+  // Подготавливаем значения с ведущими нулями
+  const map = {
+    'DD': String(date.getDate()).padStart(2, '0'),
+    'MM': String(date.getMonth() + 1).padStart(2, '0'),
+    'YYYY': date.getFullYear(),
+    'YY': String(date.getFullYear()).slice(-2),
+    'HH': String(date.getHours()).padStart(2, '0'),
+    'mm': String(date.getMinutes()).padStart(2, '0')
+  };
+
+  // Заменяем токены из мапы, используя регулярное выражение
+  return pattern.replace(/DD|MM|YYYY|YY|HH|mm/g, (matched) => map[matched]);
+};
+window.dateFormatterByPattern = dateFormatterByPattern;
+
 function formatTimeMs(ms) {
   // Константы в миллисекундах
   const SECOND = 1000;

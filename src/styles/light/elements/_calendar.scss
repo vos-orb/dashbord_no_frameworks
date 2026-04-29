@@ -57,15 +57,17 @@ $hover-color: #f8f9fa;
         background: rgba(0, 0, 0, 0.1);
         @include border-radius;
         &.has-meta {
-          background-color: color.adjust($primary-color, $alpha: -0.5);
+          border: 3px solid $primary-color;
+          //background-color: color.adjust($primary-color, $alpha: -0.5);
         }
         &:hover {
           border: 1px solid $primary-color;
         }
         &.selected {
-          border: 1px solid $primary-color;
-          background: $primary-color;
-          color: #ffffff;
+          //border: 8px solid $primary-color;
+          //background: $primary-color;
+          background: color.adjust($primary-color, $lightness: 60%);
+          //color: #ffffff;
         }
         &.disabled {
           color: color.adjust($primary-color, $alpha: -0.5);
@@ -81,13 +83,13 @@ $hover-color: #f8f9fa;
           line-height: 100cqh;
           .meta-content {
             position: absolute;
+            height: 100%;
             bottom: 0;
             left: 0;
             right: 0;
             font-size: 12px;
             top: 0;
             text-align: center;
-            background: rgba(0, 0, 0, 0.1);
             &>.event {
               height: 100%;
               & > .pnl {
@@ -121,6 +123,26 @@ $hover-color: #f8f9fa;
             }
           }
         }
+        &.selected {
+          .day-content {
+            .meta-content {
+
+              &> .event {
+                &.positive {
+                  &>.pnl {
+                    //color: lightgreen;
+                  }
+                }
+                &.negative {
+                  &>.pnl {
+                    //color: red
+                  }
+                }
+              }
+            }
+          }
+        }
+
       }
     }
   }
