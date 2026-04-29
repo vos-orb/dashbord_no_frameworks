@@ -1,7 +1,7 @@
 {% extends "layout.njk" %}
 {% block content %}
 <div class="spoiler expanded">
-  <div class="header">PnL/ROI Spoiler</div>
+  <div class="header">PnL/ROI</div>
   <div class="contents">
 
     <div class="dropdown users-pnl">
@@ -69,7 +69,6 @@
 <div class="flex-row">
   <div class="flex-column">
     <h3>Баланс инвестора</h3>
-    {# TODO }ОТКУДА БРАТЬ НАЧАЛЬНЫЙ БАЛАНС И ТЕКУЩИЙ БАЛАНС#}
     <div class="table-component balance-of-investor">
       <div class="search-container">
         <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
@@ -294,8 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
     balancePeriodDatepicker._datepicker.setPeriod(tr[e.detail.value]);
   });
   balancePeriodDatepicker.addEventListener('datechange', (e) => {
-    console.warn('BALANCE DATE CHANGED, e.detail', e.detail);
-    //TODO apply date filter to chart
     let p = e?.detail?.currentValue;
     const [startDate, endDate] =
       (p!='')
@@ -352,10 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         console.warn('TEBLE formattedBalanceDiffData', formattedBalanceDiffData);
         new UiTable(tableBOI, formattedBalanceDiffData, 10, {
-          numericColumns: [
-            'first_balance',
-            'last_balance'
-          ]
+          numericColumns: []
         });
       } catch(err) {
         console.log('ERROR', err)
@@ -371,11 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         console.warn('TEBLE formattedGFCDFData', formattedGFCDFData);
         new UiTable(tableGFCDF, formattedGFCDFData, 10, {
-          numericColumns: [
-            'start_balance',
-            'end_balance',
-            'diff'
-          ]
+          numericColumns: ['diff']
         });
       } catch(err) {
         console.log('ERROR', err)
@@ -400,12 +390,38 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     "xAxis": {
       "type": 'datetime',
+      "tickPositioner": function () {
+        let positions = [];
+        this.chart.series.forEach(series => {
+          series.options.data.forEach(point => {
+            const rawX = Array.isArray(point) ? point[0] : point.x;
+            const timestamp = typeof rawX === 'string' ? Date.parse(rawX) : rawX;
+            if (timestamp && !positions.includes(timestamp)) {
+              positions.push(timestamp);
+            }
+          });
+        });
+        positions.sort((a, b) => a - b);
+        const axisWidth = this.width;
+        const estimatedLabelWidth = 10; // Approx. width of label
+        const maxLabels = Math.floor(axisWidth / estimatedLabelWidth);
+        if (positions.length > maxLabels) {
+          const step = Math.ceil(positions.length / maxLabels);
+          positions = positions.filter((_, index) => index % step === 0);
+        }
+        return positions;
+      },
       "labels": {
+        "enabled": true,
         "format": '{value:%Y-%m-%d}',
         "style": {
           "color": "#64748b",
-          "fontSize": "12px"
-        }
+          "fontSize": "11px",
+          "textOverflow": "none" // Убирает троеточие
+        },
+        "allowOverlap": true, // Позволяет видеть все точки
+        "rotation": -45,      // Наклон, чтобы даты не слипались
+        "align": 'right'
       },
       "crosshair": {
         "width": 1,
@@ -453,14 +469,15 @@ document.addEventListener('DOMContentLoaded', () => {
     "tooltip": {
       "shared": true,
       "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
       "backgroundColor": "rgba(255, 255, 255, 0.96)",
       "style": {
         "color": "#1e293b",
         "fontSize": "13px",
         "fontWeight": 500
       },
-      "borderRadius": 12,
-      "padding": 16
+      "borderRadius": 8,
+      "padding": 8
     },
     "plotOptions": {
       "area": {
@@ -573,14 +590,38 @@ document.addEventListener('DOMContentLoaded', () => {
     },
     "xAxis": {
       "type": 'datetime',
-      "categories": [],
+      "tickPositioner": function () {
+        let positions = [];
+        this.chart.series.forEach(series => {
+          series.options.data.forEach(point => {
+            const rawX = Array.isArray(point) ? point[0] : point.x;
+            const timestamp = typeof rawX === 'string' ? Date.parse(rawX) : rawX;
+            if (timestamp && !positions.includes(timestamp)) {
+              positions.push(timestamp);
+            }
+          });
+        });
+        positions.sort((a, b) => a - b);
+        const axisWidth = this.width;
+        const estimatedLabelWidth = 10; // Approx. width of label
+        const maxLabels = Math.floor(axisWidth / estimatedLabelWidth);
+        if (positions.length > maxLabels) {
+          const step = Math.ceil(positions.length / maxLabels);
+          positions = positions.filter((_, index) => index % step === 0);
+        }
+        return positions;
+      },
       "labels": {
+        "enabled": true,
         "format": '{value:%Y-%m-%d}',
-        "padding": 7,
         "style": {
           "color": "#64748b",
-          "fontSize": "12px"
-        }
+          "fontSize": "11px",
+          "textOverflow": "none" // Убирает троеточие
+        },
+        "allowOverlap": true, // Позволяет видеть все точки
+        "rotation": -45,      // Наклон, чтобы даты не слипались
+        "align": 'right'
       },
       "crosshair": {
         "width": 1,
@@ -617,8 +658,8 @@ document.addEventListener('DOMContentLoaded', () => {
         "fontSize": "13px",
         "fontWeight": 500
       },
-      "borderRadius": 12,
-      "padding": 16
+      "borderRadius": 8,
+      "padding": 8
     },
     "plotOptions": {
       "area": {
