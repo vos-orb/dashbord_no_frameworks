@@ -249,6 +249,8 @@ let currentTradingSerie = '';
 let currentDatePeriod = [];
 let chartPnl = {};
 let calendarDetails;
+let calendarDetailsCurrentMonth = (new Date().getMonth() + 1);
+let calendarDetailsCurrentYear = new Date().getFullYear();
 
 let chartCumulativeReturns = {};
 let chartCumulativeReturnsScaled = {};
@@ -404,19 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const fillCalendarWithData = async function(params={
-    "month": 4,
-    "strategy": currentStrategy,//"supertrend_15m_tp_ts_total_tp_v2",
-    "year": 2026
-  }) {
-    let p = {
-      month: (new Date().getMonth() + 1),
-      year: new Date().getFullYear()
-    };
-    if (params?.strategy) {
-      p.strategy = params.strategy;
-    }
-    const response = await postRequest('/analys/calendar/calendar_table', p);
+  const fillCalendarWithData = async function(params) {
+    const response = await postRequest('/analys/calendar/calendar_table', params);
 
     const formattedResponse = await response.map((item) => ({
       htmltext: `<span class="event${(item.pnl < 0)? ' negative': ((item.pnl === 0)?'':' positive')}">
@@ -427,11 +418,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
 
     calendarDetails?._calendar?.setMeta(formattedResponse);
+
+  };
+  const initCalendarDetails = async function() {
+    calendarDetailsCurrentMonth = (new Date().getMonth() + 1);
+    calendarDetailsCurrentYear = new Date().getFullYear();
     calendarDetails.addEventListener('dayselected', (e) => {
-      console.warn('DAYSELECTED-> ', e?.detail?.date);
       handleCalendarDayClick(e?.detail?.date);
     });
-  };
+    calendarDetails.addEventListener('monthchanged', (e) => {
+      calendarDetailsCurrentMonth = (e?.detail?.month + 1);
+      fillCalendarWithData({
+        month: calendarDetailsCurrentMonth,
+        year: calendarDetailsCurrentYear,
+        strategy: currentStrategy
+      });
+    });
+    calendarDetails.addEventListener('yearchanged', (e) => {
+      calendarDetailsCurrentYear = e?.detail?.year;
+      fillCalendarWithData({
+        month: calendarDetailsCurrentMonth,
+        year: calendarDetailsCurrentYear,
+        strategy: currentStrategy
+      });
+    });
+  }
 
   const handleCalendarDayClick = async function(date) {
     let tableDayDetails = document.querySelector('.table-day-details');
@@ -938,7 +949,12 @@ const getStrategyQsReport = async function(params) {
     if (currentTradingSerie) { params.session = currentTradingSerie; }
     //const response = await postRequest('/get_strategy_results', params);
     getPnlCharData(params);
-    fillCalendarWithData(params);
+    initCalendarDetails();
+    fillCalendarWithData({
+      month: calendarDetailsCurrentMonth,
+      year: calendarDetailsCurrentYear,
+      strategy: currentStrategy
+    });
     getStrategyQsReport(params);
     //getStrategyResults(response, true);
   });
@@ -999,7 +1015,8 @@ const getStrategyQsReport = async function(params) {
     },
     tooltip: {
       shared: true,
-      crosshairs: true
+      crosshairs: true,
+      pointFormat: '<br />{series.name}: <b>{point.y:,.2f}</b>'
     },
     plotOptions: {
       series: {
@@ -1725,20 +1742,8 @@ const getStrategyQsReport = async function(params) {
     calendarDetails.addEventListener('calendarinitialized', (e) => {
       e.detail.calendar.setMeta([
         {
-          date: new Date('2023-10-15'),
-          htmltext: '<span class="event">Event 1</span>'
-        },
-        {
-          date: new Date('2023-10-20'),
-          htmltext: '<span class="event">Event 2</span>'
-        },
-        {
-          date: new Date('2026-04-21'),
-          htmltext: '<span class="event">much better WOW</span>'
-        },
-        {
-          date: new Date('2026-05-23'),
-          htmltext: '<span class="event">very nice</span>'
+          date: new Date('2026-04-25'),
+          htmltext: '<span class="event"><span class="pnl">wow</span><span class="count">888</span></span>'
         }
       ]);
     });

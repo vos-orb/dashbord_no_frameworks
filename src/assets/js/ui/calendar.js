@@ -91,12 +91,24 @@
     setupEventListeners() {
       // Year and month change events
       this.yearSelect.addEventListener('change', () => {
-        this.currentDate.setFullYear(parseInt(this.yearSelect.value, 10));
+        const year = parseInt(this.yearSelect.value, 10);
+        this.currentDate.setFullYear(year);
+        // Dispatch year changed event
+        this.element.dispatchEvent(new CustomEvent('yearchanged', {
+          detail: { year: year },
+          bubbles: true
+        }));
         this.renderCalendar();
       });
 
       this.monthSelect.addEventListener('change', () => {
-        this.currentDate.setMonth(parseInt(this.monthSelect.value, 10));
+        const month = parseInt(this.monthSelect.value, 10);
+        this.currentDate.setMonth(month);
+        // Dispatch month changed event
+        this.element.dispatchEvent(new CustomEvent('monthchanged', {
+          detail: { month: month },
+          bubbles: true
+        }));
         this.renderCalendar();
       });
 
