@@ -1,7 +1,6 @@
 {% extends "layout.njk" %}
 {% block content %}
 
-
   <div class="dropdown tags">
     <button class="dropdown-toggle">Выберите показатель</button>
     <div class="dropdown-menu"></div>
@@ -9,7 +8,7 @@
 
   <div class="ui-datepicker pnl-period-datepicker">
     <div class="wrapper">
-      <input type="text" placeholder="Выберите период" readonly />
+      <input type="text" placeholder="Выберите дату" readonly />
     </div>
   </div>
 <div class="flex-row">
@@ -17,7 +16,6 @@
 
 
   <h3>Баланс инвестора</h3>
-  {# TODO СВЕРИТЬ КОЛОНКИ#}
   <div class="table-component concat-stats">
     <div class="search-container">
       <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
@@ -27,7 +25,7 @@
       <table>
         <thead>
         <tr>
-          <th data-column="concat">Тикер filltimefilltimefilltime</th>
+          <th data-column="concat">Тикер</th>
           <th data-column="tag">Стратегия</th>
           <th data-column="account_name">Аккаунт</th>
           <th data-column="start_time">Вход (дата)</th>
@@ -79,17 +77,50 @@
   </div>
 </div>
 
-
-
-
-
-
-
-
-  <script type="module">
+<script type="module">
 import { getRequest, postRequest } from '@/services/api.js';
-
+let currentDate = null;
+let currentStrategy = null;
 document.addEventListener('DOMContentLoaded', () => {
+
+  const getDAtaAndFillTable = async () => {
+    let params = {};
+    params.name_acc = currentStrategy || 'supertrend_15m_tp_ts_total_tp_v2';
+    params.filltime = currentDate || '2026-04-01';
+    const response = await postRequest('/get_position_data', { "name_acc": params.name_acc, "filltime": params.filltime } );
+
+    const formattedInvestorBalanceData = await Promise.all(
+      response.map(async (item) => ({
+        concat: item.concat, // "IP-USDT",
+        tag: item.tag, // "supertrend_15m_tp_ts_total_tp_v2",
+        account_name: item.account_name, // "user_name"
+        start_time: await dateFormatter(item.start_time), // "2026-04-18T11:00:53.434000",
+        entry_price: numberFormatter.format(item.entry_price), // 0.573,
+        end_time: await dateFormatter(item.end_time), // "2026-04-18T12:45:01.361000",
+        exit_price: numberFormatter.format(item.exit_price), // 0.559,
+        delta_time: formatTimeMs((item.delta_time * 1000)), // 6247.927,
+        pnl: numberFormatter.format(item.pnl), // 1.3689999999999907,
+        clean_profit_percent: numberFormatter.format(item.clean_profit_percent), // 2.541680591140304,
+        gross_profit: numberFormatter.format(item.gross_profit), // 1.3159999999999907,
+        fee: numberFormatter.format(item.fee), // -0.053,
+        closeTotalPos: numberFormatter.format(item.closeTotalPos), // 94.0,
+        openMaxPos: numberFormatter.format(item.cash * item.lever), // 94.0,
+        cash: numberFormatter.format(item.cash), // 53.861999999999995,
+        lever: numberFormatter.format(item.lever), // 3.0,
+        direction: item.direction, // "short",
+        net_pnl_percent: numberFormatter.format(item.net_pnl_percent) // 2.443280977312374,
+      }))
+    );
+    let tableConcatStats = document.querySelector('.table-component.concat-stats');
+    new UiTable(tableConcatStats, formattedInvestorBalanceData, 16, {
+      numericColumns: [
+        'gross_profit',
+        'fee',
+        'net_pnl_percent'
+      ]
+    });
+
+  };
   // PnL
   initDropdowns('.dropdown.tags', {
     data: async function() {
@@ -106,47 +137,14 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     },
     onSelect: async function (selectedItem) {
-      let tableConcatStats = document.querySelector('.table-component.concat-stats');
-      const response = await postRequest('/get_position_data', { "name_acc": selectedItem } );
-      const formattedInvestorBalanceData = await Promise.all(
-        response.map(async (item) => ({
-          concat: item.concat, // "IP-USDT",
-          tag: item.tag, // "supertrend_15m_tp_ts_total_tp_v2",
-          account_name: item.account_name, // "user_name"
-          start_time: await dateFormatter(item.start_time), // "2026-04-18T11:00:53.434000",
-          entry_price: numberFormatter.format(item.entry_price), // 0.573,
-          end_time: await dateFormatter(item.end_time), // "2026-04-18T12:45:01.361000",
-          exit_price: numberFormatter.format(item.exit_price), // 0.559,
-          delta_time: formatTimeMs((item.delta_time * 1000)), // 6247.927,
-          pnl: numberFormatter.format(item.pnl), // 1.3689999999999907,
-          clean_profit_percent: numberFormatter.format(item.clean_profit_percent), // 2.541680591140304,
-          gross_profit: numberFormatter.format(item.gross_profit), // 1.3159999999999907,
-          fee: numberFormatter.format(item.fee), // -0.053,
-          closeTotalPos: numberFormatter.format(item.closeTotalPos), // 94.0,
-          openMaxPos: numberFormatter.format(item.cash * item.lever), // 94.0,
-          cash: numberFormatter.format(item.cash), // 53.861999999999995,
-          lever: numberFormatter.format(item.lever), // 3.0,
-          direction: item.direction, // "short",
-          net_pnl_percent: numberFormatter.format(item.net_pnl_percent) // 2.443280977312374,
-        }))
-      );
-      new UiTable(tableConcatStats, formattedInvestorBalanceData, 10, {
-        numericColumns: [
-          'entry_price',
-          'exit_price',
-          'delta_time' ,
-          'pnl',
-          'clean_profit_percent',
-          'gross_profit',
-          'fee',
-          'closeTotalPos',
-          'openMaxPos',
-          'cash',
-          'lever',
-          'net_pnl_percent'
-        ]
-      });
+      currentStrategy = selectedItem;
+      getDAtaAndFillTable();
     }
+  });
+  let pnlPeriodDatepicker = document.querySelector('.pnl-period-datepicker');
+  pnlPeriodDatepicker.addEventListener('datechange', (e) => {
+    currentDate = e?.detail?.currentValue;
+    getDAtaAndFillTable();
   });
 });
   </script>
