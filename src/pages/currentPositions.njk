@@ -150,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 posSide: innerData.posSide,
                 totalEq: numberFormatter.format(innerData.totalEq),
                 perc_pos: numberFormatter.format(innerData.perc_pos),
-                sell: 0
+                sell: `<div class="ui-button primary">Продать</div>`
               };
             }));
             new UiTable(tableUserStats, formattedUsersStatsData, 10, {
