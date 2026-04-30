@@ -1,0 +1,27 @@
+@use '../_shared' as *;
+@use 'sass:color';
+
+.draw-down-wrapper {
+  display: flex;
+  gap: 8px;
+  &>.item {
+    @include border-radius;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    flex: 1;
+    height: 60px;
+    border: 1px solid $common-border-color;
+    color: $primary-text-color;
+    text-align: left;
+    &>.title {
+      margin: 8px 0;
+    }
+    &>.value {
+      font-weight: bold;
+      &>.skeleton {
+        height: 16px;
+        width: 100%;
+      }
+    }
+  }
+}

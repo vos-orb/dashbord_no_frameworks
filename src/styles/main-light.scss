@@ -12,6 +12,8 @@
 @use "light/elements/_buttons.scss";
 @use "light/elements/_calendar.scss";
 
+@use "light/partials/_drawdown.scss";
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;

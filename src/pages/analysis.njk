@@ -45,6 +45,34 @@
 <div class="spoiler expanded">
   <div class="header">PNL/ROI</div>
   <div class="contents">
+
+    <div class='draw-down-wrapper'>
+      <div class="item dd-max-drawdown-abs">
+        <div class="title">Макс. просадка </div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+      <div class="item dd-max-drawdown-pct">
+        <div class="title">Макс. просадка (%)</div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+      <div class="item dd-pnl">
+        <div class="title">PnL </div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+      <div class="item dd-roi">
+        <div class="title">ROI </div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+      <div class="item dd-fee">
+        <div class="title">Коммиссия </div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+      <div class="item dd-amount">
+        <div class="title">Amount </div>
+        <div class="value"><div class="skeleton"></div></div>
+      </div>
+    </div>
+
     <div class="ui-chartjs" id="container_pnl_roi" style="width:100%; height:400px;"></div>
   </div>
 </div>
@@ -119,13 +147,12 @@
 
   </div>
 </div>
-<div class="spoiler">
+<div class="spoiler expanded">
   <div class="header">Отчёт риск-профиль</div>
   <div class="contents">
 
     <div class="flex-row">
       <div class="flex-column">
-        charts
 <div class="ui-chartjs" id="container_cumulative_returns" style="width:100%; height:400px;"></div>
 <div class="ui-chartjs" id="container_cumulative_returns_scaled" style="width:100%; height:400px;"></div>
 <div class="ui-chartjs" id="container_eoy_returns" style="width:100%; height:400px;"></div>
@@ -271,7 +298,6 @@ async function getStrategyResults(response, isUpdate=false) {
 
  // let coins = response.data.strategy_info.find(s => s.name === strategyNames[0])?.coins || [];
   let pnlRoiChartData = response?.data?.pnl_roi_chart;
-////TODO HERE CHART
   /*if (chartPnl?.series ) {
     chartPnl.series[0].setData(pnlRoiChartData.roi, false); // false, чтобы не перерисовывать сразу
     chartPnl.series[1].setData(pnlRoiChartData.pnl, false);
@@ -376,6 +402,85 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   const ddlData = getDataForDddls();
+
+  const getMaxLowerForStrategyData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_max_lower_for_strategy', params);
+      if (response?.max_lower) {
+        let domInfoBoxValue = document.querySelector('.dd-max-drawdown-abs .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.max_lower);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
+  const getMaxLowerPercData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_max_lower_perc_for_strategy', params);
+      if (response?.max_lower_perc) {
+        let domInfoBoxValue = document.querySelector('.dd-max-drawdown-pct .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.max_lower_perc);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
+  const getDdPnlData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_pnl_for_strategy', params);
+      if (response?.pnl) {
+        let domInfoBoxValue = document.querySelector('.dd-pnl .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.pnl);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
+  const getDdRoiData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_roi_for_strategy', params);
+      if (response?.roi) {
+        let domInfoBoxValue = document.querySelector('.dd-roi .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.roi);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
+  const getDdFeeData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_fee_for_strategy', params);
+      if (response?.fee) {
+        let domInfoBoxValue = document.querySelector('.dd-fee .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.fee);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
+  const getDdAmountData = async (params) => {
+    try {
+      const response = await postRequest('/analys/vidjets/get_amount_for_strategy', params);
+      if (response?.amount) {
+        let domInfoBoxValue = document.querySelector('.dd-amount .value');
+        domInfoBoxValue.innerHTML = numberFormatter.format(response?.amount);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return ['Ошибка загрузки'];
+    }
+  };
+
   const getPnlCharData = async function(params = {}) {
     const response = await postRequest('/analys/vidjets/get_pnl_roi_graph_for_strategy', params);
     //chartPnl.
@@ -737,7 +842,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const yearName = this.series.yAxis.categories[this.point.y];
             const val = this.point.value;
 
-            return `${yearName} ${monthName} - <b>${val}</b>`;
+            return `${yearName} ${monthName} - <b>${numberFormatter.format(val)}</b>`;
           }
         },
       }, true, true);
@@ -917,7 +1022,6 @@ document.addEventListener('DOMContentLoaded', () => {
         },
       });
     }
-
   };
 
   let analyzePNLDatepicker = document.querySelector('.analyze-pnl-datepicker');
@@ -949,6 +1053,12 @@ const getStrategyQsReport = async function(params) {
     if (currentTradingSerie) { params.session = currentTradingSerie; }
     //const response = await postRequest('/get_strategy_results', params);
     getPnlCharData(params);
+    getMaxLowerForStrategyData(params);
+    getMaxLowerPercData(params);
+    getDdPnlData(params);
+    getDdRoiData(params);
+    getDdFeeData(params);
+    getDdAmountData(params);
     initCalendarDetails();
     fillCalendarWithData({
       month: calendarDetailsCurrentMonth,
@@ -1125,6 +1235,19 @@ const getStrategyQsReport = async function(params) {
             }
         }
     },
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     accessibility: {
         enabled: false
     },
@@ -1138,65 +1261,78 @@ const getStrategyQsReport = async function(params) {
     chart: {
       "backgroundColor": "transparent",
     },
-        title: {
-          text: 'Cumulative returns (Log Scaled)'
-        },
-        xAxis: {
-          "type": 'datetime',
-          title: {
-            text: null
-          },
-          labels: {
-              format: '{value:%Y-%m-%d}'
+    title: {
+      text: 'Cumulative returns (Log Scaled)'
+    },
+    xAxis: {
+      "type": 'datetime',
+      title: {
+        text: null
+      },
+      labels: {
+          format: '{value:%Y-%m-%d}'
+      }
+    },
+    credits: { enabled: false },
+    yAxis: {
+      title: {
+        text: null
+      },
+      plotLines: [{
+        color: 'red',
+        width: 1,
+        value: 0,
+        zIndex: 5,
+        dashStyle: "Dash",
+        label: {
+          text: `Уровень 0`,
+          align: 'right',
+          style: {
+            color: 'red'
           }
         },
-        credits: { enabled: false },
-        yAxis: {
-          title: {
-            text: null
-          },
-          plotLines: [{
-            color: 'red',
-            width: 1,
-            value: 0,
-            zIndex: 5,
-            dashStyle: "Dash",
-            label: {
-              text: `Уровень 0`,
-              align: 'right',
-              style: {
-                color: 'red'
-              }
-            },
-          }]
+      }]
+    },
+    series: [
+        {
+            type: 'line',
+            name: 'Данные',
+            data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
         },
-        series: [
-            {
-                type: 'line',
-                name: 'Данные',
-                data: [['', 0]]//data.map(item => [dayjs(newDate).format('DD.MM.YY'), item.value])
-            },
-        ],
-        plotOptions: {
-            line: {
-                marker: {
-                    enabled: false,
-                    states: {
-                        hover: {
-                            enabled: true,
-                            radius: 5
-                        }
+    ],
+    plotOptions: {
+        line: {
+            marker: {
+                enabled: false,
+                states: {
+                    hover: {
+                        enabled: true,
+                        radius: 5
                     }
                 }
             }
-        },
-        accessibility: {
-            enabled: false
-        },
-        legend: {
-            enabled: false
         }
-    };
+    },
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
+    accessibility: {
+        enabled: false
+    },
+    legend: {
+        enabled: false
+    }
+  };
   chartCumulativeReturnsScaled = Highcharts.chart('container_cumulative_returns_scaled', chartCumulativeReturnsScaledOptions);
 
   const chartEoyReturnsOptions = {
@@ -1243,6 +1379,19 @@ const getStrategyQsReport = async function(params) {
         groupPadding: 0.1
       }
     },
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     accessibility: {
       enabled: false
     },
@@ -1275,6 +1424,19 @@ const getStrategyQsReport = async function(params) {
       name: 'Данные',
       data: [['', 0]]//data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
     }],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     legend: {
       enabled: false
     },
@@ -1329,6 +1491,19 @@ const getStrategyQsReport = async function(params) {
         data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
       },
     ],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     legend: {
       enabled: false
     }
@@ -1379,6 +1554,19 @@ const getStrategyQsReport = async function(params) {
         data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
       },
     ],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     legend: {
       enabled: false
     }
@@ -1429,6 +1617,19 @@ const getStrategyQsReport = async function(params) {
         data: [['', 0]] //chartData.data.map(item => [dayjs(item.date).format('DD.MM.YY'), item.value])
       },
     ],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     legend: {
       enabled: false
     }
@@ -1561,6 +1762,19 @@ const getStrategyQsReport = async function(params) {
         threshold: 0
       },
     ],
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
     legend: {
       enabled: false
     }
@@ -1623,8 +1837,8 @@ const getStrategyQsReport = async function(params) {
         grouping: false,
       },
     ],
-    tooltip: {
-      /*formatter: function(this: any) {
+    /*tooltip: {
+      formatter: function(this: any) {
     if (this.series.type === 'xrange') {
       const point = this.point as any;
       const startDate = allDates[point.x];
@@ -1651,11 +1865,24 @@ const getStrategyQsReport = async function(params) {
     }
 
     return this.y;
-  }*/
-},
+  }
+},*/
   accessibility: {
     enabled: false
   },
+    "tooltip": {
+      "shared": true,
+      "valueDecimals": 2,
+      "xDateFormat": '%Y-%m-%d',
+      "backgroundColor": "rgba(255, 255, 255, 0.96)",
+      "style": {
+        "color": "#1e293b",
+        "fontSize": "13px",
+        "fontWeight": 500
+      },
+      "borderRadius": 8,
+      "padding": 8
+    },
 };
   chartDrawdownPeriods = Highcharts.chart('container_drawdown_periods', chartDrawdownPeriodsOptions);
   //Return Quantiles (Candlestick)
@@ -1713,6 +1940,19 @@ const getStrategyQsReport = async function(params) {
             x: index
           })),*/
           tooltip: {
+
+            "shared": true,
+            "valueDecimals": 2,
+            "xDateFormat": '%Y-%m-%d',
+            "backgroundColor": "rgba(255, 255, 255, 0.96)",
+            "style": {
+              "color": "#1e293b",
+              "fontSize": "13px",
+              "fontWeight": 500
+            },
+            "borderRadius": 8,
+            "padding": 8,
+
             pointFormat:
               '<span style="color:{point.color}">\u25CF</span> <b>{point.name}</b><br/>' +
               'Open: {point.open}<br/>' +
@@ -1731,6 +1971,19 @@ const getStrategyQsReport = async function(params) {
           },
         },
       ],
+      "tooltip": {
+        "shared": true,
+        "valueDecimals": 2,
+        "xDateFormat": '%Y-%m-%d',
+        "backgroundColor": "rgba(255, 255, 255, 0.96)",
+        "style": {
+          "color": "#1e293b",
+          "fontSize": "13px",
+          "fontWeight": 500
+        },
+        "borderRadius": 8,
+        "padding": 8
+      },
     };
   chartReturnQuantiles = Highcharts.chart('container_return_quantiles', chartReturnQuantilesOptions);
 
