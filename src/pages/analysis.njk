@@ -500,12 +500,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const roiData = rawData.map(item => [parseDate(item.date), item.roi]);
       const pnlData = rawData.map(item => [parseDate(item.date), item.pnl]);
       const balanceData = rawData.map(item => [parseDate(item.date), item.balance]);
+      const amountData = rawData.map(item => [parseDate(item.date), item.amount]);
       chartPnl.update({
         series: [
           { name: 'ROI', data: roiData },
           { name: 'PnL', data: pnlData },
           { name: 'Баланс', data: balanceData },
-          { name: 'Amount', data: [] } //TODO integrate when back is ready
+          { name: 'Amount', data: amountData }
         ]
       });
     }
@@ -1114,6 +1115,15 @@ const getStrategyQsReport = async function(params) {
           labels: {
             style: { color: '#4CAF50' }
           }
+        },
+        {
+          title: {
+            text: 'Amount',
+            style: { color: '#F44336' }
+          },
+          labels: {
+            style: { color: '#F44336' }
+          }
         }
       ]
     ,
@@ -1172,8 +1182,8 @@ const getStrategyQsReport = async function(params) {
         name: 'Amount',
         data: [],
         color: '#F44336',
-        dashStyle: 'ShortDot',
-        yAxis: 0
+        dashStyle: 'Solid',
+        yAxis: 3
       },
     ]
   };
