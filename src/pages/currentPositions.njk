@@ -32,14 +32,12 @@
     </div>
   </div>
 
-
   <div class="dropdown users-stats">
     <button class="dropdown-toggle">Выберите пользователя</button>
     <div class="dropdown-menu"></div>
   </div>
 
   <h3>Баланс инвестора</h3>
-  {# TODO СВЕРИТЬ КОЛОНКИ#}
   <div class="table-component user-stats">
     <div class="search-container">
       <input class="inp search" type="text" placeholder="Поиск..." autocomplete="off">
@@ -55,11 +53,10 @@
           <th data-column="start_time">Вход (дата)</th>
           <th data-column="delta_time">В сделке</th>
 
-          <th data-column="percDeltaNow">Процент (%)</th>
-          <th data-column="income">Доход ($)</th>
+          <th data-column="percDeltaNow">ROI (%)</th>
+          <th data-column="income">PnL ($)</th>
           <th data-column="fee">Комиссия ($)</th>
-          <th data-column="pnl">Прибыль ($)</th>
-          <th data-column="notionalUsd">Объём ($)</th>
+          <th data-column="notionalUsd">Стоимость позиции ($)</th>
 
           <th data-column="lever">Плечо</th>
           <th data-column="posSide">Сторона</th>
@@ -76,7 +73,6 @@
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
 
-          <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
           <td><div class="skeleton" style="height: 40px;"></div></td>
@@ -100,10 +96,11 @@
   </div>
   </div>
 
-
-
   <script type="module">
-import { getRequest, postRequest, webSocketManager } from '@/services/api.js';
+import { getRequest, postRequest, webSocketManager, WebSocketGroup } from '@/services/api.js';
+
+let wsConnectionForInvBalance = null;
+const myWebSocketGroup = new WebSocketGroup();
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -125,46 +122,42 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     },
     onSelect: async function (selectedUser) {
-      console.log('Выбран Пользак :', selectedUser);
+
       if ({{ DEBUG }}) {
-        //updateTable();
+        console.log('Выбран Пользак :', selectedUser);
       }
       try {
         const wsUrl = `${import.meta.env.VITE_API_URL}/ws/${selectedUser}`;
-        const connection = webSocketManager.connect(wsUrl, {
+        const invBalParams = {
           onMessage: async (data, ws) => {
-            let item = data?.data;
-            //TODO update in the table by account_name and push new obj if ney account selected so both updated
-            const formattedUsersStatsData = [{
-              instId: item.instId,
-              account_name: item.account,
-              entry_price: numberFormatter.format(item.avgPx),
-              start_time: await dateFormatter(item.timeStamp),
-              delta_time: formatTimeMs((item.cTime / 10000)),
+            const formattedUsersStatsData = await Promise.all( data?.data.map( async item => {
+              const { data: innerData } = item;
 
-              percDeltaNow: numberFormatter.format(item.percDeltaNow),
-              income: numberFormatter.format(item.income),
-              fee: numberFormatter.format(item.fee),
-              pnl: numberFormatter.format(item.pnl),
-              notionalUsd: numberFormatter.format(item.notionalUsd),
+              return {
+                instId: innerData.instId,
+                account_name: innerData.account,
+                entry_price: numberFormatter.format(innerData.avgPx),
+                start_time: await dateFormatter(innerData.timestamp),
+                delta_time: formatTimeMs((innerData.time * 1000)),
 
-              lever: numberFormatter.format(item.lever),
-              posSide: item.posSide,
-              totalEq: numberFormatter.format(item.totalEq),
-              perc_pos: numberFormatter.format(item.perc_pos),
-              sell: 0
-            }];
+                percDeltaNow: numberFormatter.format(innerData.percDeltaNow),
+                income: numberFormatter.format(innerData.income),
+                fee: numberFormatter.format(innerData.fee),
+                pnl: numberFormatter.format(innerData.pnl),
+                notionalUsd: numberFormatter.format(innerData.notionalUsd),
+
+                lever: numberFormatter.format(innerData.lever),
+                posSide: innerData.posSide,
+                totalEq: numberFormatter.format(innerData.totalEq),
+                perc_pos: numberFormatter.format(innerData.perc_pos),
+                sell: 0
+              };
+            }));
             new UiTable(tableUserStats, formattedUsersStatsData, 10, {
               numericColumns: [
-                'entry_price',
                 'percDeltaNow',
                 'income',
-                'fee',
-                'pnl',
-                'notionalUsd',
-                'lever',
-                'totalEq',
-                'perc_pos'
+                'fee'
               ]
             });
           },
@@ -179,7 +172,9 @@ document.addEventListener('DOMContentLoaded', () => {
           onError: (error, ws) => {
             console.error('WebSocket error:', error);
           }
-        });
+        };
+        myWebSocketGroup.connect(wsUrl, invBalParams);
+
       } catch(err) {
         console.error('Ошибка загрузки данных:', err);
       }

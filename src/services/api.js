@@ -177,11 +177,78 @@ class WebSocketManager {
     }
     return false;
   }
+  getConnectionStatus(url) {
+    if (!this.connections.has(url)) return 'disconnected';
+    const ws = this.connections.get(url);
+    return ['CONNECTING', 'OPEN', 'CLOSING', 'CLOSED'][ws.readyState];
+  }
 }
 
 // Export singleton instance
 export const webSocketManager = new WebSocketManager();
 
+// WebSocket Group Manager
+class WebSocketGroup {
+  constructor() {
+    this.activeConnection = null;
+    this.groupName = 'default-group';
+  }
+
+  /**
+   * Connect to a WebSocket, closing any previous connection in the group
+   * @param {string} url - WebSocket URL
+   * @param {object} options - Connection options
+   */
+  connect(url, options = {}) {
+    // Close previous connection if exists
+    if (this.activeConnection) {
+      webSocketManager.disconnect(this.activeConnection.url);
+    }
+
+    // Store the URL for reference
+    this.activeConnection = { url };
+
+    // Connect with the new URL
+    return webSocketManager.connect(url, {
+      ...options,
+      onClose: (event, ws) => {
+        if (options.onClose) options.onClose(event, ws);
+        if (this.activeConnection?.url === url) {
+          this.activeConnection = null;
+        }
+      }
+    });
+  }
+
+  /**
+   * Disconnect the active connection
+   */
+  disconnect() {
+    if (this.activeConnection) {
+      webSocketManager.disconnect(this.activeConnection.url);
+      this.activeConnection = null;
+    }
+  }
+
+  /**
+   * Check if there's an active connection
+   * @returns {boolean}
+   */
+  isConnected() {
+    return this.activeConnection !== null &&
+      webSocketManager.isConnected(this.activeConnection.url);
+  }
+
+  /**
+   * Get the current connection status
+   * @returns {string}
+   */
+  getStatus() {
+    if (!this.activeConnection) return 'disconnected';
+    return webSocketManager.getConnectionStatus(this.activeConnection.url);
+  }
+}
+export { WebSocketGroup };
 /**
  * GET request helper
  * @param {string} endpoint - API endpoint
