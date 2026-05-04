@@ -3,6 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <title>{{ title }}</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "@/": "/assets/js/",
+        "@/services/api.js": "/assets/js/services/api.js",
+        "@/routes": "/assets/js/routes.js"
+      }
+    }
+  </script>
 
   <link rel="icon" href="{{ asset('favicon.ico') }}">
   <link id="stylesheet_theme" rel="stylesheet" href="{{ asset('css/main-' + THEME_NAME + '.css') }}">
@@ -16,7 +25,17 @@
 </main>
 
 {% include "footer.njk" %}
+<script>
+  // This polyfills import.meta.env for the browser in production
+  window.importMetaEnv = {
+    VITE_API_URL: "{{ API_URL }}",
+    VITE_API_TIMEOUT: "{{ API_TIMEOUT }}",
+    VITE_DEBUG: "{{ DEBUG }}"
+  };
 
+  // Modern browsers allow defining properties on import.meta via a trick
+  // but the easiest way is to adjust your main.js slightly or use a global.
+</script>
 <script type="module" src="/assets/js/main.js"></script>
 </body>
 </html>

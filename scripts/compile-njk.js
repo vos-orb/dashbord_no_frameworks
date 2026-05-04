@@ -34,8 +34,6 @@ env.addGlobal('DEBUG', process.env.VITE_DEBUG);
 
 const themes = [
   { themeName: 'light', styleFile: 'main-light.scss'},
-  //{ themeName: 'dark', styleFile: 'main-dark.scss'},
-  //{ themeName: 'ocean', styleFile: 'mian-ocean.scss'},
   { themeName: 'prom', styleFile: 'main-prom.scss'}
 ];
 // Get theme from environment or use default
@@ -44,15 +42,11 @@ console.warn('TEST VARIABLE VITE_THEME from env', selectedTheme);
 const themeConfig = themes.find(t => t.themeName === selectedTheme) || themes[0];
 env.addGlobal('THEME_NAME', themeConfig.themeName);
 
-// Compile SCSS to CSS
 try {
   console.log('Compiling SCSS to CSS...');
-  //execSync('sass src/styles:dist/assets/css --no-source-map --style=compressed', { stdio: 'inherit' });
   const themes = [
     { input: 'src/styles/main-light.scss', output: 'dist/assets/css/main-light.css' },
     { input: 'src/styles/main-prom.scss', output: 'dist/assets/css/main-prom.css' }
-    //{ input: 'src/styles/main-dark.scss', output: 'dist/assets/css/main-dark.css' }
-    // Add other themes if needed
   ];
 
   themes.forEach(({ input, output }) => {
@@ -93,14 +87,12 @@ routes.forEach(route => {
   }
 });
 
-// Copy assets with path fixes
 if (!fs.existsSync(path.join(DIST_DIR, 'assets'))) {
   fs.mkdirSync(path.join(DIST_DIR, 'assets'), { recursive: true });
 }
 
 const srcAssets = path.join(SRC_ROOT, 'assets');
 if (fs.existsSync(srcAssets)) {
-  // Copy all assets except SCSS files (already compiled)
   const files = fs.readdirSync(srcAssets);
   files.forEach(file => {
     if (!file.endsWith('.scss')) {
@@ -113,17 +105,87 @@ if (fs.existsSync(srcAssets)) {
       }
     }
   });
+}
+const JS_TARGET_DIR = path.join(DIST_DIR, 'assets', 'js');
 
-  // Fix SCSS import paths in main.js
-  const mainJsPath = path.join(DIST_DIR, 'assets/js/main.js');
-  if (fs.existsSync(mainJsPath)) {
-    let content = fs.readFileSync(mainJsPath, 'utf8');
-    content = content.replace(
-      /import ['"]\/src\/styles/g,
-      'import \'@/styles'
-    );
-    fs.writeFileSync(mainJsPath, content);
+// Ensure the target directory exists
+if (!fs.existsSync(JS_TARGET_DIR)) {
+  fs.mkdirSync(JS_TARGET_DIR, { recursive: true });
+}
+
+const sourceFilesToSync = [
+  {
+    src: path.join(SRC_ROOT, 'services'),
+    dest: path.join(JS_TARGET_DIR, 'services')
+  },
+  {
+    src: path.join(SRC_ROOT, 'routes.js'),
+    dest: path.join(JS_TARGET_DIR, 'routes.js')
+  },
+  // Add this to make sure main.js is also in the right place if it's not already
+  {
+    src: path.join(SRC_ROOT, 'assets/js/main.js'),
+    dest: path.join(JS_TARGET_DIR, 'main.js')
+  }
+];
+
+sourceFilesToSync.forEach(({ src, dest }) => {
+  if (fs.existsSync(src)) {
+    const stats = fs.lstatSync(src);
+
+    if (stats.isDirectory()) {
+      // If it's a directory (like 'services'), copy it, then patch all JS files inside
+      fs.cpSync(src, dest, { recursive: true, force: true });
+
+      const patchDir = (dir) => {
+        fs.readdirSync(dir).forEach(file => {
+          const fullPath = path.join(dir, file);
+          if (fs.lstatSync(fullPath).isDirectory()) {
+            patchDir(fullPath);
+          } else if (file.endsWith('.js')) {
+            patchFile(fullPath);
+          }
+        });
+      };
+      patchDir(dest);
+      console.log(`✅ Synced and Patched Directory: ${path.basename(src)}`);
+    } else {
+      // If it's a single file (like routes.js or main.js)
+      fs.copyFileSync(src, dest);
+      if (src.endsWith('.js')) {
+        patchFile(dest);
+      }
+      console.log(`✅ Synced and Patched File: ${path.basename(src)}`);
+    }
+  } else {
+    console.warn(`⚠️ Warning: Source path not found: ${src}`);
+  }
+});
+
+// Helper function to do the actual string replacement
+function patchFile(filePath) {
+  let content = fs.readFileSync(filePath, 'utf8');
+
+  // Create the replacement object
+  const envObj = JSON.stringify({
+    VITE_API_URL: process.env.VITE_API_URL || '',
+    VITE_API_TIMEOUT: process.env.VITE_API_TIMEOUT || '',
+    VITE_DEBUG: process.env.VITE_DEBUG || 'false',
+    VITE_API_URL_2: process.env.VITE_API_URL_2 || '',
+    VITE_API_HEADERS: process.env.VITE_API_HEADERS || ''
+  });
+
+  if (content.includes('import.meta.env')) {
+    content = content.replace(/import\.meta\.env/g, envObj);
+    fs.writeFileSync(filePath, content);
   }
 }
+
+// ==========================================
+// ADD THIS END
+// ==========================================
+
+
+
 
 console.log(`All templates compiled in ${mode} mode`);

@@ -60,7 +60,8 @@ export default defineConfig(({ mode }) => {
           analysis: path.resolve(__dirname, 'dist/analysis.html'),
           tradingHistory: path.resolve(__dirname, 'dist/trading-history.html'),
           currentPositions: path.resolve(__dirname, 'dist/current-positions.html'),
-          designSystem: path.resolve(__dirname, 'dist/design-system.html')
+          designSystem: path.resolve(__dirname, 'dist/design-system.html'),
+          main: path.resolve(__dirname, 'src/assets/js/main.js') // Include main.js in the build
         },
         output: {
           assetFileNames: 'assets/[name]-[hash].[ext]',
