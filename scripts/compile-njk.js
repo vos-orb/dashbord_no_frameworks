@@ -166,20 +166,40 @@ sourceFilesToSync.forEach(({ src, dest }) => {
 function patchFile(filePath) {
   let content = fs.readFileSync(filePath, 'utf8');
 
-  // Create the replacement object
-  const envObj = JSON.stringify({
+  // If the file doesn't use env vars, skip it
+  if (!content.includes('import.meta.env')) return;
+
+  // 1. Define the full object first as a fallback
+  const envObj = {
     VITE_API_URL: process.env.VITE_API_URL || '',
-    VITE_API_TIMEOUT: process.env.VITE_API_TIMEOUT || '',
-    VITE_DEBUG: process.env.VITE_DEBUG || 'false',
     VITE_API_URL_2: process.env.VITE_API_URL_2 || '',
-    VITE_API_HEADERS: process.env.VITE_API_HEADERS || ''
+    VITE_API_TIMEOUT: process.env.VITE_API_TIMEOUT || '5000',
+    VITE_API_HEADERS: process.env.VITE_API_HEADERS || '{}',
+    VITE_DEBUG: process.env.VITE_DEBUG || 'false',
+    MODE: process.env.NODE_ENV || 'development'
+  };
+
+  // 2. Perform specific replacements first (longest keys first to avoid VITE_API_URL_2 issues)
+  const specificReplacements = [
+    ['import.meta.env.VITE_API_URL_2', JSON.stringify(envObj.VITE_API_URL_2)],
+    ['import.meta.env.VITE_API_URL', JSON.stringify(envObj.VITE_API_URL)],
+    ['import.meta.env.VITE_API_TIMEOUT', envObj.VITE_API_TIMEOUT],
+    ['import.meta.env.VITE_API_HEADERS', JSON.stringify(envObj.VITE_API_HEADERS)],
+    ['import.meta.env.VITE_DEBUG', envObj.VITE_DEBUG],
+    ['import.meta.env', JSON.stringify(envObj)] // Final fallback
+  ];
+
+  specificReplacements.forEach(([key, value]) => {
+    const regex = new RegExp(key.replace(/\./g, '\\.'), 'g');
+    content = content.replace(regex, value);
   });
 
-  if (content.includes('import.meta.env')) {
-    content = content.replace(/import\.meta\.env/g, envObj);
-    fs.writeFileSync(filePath, content);
-  }
+  fs.writeFileSync(filePath, content, 'utf8');
+  console.log(`  ↳ Patched: ${path.basename(filePath)}`);
 }
+
+
+
 
 // ==========================================
 // ADD THIS END

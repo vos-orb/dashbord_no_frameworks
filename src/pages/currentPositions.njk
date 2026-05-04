@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Выбран Пользак :', selectedUser);
       }
       try {
-        const wsUrl = `${import.meta.env.VITE_API_URL}/ws/${selectedUser}`;
+        const wsUrl = `{{API_URL}}/ws/${selectedUser}`;
         const invBalParams = {
           onMessage: async (data, ws) => {
             const formattedUsersStatsData = await Promise.all( data?.data.map( async item => {
