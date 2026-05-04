@@ -95,24 +95,24 @@
           <thead>
             <tr>
 
+              <th data-column="concat">Тикер</th>
+              <th data-column="tag">Стратегия</th>
+              <th data-column="account_name">Аккаунт</th>
+              <th data-column="start_time">Вход (дата)</th>
+              <th data-column="end_time">Выход (дата)</th>
 
-              <th data-column="uly">Тикер</th>
-              <th data-column="strategy">Стратегия</th>
-              <th data-column="trader_name">Аккаунт</th>
-              <th data-column="ctime">Вход (дата)</th>
-              <th data-column="utime">Выход (дата)</th>
-
-              <th data-column="price_buy">Цена покупки ($)</th>
-              <th data-column="price_sell">Цена продажи ($)</th>
-              <th data-column="marg">Маржа ($)</th>
+              <th data-column="entry_price">Цена покупки ($)</th>
+              <th data-column="exit_price">Цена продажи ($)</th>
+              <th data-column="cash">Маржа ($)</th>
               <th data-column="lever">Плечо</th>
-              <th data-column="pos_cost">Стоимость позиции</th>
+              <th data-column="openMaxPos">Стоимость позиции</th>
 
               <th data-column="delta_time">В сделке</th>
-              <th data-column="pnl_ratio">PnL (%)</th>
-              <th data-column="pnl">Доход ($)</th>
+              <th data-column="net_pnl_percent">ROI (%)</th>
+              <th data-column="gross_profit">PnL ($)</th>
               <th data-column="fee">Комиссия ($)</th>
-              <th data-column="posside">Сторона</th>
+              <th data-column="direction">Сторона</th>
+
             </tr>
           </thead>
           <tbody class="table-body">
@@ -482,6 +482,9 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   const getPnlCharData = async function(params = {}) {
+    if (!params.date_from) {
+      params.date_from = '01.03.2026';
+    }
     const response = await postRequest('/analys/vidjets/get_pnl_roi_graph_for_strategy', params);
     //chartPnl.
     if (chartPnl?.series ) {
@@ -559,29 +562,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const formattedTableData = await Promise.all(
       dataArrDayDetails.map( async (item) => ({
-        uly: item?.uly,//Тикер
-        strategy: item?.strategy_name,
-        trader_name: item?.trader_name,
-        ctime: await dateFormatter(item?.ctime),
-        utime: await dateFormatter(item?.utime),
-
-        price_buy: numberFormatter.format(item?.openavgpx),
-        price_sell: numberFormatter.format(item?.closeavgpx),
-        marg: numberFormatter.format(((item?.size_contracts * item?.openavgpx) / item?.lever)),
-        lever: numberFormatter.format(item?.lever),
-        pos_cost: numberFormatter.format(item?.openmaxpos),
-
-        delta_time: await formatTimeMs((new Date(item?.utime) - new Date(item?.ctime))),
-        pnl_ratio: numberFormatter.format((item?.pnlratio * 100)),
-        pnl: numberFormatter.format(item?.pnl),
-        fee: numberFormatter.format(item?.fee),
-        posside: item?.posside
+        concat: item.concat, // "IP-USDT",
+        tag: item.tag, // "supertrend_15m_tp_ts_total_tp_v2",
+        account_name: item.account_name, // "user_name"
+        start_time: await dateFormatter(item.start_time), // "2026-04-18T11:00:53.434000",
+        entry_price: numberFormatter.format(item.entry_price), // 0.573,
+        end_time: await dateFormatter(item.end_time), // "2026-04-18T12:45:01.361000",
+        exit_price: numberFormatter.format(item.exit_price), // 0.559,
+        delta_time: formatTimeMs((item.delta_time * 1000)), // 6247.927,
+        pnl: numberFormatter.format(item.pnl), // 1.3689999999999907,
+        clean_profit_percent: numberFormatter.format(item.clean_profit_percent), // 2.541680591140304,
+        gross_profit: numberFormatter.format(item.gross_profit), // 1.3159999999999907,
+        fee: numberFormatter.format(item.fee), // -0.053,
+        closeTotalPos: numberFormatter.format(item.closeTotalPos), // 94.0,
+        openMaxPos: numberFormatter.format(item.cash * item.lever), // 94.0,
+        cash: numberFormatter.format(item.cash), // 53.861999999999995,
+        lever: numberFormatter.format(item.lever), // 3.0,
+        direction: item.direction, // "short",
+        net_pnl_percent: numberFormatter.format(item.net_pnl_percent) // 2.443280977312374,
       }))
     );
     new UiTable(tableDayDetails, formattedTableData, 10, {
       numericColumns: [
-        'pnl_ratio',
-        'pnl',
+        'net_pnl_percent',
+        'gross_profit',
         'fee'
       ]
     });
@@ -1046,7 +1050,7 @@ const getStrategyQsReport = async function(params) {
     evt.stopPropagation();
     // send empty object if no contents filled
     let params = {};
-    if (currentDatePeriod[0]) { params.date_from = currentDatePeriod[0]; }
+    if (currentDatePeriod[0]) { params.date_from = currentDatePeriod[0] || '01.03.2026'; }
     if (currentDatePeriod[1]) { params.date_to = currentDatePeriod[1]; }
     if (currentStrategy) { params.strategy = currentStrategy; }
     if (currentCoin) { params.symbol = currentCoin; }
