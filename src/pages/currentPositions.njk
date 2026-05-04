@@ -111,11 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
         //return ["user1","user2","user3","user4","user5","user6"];
       }
       try {
-        const responseUsers = await getRequest('/cred_users/all',null,{uri:2});
-        const usersArr = await Promise.all(
-          responseUsers?.rows.map(async (item) =>item.username)
-        );
-        return usersArr;
+        const responseUsers = await getRequest('/filter/user_name');
+        return responseUsers.map(item => item.trader_name);
       } catch (error) {
         console.error('Ошибка загрузки данных:', error);
         return ['Ошибка загрузки'];
