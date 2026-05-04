@@ -53,7 +53,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: '../dist_build',
       emptyOutDir: true,
-      cssCodeSplit: false,
+      cssCodeSplit: true,
       rollupOptions: {
         input: {
           balance: path.resolve(__dirname, 'dist/balance.html'),

@@ -34,9 +34,9 @@ env.addGlobal('DEBUG', process.env.VITE_DEBUG);
 
 const themes = [
   { themeName: 'light', styleFile: 'main-light.scss'},
-  { themeName: 'dark', styleFile: 'main-dark.scss'},
-  { themeName: 'ocean', styleFile: 'mian-ocean.scss'},
-  { themeName: 'prom', styleFile: 'mian-ocean.scss'}
+  //{ themeName: 'dark', styleFile: 'main-dark.scss'},
+  //{ themeName: 'ocean', styleFile: 'mian-ocean.scss'},
+  { themeName: 'prom', styleFile: 'main-prom.scss'}
 ];
 // Get theme from environment or use default
 const selectedTheme = process.env.VITE_THEME || 'light';
@@ -47,8 +47,19 @@ env.addGlobal('THEME_NAME', themeConfig.themeName);
 // Compile SCSS to CSS
 try {
   console.log('Compiling SCSS to CSS...');
-  execSync('sass src/styles:dist/assets/css --no-source-map --style=compressed', { stdio: 'inherit' });
+  //execSync('sass src/styles:dist/assets/css --no-source-map --style=compressed', { stdio: 'inherit' });
+  const themes = [
+    { input: 'src/styles/main-light.scss', output: 'dist/assets/css/main-light.css' },
+    { input: 'src/styles/main-prom.scss', output: 'dist/assets/css/main-prom.css' }
+    //{ input: 'src/styles/main-dark.scss', output: 'dist/assets/css/main-dark.css' }
+    // Add other themes if needed
+  ];
+
+  themes.forEach(({ input, output }) => {
+    execSync(`sass ${input}:${output} --no-source-map --style=compressed`, { stdio: 'inherit' });
+  });
   console.log('✅ SCSS compiled successfully');
+
 } catch (err) {
   console.error('SCSS compilation failed:', err);
   process.exit(1);

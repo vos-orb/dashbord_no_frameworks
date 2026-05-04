@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "node scripts/compile-njk.js && sass src/styles:dist/assets/css --watch & vite --mode development",
-    "build:prod": "node scripts/compile-njk.js --mode production && vite build --mode production",
+    "build:prod": "rm -rf dist dist_build && node scripts/compile-njk.js --mode production && vite build --mode production --emptyOutDir",
+    "build:css": "sass src/styles/main-light.scss:dist/assets/css/main-light.css --no-source-map --style=compressed && sass src/styles/main-prom.scss:dist/assets/css/main-prom.css --no-source-map --style=compressed",
+    "build:prod:full": "npm run build:css && node scripts/compile-njk.js --mode production && vite build --mode production",
     "build:prod:seo": "node scripts/compile-njk.js --mode production && vite build --mode production",
     "preview": "vite preview",
     "compile:scss": "sass src/styles:dist/assets/css --watch"
